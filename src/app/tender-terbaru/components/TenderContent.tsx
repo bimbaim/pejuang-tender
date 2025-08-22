@@ -7,7 +7,6 @@ import styles from "./TenderContent.module.css";
 import TenderSidebar from "./TenderSidebar";
 import TenderCard from "./TenderCard";
 import type { Tender } from "@/types/tender";
-
 import { supabase } from "@/lib/supabase";
 
 const TenderContent = () => {
@@ -16,9 +15,10 @@ const TenderContent = () => {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalTenders, setTotalTenders] = useState(0);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const pageSize = 5; // 5 item per halaman
-  const maxLimit = 15; // maksimal 15 item total
+  const pageSize = 5; // per page
+  const limit = 15;   // max total fetched
 
   useEffect(() => {
     const fetchTenders = async () => {
@@ -26,41 +26,50 @@ const TenderContent = () => {
       setError(null);
 
       const start = (page - 1) * pageSize;
-      const end = start + pageSize - 1;
+      const end = Math.min(start + pageSize - 1, limit - 1);
 
       const currentYear = new Date().getFullYear();
       const startOfYear = new Date(currentYear, 0, 1).toISOString();
 
-      // Ambil total count untuk tahun berjalan
-      const { count, error: countError } = await supabase
+      // Count query
+      let countQuery = supabase
         .from("lpse_tenders")
         .select("*", { count: "exact", head: true })
         .gte("created_at", startOfYear);
 
+      // Filter by category
+      if (selectedCategory) {
+        countQuery = countQuery.eq("category", selectedCategory);
+      }
+
+      const { count, error: countError } = await countQuery;
       if (countError) {
-        console.error("Error fetching total count:", countError);
+        console.error(countError);
         setError("Gagal memuat total data tender.");
         setLoading(false);
         return;
       }
+      setTotalTenders(Math.min(count || 0, limit));
 
-      // Batasi maksimal hanya 15 item
-      const limitedCount = Math.min(count || 0, maxLimit);
-      setTotalTenders(limitedCount);
-
-      // Ambil data tender untuk halaman saat ini (max 15 item saja)
-      const { data, error: dataError } = await supabase
+      // Data query
+      let dataQuery = supabase
         .from("lpse_tenders")
         .select(
-          "id, title, agency, budget, source_url, qualification_method, created_at"
+          "id, title, agency, budget, source_url, qualification_method, created_at, category"
         )
         .gte("created_at", startOfYear)
         .order("id", { ascending: false })
-        .range(start, Math.min(end, maxLimit - 1)); // batasi max 15 item total
+        .range(start, end);
+
+      if (selectedCategory) {
+        dataQuery = dataQuery.eq("category", selectedCategory);
+      }
+
+      const { data, error: dataError } = await dataQuery;
 
       if (dataError) {
-        console.error("Error fetching tenders:", dataError);
-        setError("Gagal memuat data tender. Silakan coba lagi nanti.");
+        console.error(dataError);
+        setError("Gagal memuat data tender.");
       } else {
         setTenders(data as Tender[]);
       }
@@ -68,78 +77,51 @@ const TenderContent = () => {
     };
 
     fetchTenders();
-  }, [page, pageSize]);
+  }, [page, pageSize, selectedCategory]);
 
   const totalPages = Math.ceil(totalTenders / pageSize);
-
-  if (loading) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.container}>
-          <TenderSidebar />
-          <div className={styles.tenderList}>
-            <p>Memuat data tender...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.container}>
-          <TenderSidebar />
-          <div className={styles.tenderList}>
-            <p className={styles.errorMessage}>{error}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (tenders.length === 0 && totalTenders === 0) {
-    return (
-      <div className={styles.mainContent}>
-        <div className={styles.container}>
-          <TenderSidebar />
-          <div className={styles.tenderList}>
-            <p>Tidak ada data tender yang ditemukan.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.mainContent}>
       <div className={styles.container}>
-        <TenderSidebar />
+        <TenderSidebar
+          selectedCategory={selectedCategory}
+          onSelectCategory={(cat) => {
+            setPage(1); // reset ke halaman 1
+            setSelectedCategory(cat);
+          }}
+        />
+
         <div className={styles.tenderList}>
+          {loading && <p>Memuat data tender...</p>}
+          {error && <p className={styles.errorMessage}>{error}</p>}
+          {!loading && !error && tenders.length === 0 && (
+            <p>Tidak ada data tender.</p>
+          )}
+
           {tenders.map((tender) => (
             <TenderCard key={tender.id} tender={tender} />
           ))}
 
-          {/* Navigasi Halaman */}
-          <div className={styles.pagination}>
-            <button
-              onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-            <span>
-              Halaman {page} dari {totalPages}
-            </span>
-            <button
-              onClick={() =>
-                setPage((prevPage) => Math.min(prevPage + 1, totalPages))
-              }
-              disabled={page >= totalPages}
-            >
-              Next
-            </button>
-          </div>
+          {tenders.length > 0 && (
+            <div className={styles.pagination}>
+              <button
+                onClick={() => setPage((p) => Math.max(p - 1, 1))}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+              <span>
+                Halaman {page} dari {totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                disabled={page >= totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,25 +1,77 @@
-import React from 'react';
-import Link from 'next/link';
-import styles from './TenderSidebar.module.css';
+// File: src/components/tender/TenderSidebar.tsx
 
-const TenderSidebar = () => {
+"use client";
+
+import React, { useEffect, useState } from "react";
+import styles from "./TenderSidebar.module.css";
+import { supabase } from "@/lib/supabase";
+
+interface TenderSidebarProps {
+  selectedCategory: string | null;
+  onSelectCategory: (category: string | null) => void;
+}
+
+const TenderSidebar: React.FC<TenderSidebarProps> = ({
+  selectedCategory,
+  onSelectCategory,
+}) => {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from("lpse_tenders")
+        .select("category");
+
+      if (error) {
+        console.error("Error fetching categories:", error);
+        return;
+      }
+
+      if (data) {
+        // Extract unique categories
+        const unique = Array.from(
+          new Set(data.map((item) => item.category).filter(Boolean))
+        ) as string[];
+        setCategories(unique);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <div className={styles.sidebar}>
       <div className={styles.categoryCard}>
         <p className={styles.categoryTitle}>Semua Kategori</p>
         <div className={styles.categoryLinks}>
-          <Link href="#" className={styles.activeLink}>Pengadaan Barang</Link>
-          <Link href="#" className={styles.link}>Pekerjaan Konstruksi</Link>
-          <Link href="#" className={styles.link}>Jasa Konsultansi Badan Usaha Konstruksi</Link>
-          <Link href="#" className={styles.link}>Jasa Konsultansi Perorangan Konstruksi</Link>
-          <Link href="#" className={styles.link}>Jasa Konsultansi Badan Usaha Non Konstruksi</Link>
-          <Link href="#" className={styles.link}>Jasa Konsultansi Perorangan Non Konstruksi</Link>
-          <Link href="#" className={styles.link}>Pekerjaan Konstruksi Terintegrasi</Link>
-          <Link href="#" className={styles.link}>Jasa Lainnya</Link>
+          <button
+            onClick={() => onSelectCategory(null)}
+            className={
+              selectedCategory === null ? styles.activeLink : styles.link
+            }
+          >
+            Semua
+          </button>
+
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => onSelectCategory(cat)}
+              className={
+                selectedCategory === cat ? styles.activeLink : styles.link
+              }
+            >
+              {cat}
+            </button>
+          ))}
         </div>
       </div>
+
       <div className={styles.ctaCard}>
-        <p className={styles.ctaTitle}>Ingin Akses Lengkap sesuai kata kunci usaha Anda</p>
+        <p className={styles.ctaTitle}>
+          Ingin Akses Lengkap sesuai kata kunci usaha Anda
+        </p>
         <button className={styles.ctaButton}>COBA SEKARANG</button>
       </div>
     </div>
