@@ -19,6 +19,30 @@ const TenderContent = () => {
   const pageSize = 5;
   const limit = 15; // max item
 
+  // ✅ Fetch kategori sekali saja (tahun berjalan)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const currentYear = new Date().getFullYear();
+      const startOfYear = new Date(currentYear, 0, 1).toISOString();
+
+      const { data, error } = await supabase
+        .from("lpse_tenders")
+        .select("category")
+        .gte("created_at", startOfYear)
+        .not("category", "is", null);
+
+      if (!error && data) {
+        const uniqueCategories = Array.from(
+          new Set(data.map((t) => t.category))
+        );
+        setCategories(uniqueCategories);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // ✅ Fetch tender tiap kali page/category berubah
   useEffect(() => {
     const fetchTenders = async () => {
       setLoading(true);
@@ -27,11 +51,9 @@ const TenderContent = () => {
       const currentYear = new Date().getFullYear();
       const startOfYear = new Date(currentYear, 0, 1).toISOString();
 
-      // Hitung start & end
       const start = (page - 1) * pageSize;
       const end = Math.min(start + pageSize - 1, limit - 1);
 
-      // Ambil total count (dengan filter)
       let countQuery = supabase
         .from("lpse_tenders")
         .select("*", { count: "exact", head: true })
@@ -50,7 +72,6 @@ const TenderContent = () => {
       }
       setTotalTenders(Math.min(count || 0, limit));
 
-      // Ambil data tender halaman aktif
       let dataQuery = supabase
         .from("lpse_tenders")
         .select("id, title, agency, budget, source_url, qualification_method, created_at, category")
@@ -68,10 +89,6 @@ const TenderContent = () => {
         setError("Gagal memuat data tender.");
       } else {
         setTenders(data as Tender[]);
-
-        // Ambil kategori dari data yg di-fetch (supaya hanya tahun berjalan & unique)
-        const uniqueCategories = Array.from(new Set(data.map((t) => t.category).filter(Boolean)));
-        setCategories(uniqueCategories);
       }
 
       setLoading(false);
@@ -90,7 +107,7 @@ const TenderContent = () => {
           selectedCategory={selectedCategory}
           onSelectCategory={(cat) => {
             setSelectedCategory(cat);
-            setPage(1); // reset ke halaman pertama
+            setPage(1);
           }}
         />
         <div className={styles.tenderList}>
