@@ -15,7 +15,7 @@ const TenderSidebar: React.FC<TenderSidebarProps> = ({
   return (
     <div className={styles.sidebar}>
       <div className={styles.categoryCard}>
-        <p className={styles.categoryTitle}>Kategori</p>
+        {/* <p className={styles.categoryTitle}>Kategori</p> */}
         <div className={styles.categoryLinks}>
           <button
             className={!selectedCategory ? styles.activeLink : styles.link}
