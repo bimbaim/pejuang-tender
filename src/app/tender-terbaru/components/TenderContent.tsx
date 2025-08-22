@@ -64,7 +64,7 @@ useEffect(() => {
         .gte("created_at", startOfYear);
 
       if (selectedCategory) {
-        countQuery = countQuery.eq("category", selectedCategory);
+        countQuery = countQuery.ilike("category", `${selectedCategory}%`);
       }
 
       const { count, error: countError } = await countQuery;
@@ -84,7 +84,7 @@ useEffect(() => {
         .range(start, end);
 
       if (selectedCategory) {
-        dataQuery = dataQuery.eq("category", selectedCategory);
+        dataQuery = dataQuery.ilike("category", `${selectedCategory}%`);
       }
 
       const { data, error: dataError } = await dataQuery;
