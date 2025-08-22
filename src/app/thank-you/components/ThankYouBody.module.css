@@ -13,7 +13,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 48px;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   padding: 64px; /* Added padding to the white content box */
   text-align: center; /* Center-aligns all text inside */
 }
