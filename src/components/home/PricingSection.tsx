@@ -12,18 +12,18 @@ interface Features {
   keywords?: number;
   email_notifikasi?: boolean;
   wa_notifikasi?: boolean;
-  // Add any other features you expect here with their respective types
 }
 
 interface Plan {
   id: string;
   name: string;
   duration_months: number;
-  price: number; // single unit price
-  amount: number; // total units / value
-  features: Features; // Changed from Record<string, any> to the specific Features interface
+  price: number;
+  amount: number;
+  features: Features;
   isHighlighted: boolean;
-  category?: string;
+  category: string; // Add this line
+  duration: number; // And this line
 }
 
 interface PricingSectionProps {
