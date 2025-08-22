@@ -37,6 +37,10 @@ useEffect(() => {
         t.category.replace(/\s*-\s*.*$/, "") // hapus " - ..." termasuk tanda "-"
       );
       const uniqueCategories = Array.from(new Set(normalizedCategories));
+      // ✅ Urutkan abjad
+      const sortedCategories = uniqueCategories.sort((a, b) =>
+        a.localeCompare(b)
+      );
       setCategories(uniqueCategories);
     }
   };
