@@ -52,7 +52,8 @@ useEffect(() => {
       .select("id, title, agency, budget, source_url, qualification_method, created_at")
       .gte("created_at", startOfYear)
       .order("id", { ascending: false })
-      .range(start, end);
+      // .range(start, end);
+      .limit(10); // <= hanya ambil 10 data
 
     if (dataError) {
       console.error("Error fetching tenders:", dataError);
