@@ -27,7 +27,7 @@ const Navbar = () => {
             BERANDA
           </Link>
           <Link href="/tender-terbaru" className={`${styles.navLink} ${pathname === '/tender-terbaru' ? styles.activeLink : ''}`}>
-            PAKET LELANG TERBARU
+            TENDER TERBARU
           </Link>
         </div>
         <div className={styles.actions}>

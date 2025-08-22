@@ -1,30 +1,25 @@
+// File: src/components/tender/TenderCard.tsx
+
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './TenderCard.module.css';
 
+import type { Tender } from "@/types/tender";
+
+
 interface TenderCardProps {
-  type: string;
-  title: string;
-  lelangCode: string;
-  unitKerja: string;
-  hps: string;
-  lelangLink: string;
+  tender: Tender;
 }
 
-const TenderCard: React.FC<TenderCardProps> = ({
-  type,
-  title,
-  lelangCode,
-  unitKerja,
-  hps,
-  lelangLink,
-}) => {
+const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
+  const { id, title, agency, budget, source_url, qualification_method } = tender;
+
   return (
     <div className={styles.tenderCard}>
       <div className={styles.imageWrapper}>
         <Image
-          src="/images/tender-logo.png" // Placeholder image for the tender
+          src="/images/tender-logo.png"
           alt="Tender Logo"
           width={163}
           height={163}
@@ -33,22 +28,24 @@ const TenderCard: React.FC<TenderCardProps> = ({
       <div className={styles.content}>
         <div className={styles.textWrapper}>
           <div className={styles.tags}>
-            <span className={styles.tag}>{type}</span>
+            <span className={styles.tag}>{qualification_method}</span>
           </div>
           <h2 className={styles.title}>{title}</h2>
           <p className={styles.details}>
-            Kode Lelang: {lelangCode}
+            Kode Lelang: {id}
             <br />
-            Unit Kerja: {unitKerja}
+            Unit Kerja: {agency}
             <br />
-            HPS: {hps}
+            <b>HPS: {budget}</b>
           </p>
-          <Link href={lelangLink} className={styles.lelangLink}>
-            Link LPSE: {lelangLink}
-          </Link>
         </div>
         <div className={styles.actions}>
-          <button className={styles.actionButton}>Cek Tender</button>
+          {/* Mengganti elemen <button> dengan komponen <Link> dari Next.js */}
+          <Link href={source_url} passHref legacyBehavior>
+            <a className={styles.actionButton} target="_blank" rel="noopener noreferrer">
+              Cek Tender
+            </a>
+          </Link>
         </div>
       </div>
     </div>
