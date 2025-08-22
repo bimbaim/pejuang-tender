@@ -37,10 +37,12 @@ useEffect(() => {
         t.category.replace(/\s*-\s*.*$/, "") // hapus " - ..." termasuk tanda "-"
       );
       const uniqueCategories = Array.from(new Set(normalizedCategories));
-      // ✅ Urutkan abjad
+
+      // ✅ Urutkan Z → A
       const sortedCategories = uniqueCategories.sort((a, b) =>
-        a.localeCompare(b)
+        b.localeCompare(a) // dibalik
       );
+
       setCategories(sortedCategories);
     }
   };
