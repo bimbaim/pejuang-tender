@@ -1,0 +1,363 @@
+/* This file should be saved EXACTLY as: src/components/common/PopupForm.css */
+
+/* --- CSS Variables (Theme) --- */
+:root {
+  --color-primary: #0093dd;
+  --color-dark-blue: #144975;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-text-dark: #333333;
+  --color-text-light: #555555;
+  --color-border-light: rgba(0, 0, 0, 0.15);
+  --color-bg-light: #f0f0f0;
+
+  --font-saira: 'Saira', sans-serif;
+  --font-quicksand: 'Quicksand', sans-serif;
+}
+
+/* --- Base Reset for Popup --- */
+.popup-overlay * {
+  box-sizing: border-box;
+}
+
+/* --- Popup Overlay --- */
+.popup-overlay {
+  position: fixed;
+  inset: 0; /* shorthand for top/left/right/bottom = 0 */
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  overflow-y: auto; /* if popup exceeds viewport, overlay scrolls */
+  padding: 20px;
+}
+
+/* --- Popup Content --- */
+.popup-content {
+  background-color: var(--color-white);
+  border-radius: 16px;
+  padding: 20px;
+
+  /* Figma "hug" → fit content, but capped by design size */
+  width: fit-content;
+  height: fit-content;
+  max-width: 1010px;
+  max-height: 988px;
+
+  /* Responsive fallback on smaller screens */
+  width: 100%;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+
+  overflow-y: auto; /* scroll inside if content exceeds max-height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Close Button --- */
+.close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-text-light);
+  font-size: 28px;
+  line-height: 1;
+  transition: color 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.close-button:hover {
+  color: var(--color-black);
+}
+
+/* --- Header Section --- */
+.header-section {
+  text-align: center;
+  margin-bottom: 32px;
+  flex-shrink: 0;
+}
+
+.main-title {
+  font-size: 36px;
+  font-family: var(--font-saira);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-black);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  line-height: 1.5;
+  color: var(--color-text-dark);
+  margin: 0;
+}
+
+/* --- Form Layout --- */
+.trial-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- Input Group --- */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+
+.input-group input[type="text"],
+.input-group input[type="email"],
+.input-group input[type="tel"],
+.input-group select {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  background-color: var(--color-white);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.input-group input::placeholder {
+  color: #a0a0a0;
+}
+
+/* --- Radio Group --- */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.radio-group label:first-child {
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.radio-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.radio-option input[type="radio"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.radio-option input[type="radio"]:checked::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+}
+
+/* --- Select Dropdown --- */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper select {
+  padding-right: 40px;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Keywords Input --- */
+.keywords-input-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 50px;
+  align-items: center;
+}
+
+.keyword-tag {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-light);
+  border-radius: 6px;
+  padding: 5px 10px;
+  gap: 5px;
+}
+
+.keyword-tag input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  padding: 0;
+  min-width: 60px;
+  flex-grow: 1;
+}
+
+.remove-keyword-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-dark);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 5px;
+  transition: color 0.2s ease;
+}
+
+.remove-keyword-btn:hover {
+  color: var(--color-primary);
+}
+
+.add-keyword-btn {
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  transition: background-color 0.2s ease;
+}
+
+.add-keyword-btn:hover {
+  background-color: #d0d0d0;
+}
+
+/* --- Submit Button --- */
+.submit-button {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background-color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  color: var(--color-white);
+  font-size: 18px;
+  font-family: var(--font-quicksand);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  margin-top: 10px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.submit-button:hover {
+  background-color: var(--color-dark-blue);
+  border-color: var(--color-dark-blue);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .popup-content {
+    padding: 25px;
+    border-radius: 12px;
+  }
+
+  .close-button {
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+  }
+
+  .main-title {
+    font-size: 28px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  .trial-form {
+    gap: 15px;
+  }
+
+  .radio-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .keyword-tag {
+    padding: 4px 8px;
+  }
+
+  .submit-button {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .popup-content {
+    padding: 15px;
+  }
+
+  .main-title {
+    font-size: 24px;
+  }
+}

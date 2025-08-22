@@ -1,26 +1,40 @@
-@import "tailwindcss";
+/*
+ * All @ rules must be at the very top of the file.
+ * Nothing else (like :root { ... } or body { ... }) can come before this.
+ */
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+@import "tw-animate-css";
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Saira:wght@400;500;600;700&display=swap'); */
+
+/* Now you can add all your custom CSS after these lines. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-primary: #0093dd;
+  --color-secondary: #4cb3e7;
+  --color-dark: #191919;
+  --color-light-gray: #f2f2f2;
+  --color-white: #ffffff;
+  --color-black: #000000;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Quicksand', sans-serif;
+  color: var(--color-black);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Saira', sans-serif;
+}
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--color-secondary);
+  text-decoration: none;
 }

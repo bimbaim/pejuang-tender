@@ -1,0 +1,47 @@
+.headerSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 112px 64px;
+  gap: 80px;
+  background-color: #e5f4fb; /* Light blue background from your design */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  background-color: #e5f4fb; /* Light blue background from your design */
+  padding: 40px; /* Add some padding to the content box */
+}
+
+.mainTitle {
+  text-align: center;
+  font-size: 48px;
+  font-family: 'Saira', sans-serif;
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+  margin: 0; /* Remove default margin */
+  text-transform: uppercase; /* Match the design image */
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 18px;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 150%;
+  color: #000000;
+  margin: 0; /* Remove default margin */
+}

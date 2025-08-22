@@ -1,0 +1,442 @@
+/* File ini harus disimpan secara TEPAT sebagai: src/components/common/PackagePopupForm.css */
+
+/* --- Variabel CSS untuk konsistensi tema --- */
+:root {
+  --color-primary-blue: #0093dd;
+  --color-dark-blue: #144975;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-text-dark: #333333;
+  --color-text-light: #555555;
+  --color-border-light: rgba(0, 0, 0, 0.15);
+  --color-bg-light-gray: #f0f0f0;
+  --color-light-bg: #ececec;
+
+  --font-saira: 'Saira', sans-serif;
+  --font-quicksand: 'Quicksand', sans-serif;
+}
+
+/* --- Reset Global / Gaya Dasar --- */
+.package-popup-overlay * {
+  box-sizing: border-box;
+}
+
+/* --- Overlay Popup --- */
+.package-popup-overlay {
+  position: fixed;
+  inset: 0; /* shorthand for top/left/right/bottom = 0 */
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+
+  overflow-y: auto; /* if popup exceeds viewport, overlay scrolls */
+  padding: 20px;
+}
+
+/* --- Kontainer Konten Popup --- */
+.package-popup-content {
+  background-color: var(--color-white);
+  border-radius: 16px;
+  padding: 20px;
+
+  /* Figma "hug" → fit content, but capped by design size */
+  width: fit-content;
+  height: fit-content;
+  max-width: 1010px;
+  max-height: 988px;
+
+  /* Responsive fallback on smaller screens */
+  width: 100%;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+
+  overflow-y: auto; /* scroll inside if content exceeds max-height */
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Tombol Tutup --- */
+.package-close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-light);
+  font-size: 28px;
+  line-height: 1;
+  transition: color 0.2s ease-in-out;
+  z-index: 10;
+}
+.package-close-button:hover {
+  color: var(--color-black);
+}
+
+/* --- Header Dua Kolom --- */
+.package-popup-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.package-header-left {
+  flex: 1;
+  min-width: 250px;
+  margin-right: 20px;
+}
+.package-main-title {
+  font-size: 38px;
+  font-family: var(--font-saira);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--color-black);
+  margin-bottom: 0;
+  text-transform: uppercase;
+}
+.package-header-right {
+  flex: 0 0 200px;
+  background-color: var(--color-light-bg);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.package-price {
+  font-size: 28px;
+  font-family: var(--font-saira);
+  font-weight: 700;
+  color: var(--color-primary-blue);
+  margin: 0;
+}
+
+/* --- Form --- */
+.package-trial-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.package-form-description {
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  margin: 0 0 10px 0;
+}
+
+/* --- Grup Input --- */
+.package-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.package-label {
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  font-weight: 500;
+}
+.package-text-input,
+.package-select-input {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  font-size: 16px;
+  font-family: var(--font-quicksand);
+  color: var(--color-black);
+  background-color: var(--color-white);
+  appearance: none;
+}
+.package-text-input::placeholder {
+  color: #a0a0a0;
+}
+
+/* --- Input Sebaris --- */
+.package-inline-inputs {
+  display: flex;
+  gap: 20px;
+}
+.package-inline-inputs .package-input-group {
+  flex: 1;
+}
+
+/* --- Select Dropdown --- */
+.package-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+.package-select-input {
+  padding-right: 40px;
+}
+.package-select-arrow {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 16px;
+  height: 16px;
+}
+
+/* --- Radio --- */
+.package-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.package-radio-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.package-radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  cursor: pointer;
+}
+.package-radio-option input[type="radio"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary-blue);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.package-radio-option input[type="radio"]:checked {
+  background-color: var(--color-primary-blue);
+  border-color: var(--color-primary-blue);
+}
+.package-radio-option input[type="radio"]:checked::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-white);
+}
+
+/* --- Keywords --- */
+.package-keywords-input-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border: 1px solid var(--color-border-light);
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 50px;
+  align-items: center;
+}
+.package-keyword-tag {
+  display: flex;
+  align-items: center;
+  background-color: var(--color-bg-light-gray);
+  border-radius: 6px;
+  padding: 5px 10px;
+  gap: 5px;
+}
+.package-keyword-tag input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  min-width: 60px;
+  flex-grow: 1;
+}
+.package-remove-keyword-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-dark);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 5px;
+  transition: color 0.2s ease;
+}
+.package-remove-keyword-btn:hover {
+  color: var(--color-primary-blue);
+}
+.package-add-keyword-btn {
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  transition: background-color 0.2s ease;
+}
+.package-add-keyword-btn:hover {
+  background-color: #d0d0d0;
+}
+
+/* --- Submit --- */
+.package-submit-button {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  background-color: var(--color-primary-blue);
+  border: 1px solid var(--color-primary-blue);
+  color: var(--color-white);
+  font-size: 18px;
+  font-family: var(--font-quicksand);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  margin-top: 10px;
+  text-transform: uppercase;
+  max-width: 30%;
+  
+}
+.package-submit-button:hover {
+  background-color: var(--color-dark-blue);
+  border-color: var(--color-dark-blue);
+}
+
+/* --- Payment --- */
+.package-payment-partners {
+  margin-top: 30px;
+  text-align: center;
+}
+.package-payment-title {
+  font-size: 14px;
+  font-family: var(--font-quicksand);
+  color: var(--color-text-dark);
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+.package-payment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.package-payment-icons img {
+  /* height: 25px; */
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Wrapper: flex container for button + partners */
+.package-submit-button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+  flex-wrap: wrap; /* responsive on small screens */
+  gap: 20px;
+}
+
+/* Blue button */
+.package-submit-button {
+  background-color: #0095e0; /* Same blue as in screenshot */
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.package-submit-button:hover {
+  background-color: #007bbd; /* Darker blue on hover */
+}
+
+/* Payment partners section */
+.package-payment-partners {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* title + image aligned right */
+  gap: 4px;
+}
+
+/* Small title above the logos */
+.package-payment-title {
+  font-size: 13px;
+  color: #333;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Logo container */
+.package-payment-icons img {
+  object-fit: contain;
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .package-popup-content {
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+  .package-close-button {
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+  }
+  .package-popup-header-wrapper {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  .package-header-left {
+    margin-right: 0;
+    text-align: center;
+  }
+  .package-main-title {
+    font-size: 32px;
+  }
+  .package-header-right {
+    width: 80%;
+    max-width: 250px;
+  }
+  .package-inline-inputs {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .package-radio-options-grid {
+    grid-template-columns: 1fr;
+  }
+  .package-submit-button {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+}
+@media (max-width: 480px) {
+  .package-popup-content {
+    padding: 15px;
+  }
+  .package-main-title {
+    font-size: 28px;
+  }
+  .package-header-right {
+    width: 100%;
+  }
+  .package-price {
+    font-size: 24px;
+  }
+  .package-payment-icons img {
+    height: 20px;
+  }
+}

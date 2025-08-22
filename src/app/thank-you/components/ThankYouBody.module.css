@@ -1,0 +1,44 @@
+.bodyContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 112px 64px;
+  background-color: #e5f4fb; /* Light blue background from the image */
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 48px;
+  background-color: #ffffff;
+  padding: 64px; /* Added padding to the white content box */
+  text-align: center; /* Center-aligns all text inside */
+}
+
+.textContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mainTitle {
+  text-align: center;
+  font-size: 56px;
+  font-family: 'Saira', sans-serif; /* Using a more specific font name if available */
+  font-weight: 700; /* Bolder text to match the image */
+  line-height: 100%;
+  color: #000000;
+  text-transform: uppercase; /* Converts text to uppercase */
+}
+
+.description {
+  text-align: center;
+  font-size: 18px;
+  font-family: 'Quicksand', sans-serif; /* Using a more specific font name if available */
+  line-height: 150%;
+  color: #000000;
+  max-width: 800px; /* Constrains the width of the description */
+}

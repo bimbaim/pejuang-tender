@@ -1,0 +1,34 @@
+.features {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 112px 64px;
+  background-color: var(--color-secondary);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+}
+
+.featureCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.featureText {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-white);
+  margin: 0;
+}

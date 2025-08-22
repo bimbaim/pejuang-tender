@@ -1,0 +1,67 @@
+.ctaSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 112px 64px;
+  background-color: var(--color-dark);
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 80px;
+}
+
+.headingColumn {
+  flex: 1;
+}
+
+.mainTitle {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-white);
+  margin: 0;
+}
+
+.textColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.description {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--color-white);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+}
+
+.button {
+  border-radius: 12px;
+  padding: 10px 24px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: 1px solid var(--color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: #007bb4;
+}

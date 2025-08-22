@@ -1,0 +1,57 @@
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 64px;
+  background-color: var(--color-white);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoText {
+  font-family: 'Saira', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-black);
+}
+
+.navLinks {
+  display: flex;
+  gap: 32px;
+}
+
+.navLink {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-black);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.activeLink {
+  color: var(--color-primary); /* Highlight color for the active link */
+  font-weight: 700; /* Make it bolder when active */
+}
+
+.navLink:hover {
+  color: var(--color-primary);
+}

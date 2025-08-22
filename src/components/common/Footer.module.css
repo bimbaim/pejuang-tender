@@ -1,0 +1,71 @@
+.footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 64px;
+  background-color: var(--color-dark);
+  color: var(--color-white);
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Pushes content to opposite sides */
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.brandInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns content to the left */
+  gap: 24px;
+}
+
+.logoGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoText {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-white);
+  margin: 0;
+}
+
+.links {
+  display: flex;
+  gap: 24px;
+}
+
+.link {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-white);
+  text-decoration: underline;
+}
+
+.copyright {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-white);
+  margin-top: 16px;
+}
+
+.paymentPartners {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Aligns content to the right */
+  gap: 8px;
+}
+
+.paymentTitle {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--color-white);
+  margin: 0;
+}

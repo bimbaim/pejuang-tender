@@ -1,0 +1,77 @@
+/* Styles for Navbar component */
+.navbar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 64px;
+  background-color: #ffffff;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+}
+/* ... all other Navbar styles from your original code ... */
+.content {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.group10 {
+  height: 44px;
+  width: 130px;
+}
+.img1 {
+  height: 44px;
+  width: 44px;
+}
+.text2 {
+  text-align: left;
+  vertical-align: top;
+  font-size: 18px;
+  font-family: undefined;
+  /* letter-spacing: undefined%; */
+  line-height: 100%;
+  color: #000000;
+}
+.column {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 32px;
+}
+.link {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+.text3 {
+  text-align: left;
+  vertical-align: top;
+  font-size: 16px;
+  font-family: Quicksand;
+  line-height: 150%;
+  color: #000000;
+}
+.text4 {
+  text-align: left;
+  vertical-align: top;
+  font-size: 16px;
+  font-family: Quicksand;
+  line-height: 150%;
+  color: #000000;
+}
+.actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+}

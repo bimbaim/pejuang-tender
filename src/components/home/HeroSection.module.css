@@ -1,0 +1,64 @@
+.hero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 112px 64px;
+  background-color: var(--color-white);
+}
+
+.contentContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 80px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.textColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.mainHeading {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.description {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--color-black);
+}
+
+.actions {
+  display: flex;
+}
+
+.button {
+  border-radius: 12px;
+  padding: 10px 24px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: 1px solid var(--color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.button:hover {
+  background-color: #007bb4;
+}
+
+
+.highlightText {
+  color: var(--color-primary);
+  font-weight: bold;
+}

@@ -1,0 +1,238 @@
+.pricingSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 112px 64px;
+  background-color: var(--color-white);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 80px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.subtitle {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--color-black);
+}
+
+.mainTitle {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.description {
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--color-black);
+  max-width: 800px;
+}
+
+.pricingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+}
+
+.tabButtons {
+  display: flex;
+  padding: 4px;
+  background-color: var(--color-light-gray);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.tabButton {
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  cursor: pointer;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: var(--color-black);
+  transition: all 0.2s ease-in-out;
+}
+
+.tabButton.active {
+  background-color: var(--color-white);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.pricingCards {
+  display: flex;
+  gap: 32px;
+}
+
+.pricingCard {
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  background-color: var(--color-light-gray);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+.highlightedCard {
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-primary);
+}
+
+.priceHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.planName {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.highlightedCard .planName {
+  color: var(--color-white);
+}
+
+.planCategory {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.highlightedCard .planCategory {
+  color: var(--color-white);
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.highlightedCard .divider {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.priceDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.price {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.highlightedCard .price {
+  color: var(--color-white);
+}
+
+.ctaButton {
+  border-radius: 12px;
+  padding: 10px 24px;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: 1px solid var(--color-primary);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  width: 100%;
+}
+
+.ctaButton:hover {
+  background-color: #007bb4;
+}
+
+.highlightedButton {
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-white);
+}
+
+.highlightedButton:hover {
+  background-color: #f0f0f0;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.featureText {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.highlightedCard .featureText {
+  color: var(--color-white);
+}
+
+.highlightedCard {
+  background-color: var(--color-secondary);
+  border: 1px solid var(--color-primary);
+  /* The color property here will be inherited by the CheckIcon and the text */
+  color: var(--color-white);
+}
+
+.highlightedCard .price {
+  color: var(--color-white);
+}
+
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+/* No need for a separate rule here, the color will be inherited from .highlightedCard */

@@ -1,0 +1,83 @@
+.tenderCard {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+  background-color: var(--color-white);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.imageWrapper {
+  flex-shrink: 0;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tags {
+  display: flex;
+  gap: 10px;
+}
+
+.tag {
+  border-radius: 6px;
+  padding: 4px 10px;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 150%;
+  color: var(--color-black);
+}
+
+.title {
+  font-size: 24px;
+  font-family: 'Saira', sans-serif;
+  letter-spacing: -0.01em;
+  line-height: 110%;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.details {
+  font-size: 16px;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 150%;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.lelangLink {
+  font-size: 16px;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 150%;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.actionButton {
+  border-radius: 6px;
+  padding: 4px 10px;
+  background-color: var(--color-white);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 14px;
+  font-family: 'Quicksand', sans-serif;
+  line-height: 150%;
+  cursor: pointer;
+}

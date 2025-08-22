@@ -1,0 +1,22 @@
+.mainContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 64px;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 40px;
+  width: 100%;
+  max-width: 1440px; /* Aligns with your global max-width */
+}
+
+.tenderList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%; /* Takes up the remaining space */
+}
