@@ -21,7 +21,7 @@ const TenderSidebar: React.FC<TenderSidebarProps> = ({
             className={!selectedCategory ? styles.activeLink : styles.link}
             onClick={() => onSelectCategory(null)}
           >
-            Semua
+            Semua Kategori
           </button>
           {categories.map((cat) => (
             <button
