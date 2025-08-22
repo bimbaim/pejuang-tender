@@ -39,12 +39,17 @@ useEffect(() => {
       const uniqueCategories = Array.from(new Set(normalizedCategories));
 
       // ✅ Urutkan Z → A
-      const sortedCategories = uniqueCategories.sort((a, b) =>
-        b.localeCompare(a) // dibalik
+      let sortedCategories = uniqueCategories.sort((a, b) =>
+        b.localeCompare(a)
       );
+
+      // ✅ Pastikan "Jasa Lainnya" selalu di akhir
+      sortedCategories = sortedCategories.filter(cat => cat !== "Jasa Lainnya");
+      sortedCategories.push("Jasa Lainnya");
 
       setCategories(sortedCategories);
     }
+
   };
 
   fetchCategories();
