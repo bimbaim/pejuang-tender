@@ -41,7 +41,7 @@ useEffect(() => {
       const sortedCategories = uniqueCategories.sort((a, b) =>
         a.localeCompare(b)
       );
-      setCategories(uniqueCategories);
+      setCategories(sortedCategories);
     }
   };
 
