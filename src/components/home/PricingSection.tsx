@@ -5,6 +5,15 @@ import CheckIcon from "../common/CheckIcon";
 import styles from "./PricingSection.module.css";
 import { supabase } from "@/lib/supabase";
 
+// Define a specific interface for the features object
+interface Features {
+  kategori?: number;
+  lpse?: number;
+  keywords?: number;
+  email_notifikasi?: boolean;
+  wa_notifikasi?: boolean;
+  // Add any other features you expect here with their respective types
+}
 
 interface Plan {
   id: string;
@@ -12,7 +21,7 @@ interface Plan {
   duration_months: number;
   price: number; // single unit price
   amount: number; // total units / value
-  features: Record<string, any>;
+  features: Features; // Changed from Record<string, any> to the specific Features interface
   isHighlighted: boolean;
   category?: string;
 }
@@ -58,7 +67,8 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onOpenPackagePopup }) =
     return `IDR ${amount}`;
   };
 
-  const renderFeatures = (features: Record<string, any>) => {
+  // Changed the 'features' parameter type from Record<string, any> to Features
+  const renderFeatures = (features: Features) => {
     const list: string[] = [];
     if (features.kategori) list.push(`Maks ${features.kategori} Kategori`);
     if (features.lpse) list.push(`Maks ${features.lpse} LPSE`);

@@ -14,9 +14,14 @@ interface PopupFormProps {
   onClose: () => void; // Function to call when the popup needs to be closed
 }
 
+// Interface for safely handling generic errors, ensuring 'message' property exists
+interface ExtendedError extends Error {
+  message: string;
+}
+
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
-  
+
   // State to manage all form data
   const [formData, setFormData] = useState({
     name: '',
@@ -132,9 +137,10 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       // You can redirect to a success page or display a success message
       router.push('/thank-you');
 
-    } catch (error: any) {
-      console.error("Error creating trial account:", error.message);
-      alert("❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " + error.message);
+    } catch (error: unknown) { // Changed 'any' to 'unknown'
+      const err = error as ExtendedError; // Safely cast to our ExtendedError interface
+      console.error("Error creating trial account:", err.message);
+      alert("❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " + err.message);
     }
   };
 
@@ -217,7 +223,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   'Jasa Konsultansi Badan Usaha Konstruksi',
                   'Jasa Konsultansi Perorangan Konstruksi',
                   'Jasa Konsultansi Badan Usaha Non Konstruksi',
-                  'Jasa Konsultansi Perorangan Non Konstruksi',
+                  'Jasa Konsultansi Badan Usaha Non Konstruksi',
                   'Pekerjaan Konstruksi Terintegrasi',
                   'Jasa Lainnya'
                 ].map((category, index) => (
