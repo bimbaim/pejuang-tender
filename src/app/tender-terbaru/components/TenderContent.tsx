@@ -19,6 +19,7 @@ const TenderContent = () => {
   const pageSize = 5;
   const limit = 15; // max item
 
+
 // ✅ Fetch kategori sekali saja (tahun berjalan)
 useEffect(() => {
   const fetchCategories = async () => {
@@ -33,18 +34,16 @@ useEffect(() => {
 
     if (!error && data) {
       const normalizedCategories = data.map((t) =>
-        t.category.replace(/ - TA \d{4}$/, "") // hapus " - TA 20xx"
+        t.category.replace(/\s*-\s*.*$/, "") // hapus " - ..." termasuk tanda "-"
       );
-
-      // buang duplikat
       const uniqueCategories = Array.from(new Set(normalizedCategories));
-
       setCategories(uniqueCategories);
     }
   };
 
   fetchCategories();
 }, []);
+
 
 
   // ✅ Fetch tender tiap kali page/category berubah
