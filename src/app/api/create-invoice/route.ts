@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Xendit } from "xendit-node";
 
-// Define interfaces for the expected request body
+// Define interfaces for the expected request body from your frontend
 interface CustomerDetails {
   email: string;
   name: string;
@@ -15,7 +15,6 @@ interface CreateInvoiceRequestBody {
 }
 
 // Define an interface for potential Xendit error structure
-// This helps provide better type checking for Xendit specific error properties
 interface XenditError extends Error {
   code?: string;
   type?: string;
@@ -24,7 +23,7 @@ interface XenditError extends Error {
   errors?: {
     message: string;
     field: string;
-  }[]; // Example structure, adjust if Xendit's 'errors' array has a different type
+  }[];
 }
 
 // Initialize Xendit client with your secret key
@@ -40,9 +39,19 @@ export async function POST(req: Request) {
 
   try {
     // 1. Parse the incoming JSON request body
-    requestData = await req.json();
+    const rawRequestData = await req.json();
+    requestData = rawRequestData; // Assign raw data for logging in catch block
 
-    // 2. Destructure amount, customer, and the new subscriptionId from the parsed data
+    // Crucial check: Ensure requestData is not undefined before destructuring
+    if (!requestData || typeof requestData.amount === 'undefined' || !requestData.customer || !requestData.subscriptionId) {
+        console.error("Validation Error: Invalid or missing data after JSON parsing.");
+        return NextResponse.json(
+            { error: "Invalid request body structure." },
+            { status: 400 }
+        );
+    }
+
+    // Now TypeScript knows requestData is definitely CreateInvoiceRequestBody
     const { amount, customer, subscriptionId } = requestData;
 
     // --- Comprehensive Debugging Logs (for development) ---
@@ -52,15 +61,6 @@ export async function POST(req: Request) {
     console.log("Customer object received:", customer, "| Type:", typeof customer);
     console.log("Subscription ID received:", subscriptionId, "| Type:", typeof subscriptionId);
     console.log("--- End Incoming Request Data ---\n");
-
-    // 3. Basic Validation: Check if amount, customer, and subscriptionId are present
-    if (amount === undefined || amount === null || customer === undefined || customer === null || subscriptionId === undefined || subscriptionId === null) {
-      console.error("Validation Error: Missing 'amount', 'customer', or 'subscriptionId' in request body.");
-      return NextResponse.json(
-        { error: "Missing required fields: amount, customer, or subscriptionId" },
-        { status: 400 }
-      );
-    }
 
     // 4. Validate Amount: Ensure it's a valid positive number
     const finalAmount = Number(amount);
@@ -89,34 +89,33 @@ export async function POST(req: Request) {
     console.log(`  Customer Name: ${customer.name}`);
 
     // Define the webhook callback URL. IMPORTANT: Replace with your deployed domain for production!
-    // For local testing, you might need a tool like ngrok to expose your localhost to Xendit.
     const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "https://localhost:3000/api/xendit-webhook";
     console.log("Xendit Callback URL set to:", xenditCallbackUrl);
 
     // 6. Call Xendit API to create the invoice
+    // CORRECTED: All invoice creation parameters are now correctly nested inside the 'data' property.
     const invoice = await Invoice.createInvoice({
-      data: {
+      data: { // All properties are now correctly inside this 'data' object
         externalId: String(subscriptionId), // Use the subscription ID as the external ID
         amount: finalAmount,
         description: "Subscription Payment", // More specific description
         currency: "IDR",
         customer: {
-          givenNames: customer.name.split(" ")[0] || customer.name,
-          surname: customer.name.split(" ")[1] || "",
-          email: customer.email,
-          mobileNumber: customer.whatsapp || "+628000000000",
+            givenNames: customer.name.split(" ")[0] || customer.name,
+            surname: customer.name.split(" ")[1] || "",
+            email: customer.email,
+            mobileNumber: customer.whatsapp || "+628000000000",
         },
         successRedirectUrl: "http://localhost:3000/thank-you",
         failureRedirectUrl: "https://localhost:3000/payment-failed",
-        // Add the callback URL for Xendit to notify your server upon payment completion
-        callbackUrl: xenditCallbackUrl, 
+        // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
       },
     });
 
     console.log("Invoice created successfully:", invoice.id, "URL:", invoice.invoiceUrl);
     return NextResponse.json({ invoiceUrl: invoice.invoiceUrl });
 
-  } catch (error: unknown) { // Changed 'any' to 'unknown'
+  } catch (error: unknown) {
     console.error("\n--- Xendit API Error Caught in Server ---");
     
     // Safely cast to XenditError interface if it matches, otherwise use generic Error properties
