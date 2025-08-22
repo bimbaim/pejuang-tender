@@ -13,12 +13,14 @@ const Navbar = () => {
     <nav className={styles.navbar}>
       <div className={styles.container}>
         <div className={styles.logoGroup}>
-          <Image
-            src="/images/company-logo.png"
-            alt="Pejuang Tender Logo"
-            width={130}
-            height={44}
-          />
+          <Link href="/" className={styles.logoLink}>
+            <Image
+              src="/images/company-logo.png"
+              alt="Pejuang Tender Logo"
+              width={130}
+              height={44}
+            />
+          </Link>
         </div>
         <div className={styles.navLinks}>
           <Link href="/" className={`${styles.navLink} ${pathname === '/' ? styles.activeLink : ''}`}>
