@@ -18,47 +18,54 @@ const TenderContent = () => {
   const [totalTenders, setTotalTenders] = useState(0);
   const pageSize = 10; // Jumlah item per halaman
 
-  useEffect(() => {
-    const fetchTenders = async () => {
-      setLoading(true);
-      setError(null);
+useEffect(() => {
+  const fetchTenders = async () => {
+    setLoading(true);
+    setError(null);
 
-      // Hitung indeks awal dan akhir untuk query
-      const start = (page - 1) * pageSize;
-      const end = start + pageSize - 1;
+    // Hitung indeks awal dan akhir untuk query
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize - 1;
 
-      // 1. Ambil total jumlah tender (sangat cepat karena menggunakan { head: true })
-      const { count, error: countError } = await supabase
-        .from("lpse_tenders")
-        .select('*', { count: 'exact', head: true });
-      
-      if (countError) {
-        console.error("Error fetching total count:", countError);
-        setError("Gagal memuat total data tender.");
-        setLoading(false);
-        return;
-      }
+    // Ambil tahun sekarang
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1).toISOString(); // 1 Jan current year
 
-      setTotalTenders(count || 0);
+    // 1. Ambil total jumlah tender (dengan filter tahun berjalan)
+    const { count, error: countError } = await supabase
+      .from("lpse_tenders")
+      .select("*", { count: "exact", head: true })
+      .gte("created_at", startOfYear);
 
-      // 2. Ambil data tender untuk halaman saat ini
-      const { data, error: dataError } = await supabase
-        .from("lpse_tenders")
-        .select("id, title, agency, budget, source_url, qualification_method")
-        .order("id", { ascending: false })
-        .range(start, end); // Menggunakan .range() untuk paginasi
-
-      if (dataError) {
-        console.error("Error fetching tenders:", dataError);
-        setError("Gagal memuat data tender. Silakan coba lagi nanti.");
-      } else {
-        setTenders(data as Tender[]);
-      }
+    if (countError) {
+      console.error("Error fetching total count:", countError);
+      setError("Gagal memuat total data tender.");
       setLoading(false);
-    };
+      return;
+    }
 
-    fetchTenders();
-  }, [page, pageSize]); // Re-run effect saat 'page' atau 'pageSize' berubah
+    setTotalTenders(count || 0);
+
+    // 2. Ambil data tender untuk halaman saat ini (hanya tahun berjalan)
+    const { data, error: dataError } = await supabase
+      .from("lpse_tenders")
+      .select("id, title, agency, budget, source_url, qualification_method, created_at")
+      .gte("created_at", startOfYear)
+      .order("id", { ascending: false })
+      .range(start, end);
+
+    if (dataError) {
+      console.error("Error fetching tenders:", dataError);
+      setError("Gagal memuat data tender. Silakan coba lagi nanti.");
+    } else {
+      setTenders(data as Tender[]);
+    }
+    setLoading(false);
+  };
+
+  fetchTenders();
+}, [page, pageSize]);
+
 
   const totalPages = Math.ceil(totalTenders / pageSize);
 
