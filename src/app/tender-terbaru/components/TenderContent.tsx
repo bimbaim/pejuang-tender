@@ -30,8 +30,7 @@ useEffect(() => {
       .from("lpse_tenders")
       .select("category")
       .gte("created_at", startOfYear)
-      .not("category", "is", null) // pastikan kategori tidak null
-      .order("category", { ascending: true }); // ✅ urut berdasarkan teks di DB
+      .not("category", "is", null);
 
     if (!error && data) {
       const normalizedCategories = data.map((t) =>
