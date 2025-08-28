@@ -30,7 +30,9 @@ interface PricingSectionProps {
   onOpenPackagePopup: (plan: Plan) => void;
 }
 
-const PricingSection: React.FC<PricingSectionProps> = ({ onOpenPackagePopup }) => {
+const PricingSection: React.FC<PricingSectionProps> = ({
+  onOpenPackagePopup,
+}) => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<number>(3); // default 3 bulan
@@ -79,29 +81,39 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onOpenPackagePopup }) =
   };
 
   // 🔥 Hardcode nama paket dan highlight berdasarkan urutan
-  const hardcodedNames = ["Prajurit Tender", "Komandan Tender", "Jendral Tender"];
+  const hardcodedNames = [
+    "Prajurit Tender",
+    "Komandan Tender",
+    "Jendral Tender",
+  ];
   const hardcodedHighlight = [false, true, false];
 
   return (
-    <section className={styles.pricingSection}>
+    <section id="paket" className={styles.pricingSection}>
       <div className={styles.container}>
         <div className={styles.titleGroup}>
           <p className={styles.subtitle}>Pilih Paket Anda</p>
           <h2 className={styles.mainTitle}>INFO Tender Sesuai TARGET Anda</h2>
           <p className={styles.description}>
-            Akses data tender dari ratusan LPSE, notifikasi harian sesuai kebutuhan, hindari ketinggalan jadwal, dan memaksimalkan kemenangan Anda.
+            Akses data tender dari ratusan LPSE, notifikasi harian sesuai
+            kebutuhan, hindari ketinggalan jadwal, dan memaksimalkan kemenangan
+            Anda.
           </p>
         </div>
         <div className={styles.pricingContent}>
           <div className={styles.tabButtons}>
             <button
-              className={`${styles.tabButton} ${activeTab === 3 ? styles.active : ""}`}
+              className={`${styles.tabButton} ${
+                activeTab === 3 ? styles.active : ""
+              }`}
               onClick={() => setActiveTab(3)}
             >
               3 Bulan
             </button>
             <button
-              className={`${styles.tabButton} ${activeTab === 12 ? styles.active : ""}`}
+              className={`${styles.tabButton} ${
+                activeTab === 12 ? styles.active : ""
+              }`}
               onClick={() => setActiveTab(12)}
             >
               12 Bulan
@@ -127,7 +139,9 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onOpenPackagePopup }) =
                   </div>
                   <div className={styles.divider} />
                   <div className={styles.priceDetails}>
-                    <p className={styles.price}>{formatPrice(customPlan.price)}</p>
+                    <p className={styles.price}>
+                      {formatPrice(customPlan.price)}
+                    </p>
                     <button
                       className={`${styles.ctaButton} ${
                         customPlan.isHighlighted ? styles.highlightedButton : ""
@@ -150,7 +164,9 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onOpenPackagePopup }) =
               );
             })}
             {filteredPlans.length === 0 && (
-              <p className={styles.noPlans}>Tidak ada paket untuk {activeTab} bulan</p>
+              <p className={styles.noPlans}>
+                Tidak ada paket untuk {activeTab} bulan
+              </p>
             )}
           </div>
         </div>

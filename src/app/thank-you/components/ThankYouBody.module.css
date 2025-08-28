@@ -3,7 +3,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 112px 64px;
   background-color: #e5f4fb; /* Light blue background from the image */
 }
 
@@ -14,7 +13,6 @@
   align-items: center;
   gap: 48px;
   /* background-color: #ffffff; */
-  padding: 64px; /* Added padding to the white content box */
   text-align: center; /* Center-aligns all text inside */
 }
 
@@ -28,18 +26,56 @@
 .mainTitle {
   text-align: center;
   font-size: 56px;
-  font-family: 'Saira', sans-serif; /* Using a more specific font name if available */
+  font-family: "Saira", sans-serif; /* Using a more specific font name if available */
   font-weight: 700; /* Bolder text to match the image */
   line-height: 100%;
   color: #000000;
   text-transform: uppercase; /* Converts text to uppercase */
+  margin: 0;
 }
 
 .description {
   text-align: center;
   font-size: 18px;
-  font-family: 'Quicksand', sans-serif; /* Using a more specific font name if available */
+  font-family: "Quicksand", sans-serif; /* Using a more specific font name if available */
   line-height: 150%;
   color: #000000;
   max-width: 800px; /* Constrains the width of the description */
+  margin: 0;
+}
+
+@media all and (min-width: 901px) {
+  .contentWrapper {
+    padding: 64px;
+  }
+  .bodyContainer {
+    padding: 112px 64px;
+  }
+
+  .textContainer {
+    max-width: 768px;
+  }
+
+  .mainTitle {
+    font-size: 56px;
+  }
+}
+
+@media all and (max-width: 900px) and (min-width: 768px) {
+  .textContainer {
+    max-width: 600px;
+  }
+}
+@media all and (max-width: 900px) {
+  .bodyContainer {
+    padding: 64px 20px;
+  }
+
+  .mainTitle {
+    font-size: 40px;
+  }
+}
+@media all and (min-width: 601px) {
+}
+@media all and (max-width: 600px) {
 }

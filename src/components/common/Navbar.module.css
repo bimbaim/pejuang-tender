@@ -2,9 +2,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px 64px;
   background-color: var(--color-white);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -16,7 +15,6 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 1200px;
 }
 
 .logoGroup {
@@ -26,7 +24,7 @@
 }
 
 .logoText {
-  font-family: 'Saira', sans-serif;
+  font-family: "Saira", sans-serif;
   font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
@@ -54,4 +52,132 @@
 
 .navLink:hover {
   color: var(--color-primary);
+}
+
+.navbar {
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Nav link default (desktop) */
+.navLinks {
+  display: flex;
+  gap: 20px;
+}
+
+/* Tombol hamburger (hidden di desktop) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.bar {
+  width: 24px;
+  height: 2px;
+  background-color: #000000;
+  transition: all 0.3s ease;
+}
+
+/* animasi kalau active */
+.barActive {
+  background-color: #0070f3;
+}
+
+/* Responsive */
+
+@media all and (min-width: 1200px) {
+  .navLinks .closeBtn {
+    display: none;
+  }
+}
+@media all and (max-width: 1199px) {
+  .navLinks {
+    position: fixed;
+    right: 0;
+    background: #fff;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    display: none;
+    width: 100%;
+    left: 0;
+    top: 68;
+    height: 100%;
+  }
+
+  .hamburger.active span:first-child {
+    transform: rotate(45deg) translate(6px, 6px);
+  }
+
+  .hamburger.active span:nth-child(2) {
+    -webkit-transform: translateX(50%);
+    transform: translateX(50%);
+    opacity: 0;
+  }
+
+  .hamburger.active span:last-child {
+    transform: rotate(-47deg) translate(3px, -3px);
+  }
+
+  .showMenu {
+    display: flex;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .navbar .logoGroup {
+    width: 70%;
+  }
+
+  .navMobile {
+    width: 30%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .navbar .hamburger {
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -moz-box-align: end;
+    -ms-flex-align: end;
+    align-items: flex-end;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+  }
+
+  .closeBtn {
+    position: absolute;
+    right: 75px;
+  }
+}
+
+@media all and (min-width: 1200px) {
+  .navbar {
+    padding: 24px 80px;
+  }
+
+  .navMobile {
+    display: none;
+  }
+}
+
+@media all and (max-width: 1199px) {
+  .navbar {
+    padding: 10px 20px;
+  }
 }
