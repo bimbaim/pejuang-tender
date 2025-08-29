@@ -63,10 +63,15 @@ const PricingSection: React.FC<PricingSectionProps> = ({
   const filteredPlans = plans.filter((p) => p.duration_months === activeTab);
 
   const formatPrice = (amount: number) => {
+    // Check if the amount is large enough to be formatted with "K"
     if (amount >= 1000) {
-      return `IDR ${amount / 1000}K`;
+      // Divide by 1000 to get the value in thousands
+      const amountInK = amount / 1000;
+      // Format the number with thousands separators and append "K"
+      return `IDR ${amountInK.toLocaleString("id-ID")  }K`;
     }
-    return `IDR ${amount}`;
+    // If the amount is less than 1000, just format it with thousands separators
+    return `IDR ${amount.toLocaleString("id-ID")}`;
   };
 
   // Changed the 'features' parameter type from Record<string, any> to Features
