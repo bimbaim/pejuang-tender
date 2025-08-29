@@ -57,6 +57,12 @@
   font-weight: bold;
 }
 
+@media all and (min-width: 1441px) {
+  .contentContainer {
+    max-width: 1200px;
+  }
+}
+
 @media all and (min-width: 1200px) {
   .hero .imageColumn,
   .hero .textColumn {

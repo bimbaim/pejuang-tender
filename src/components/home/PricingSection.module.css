@@ -219,7 +219,6 @@
   color: var(--color-white);
 }
 
-
 .featureList {
   list-style: none;
   padding: 0;
@@ -235,37 +234,43 @@
   gap: 16px;
 }
 
-@media all and (min-width: 901px){
-    .pricingSection {
-      padding: 112px 80px;
-    }
-
-    .pricingCard {
-      width: 33.333%;
-    }
-
-    .pricingCards,.pricingContent {
-      width: 100%;
-    }
-
+@media all and (min-width: 1441px) {
+  .container {
+    max-width: 1200px;
+  }
 }
 
-@media all and (max-width: 900px){
-    .pricingSection {
-      padding: 64px 20px;
-    }
+@media all and (min-width: 901px) {
+  .pricingSection {
+    padding: 112px 80px;
+  }
 
-    .pricingContent {
-      width: 100%;
-    }
+  .pricingCard {
+    width: 33.333%;
+  }
 
-    .pricingCards {
-      flex-flow: column;
-      width: 100%;
-    }
+  .pricingCards,
+  .pricingContent {
+    width: 100%;
+  }
 }
 
-@media all and (min-width: 601px){
+@media all and (max-width: 900px) {
+  .pricingSection {
+    padding: 64px 20px;
+  }
+
+  .pricingContent {
+    width: 100%;
+  }
+
+  .pricingCards {
+    flex-flow: column;
+    width: 100%;
+  }
+}
+
+@media all and (min-width: 601px) {
   .price {
     font-size: 56px;
   }
@@ -279,7 +284,7 @@
   }
 }
 
-@media all and (max-width: 600px){
+@media all and (max-width: 600px) {
   .price {
     font-size: 40px;
   }

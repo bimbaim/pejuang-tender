@@ -402,6 +402,10 @@
   gap: 8px;
 }
 
+.package-header-right p.package-price {
+  margin-top: 15px;
+}
+
 /* --- Responsive --- */
 @media all and (max-width: 768px) {
   .package-popup-content {

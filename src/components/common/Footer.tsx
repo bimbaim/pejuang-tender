@@ -19,34 +19,10 @@ const Footer = () => {
               <p className={styles.logoText}>PEJUANG Tender</p>
             </div>
             <div className={styles.links}>
-              <div className={styles.navFooter}>
-                <a href="#" className={styles.link}>
-                  Privacy Policy
-                </a>
-                <a href="#" className={styles.link}>
-                  Terms of Service
-                </a>
-                <a href="#" className={styles.link}>
-                  Cookies Settings
-                </a>
-              </div>
               <p className={styles.copyright}>
                 © 2025 Pejuang Tender. All rights reserved.
               </p>
             </div>
-          </div>
-        </div>
-
-        {/* Right Section: Payment Partners */}
-        <div className={styles.paymentPartners}>
-          <p className={styles.paymentTitle}>Partner Pembayaran Kami</p>
-          <div className={styles.partnerLogos}>
-            <Image
-              src="/images/payment-partners.png"
-              alt="Payment Partners"
-              width={350} // Adjust width to fit your image
-              height={50} // Adjust height to fit your image
-            />
           </div>
         </div>
       </div>

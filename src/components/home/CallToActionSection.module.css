@@ -54,6 +54,12 @@
   background-color: #007bb4;
 }
 
+@media all and (min-width: 1441px) {
+  .container {
+    max-width: 1200px;
+  }
+}
+
 @media all and (min-width: 901px) {
   .ctaSection {
     padding: 112px 80px;
