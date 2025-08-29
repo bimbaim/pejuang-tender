@@ -216,7 +216,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-duration">
               {selectedPackage.duration_months ?? ""} Bulan
             </p>
-            <p className="package-price">{selectedPackage.price}</p>
+            <p className="package-price">IDR {selectedPackage.price}</p>
           </div>
         </div>
 
@@ -336,7 +336,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                   onClick={handleAddKeyword}
                   className="package-add-keyword-btn"
                 >
-                  + Tambah Keyword
+                  + Tambah Kata Kunci
                 </button>
               </div>
             </div>

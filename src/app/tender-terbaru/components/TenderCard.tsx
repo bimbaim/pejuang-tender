@@ -36,8 +36,10 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
             <br />
             <span className={styles.textBold}>Unit Kerja:</span> {agency}
             <br />
-            <span className={styles.textBoldBlue}>HPS:</span>{" "}
-            <span className={styles.textBlue}>{budget}</span>
+            <label className={styles.hpsLabel}>
+              <span className={styles.textBoldBlue}>HPS:</span>{" "}
+              <span className={styles.textBlue}>{budget}</span>
+            </label>
           </p>
         </div>
         <div className={styles.actions}>

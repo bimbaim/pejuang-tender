@@ -245,7 +245,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
             {/* Kategori (Category) Radio Buttons */}
             <div className="radio-group">
-              <label>Kategori</label>
+              <label>Kategori (maks 1 untuk trial)</label>
               <div className="radio-options-grid">
                 {[
                   "Pengadaan Barang",
@@ -327,7 +327,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   onClick={handleAddKeyword}
                   className="add-keyword-btn"
                 >
-                  + Add Keyword
+                  + Tambah Kata Kunci
                 </button>
               </div>
             </div>
