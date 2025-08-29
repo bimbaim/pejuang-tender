@@ -1,13 +1,21 @@
-"use client"; 
+"use client";
 
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link'; // Import Link for navigation
-import { usePathname } from 'next/navigation'; // Import usePathname hook
-import styles from './Navbar.module.css';
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import styles from "./Navbar.module.css";
 
 const Navbar = () => {
   const pathname = usePathname(); // Get the current path
+
+  const [isOpen, setIsOpen] = useState(false);
+  const openMenu = () => setIsOpen(true);
+  const closeMenu = () => setIsOpen(false);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <nav className={styles.navbar}>
@@ -22,14 +30,40 @@ const Navbar = () => {
             />
           </Link>
         </div>
-        <div className={styles.navLinks}>
-          <Link href="/" className={`${styles.navLink} ${pathname === '/' ? styles.activeLink : ''}`}>
+
+        <div className={styles.navMobile}>
+          <button
+            className={`${styles.hamburger} ${isOpen ? styles.active : ""}`}
+            onClick={toggleMenu}
+          >
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
+            <span className={styles.bar}></span>
+          </button>
+        </div>
+
+        {/* Menu */}
+        <div className={`${styles.navLinks} ${isOpen ? styles.showMenu : ""}`}>
+          <Link
+            href="/"
+            className={`${styles.navLink} ${
+              pathname === "/" ? styles.activeLink : ""
+            }`}
+            onClick={closeMenu}
+          >
             BERANDA
           </Link>
-          <Link href="/tender-terbaru" className={`${styles.navLink} ${pathname === '/tender-terbaru' ? styles.activeLink : ''}`}>
+          <Link
+            href="/tender-terbaru"
+            className={`${styles.navLink} ${
+              pathname === "/tender-terbaru" ? styles.activeLink : ""
+            }`}
+            onClick={closeMenu}
+          >
             TENDER TERBARU
           </Link>
         </div>
+
         <div className={styles.actions}>
           {/* Add actions like login/signup buttons here */}
         </div>

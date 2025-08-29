@@ -2,34 +2,22 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 64px;
-}
-
-.container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 40px;
-  width: 100%;
-  max-width: 1440px; /* Aligns with your global max-width */
 }
 
 .tenderList {
   display: flex;
   flex-direction: column;
   gap: 24px;
-  width: 100%; /* Takes up the remaining space */
+  width: 100%;
 }
-
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem; /* Jarak antara tombol dan teks */
-  margin-top: 2rem;
+  gap: 1rem;
   padding: 1rem 0;
-  width: 100%; /* Pastikan pagination mengambil lebar penuh */
+  width: 100%;
 }
 
 .pagination button {
@@ -42,7 +30,8 @@
   font-size: 1rem;
   font-weight: 600;
   transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sedikit bayangan */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Sedikit bayangan */
 }
 
 .pagination button:hover:not(:disabled) {
@@ -78,4 +67,42 @@
   .pagination span {
     font-size: 1rem;
   }
+}
+
+@media all and (min-width: 901px) {
+  .mainContent {
+    padding: 112px 80px;
+  }
+}
+
+@media all and (min-width: 1200px) {
+  .container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 60px;
+    width: 100%;
+  }
+}
+
+@media all and (max-width: 1199px) {
+  .mainContent .container {
+    flex-flow: column;
+  }
+
+  .mainContent .categoryCard {
+    width: 100%;
+  }
+}
+
+@media all and (max-width: 900px) {
+  .mainContent {
+    padding: 64px 20px;
+  }
+}
+
+@media all and (min-width: 601px) {
+}
+
+@media all and (max-width: 600px) {
 }

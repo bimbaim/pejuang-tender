@@ -1,6 +1,6 @@
-import React from 'react';
-import Image from 'next/image';
-import styles from './Footer.module.css';
+import React from "react";
+import Image from "next/image";
+import styles from "./Footer.module.css";
 
 const Footer = () => {
   return (
@@ -8,21 +8,33 @@ const Footer = () => {
       <div className={styles.container}>
         {/* Left Section: Logo, Links, and Copyright */}
         <div className={styles.brandInfo}>
-          <div className={styles.logoGroup}>
-            <Image
-              src="/images/logo-footer.png"
-              alt="Pejuang Tender Logo"
-              width={44}
-              height={44}
-            />
-            <p className={styles.logoText}>PEJUANG Tender</p>
+          <div className={styles.brandInfoWrapper}>
+            <div className={styles.logoGroup}>
+              <Image
+                src="/images/logo-footer.png"
+                alt="Pejuang Tender Logo"
+                width={44}
+                height={44}
+              />
+              <p className={styles.logoText}>PEJUANG Tender</p>
+            </div>
+            <div className={styles.links}>
+              <div className={styles.navFooter}>
+                <a href="#" className={styles.link}>
+                  Privacy Policy
+                </a>
+                <a href="#" className={styles.link}>
+                  Terms of Service
+                </a>
+                <a href="#" className={styles.link}>
+                  Cookies Settings
+                </a>
+              </div>
+              <p className={styles.copyright}>
+                © 2025 Pejuang Tender. All rights reserved.
+              </p>
+            </div>
           </div>
-          <div className={styles.links}>
-            <a href="#" className={styles.link}>Privacy Policy</a>
-            <a href="#" className={styles.link}>Terms of Service</a>
-            <a href="#" className={styles.link}>Cookies Settings</a>
-          </div>
-          <p className={styles.copyright}>© 2025 Pejuang Tender. All rights reserved.</p>
         </div>
 
         {/* Right Section: Payment Partners */}

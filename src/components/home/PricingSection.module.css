@@ -2,7 +2,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 112px 64px;
   background-color: var(--color-white);
 }
 
@@ -12,7 +11,10 @@
   align-items: center;
   gap: 80px;
   width: 100%;
-  max-width: 1200px;
+}
+
+.price {
+  font-family: Saira, Saira Fallback;
 }
 
 .titleGroup {
@@ -31,7 +33,6 @@
 }
 
 .mainTitle {
-  font-size: 48px;
   font-weight: 700;
   line-height: 1;
   color: var(--color-black);
@@ -141,11 +142,9 @@
 .priceDetails {
   display: flex;
   flex-direction: column;
-  gap: 32px;
 }
 
 .price {
-  font-size: 56px;
   font-weight: 700;
   line-height: 1;
   color: var(--color-black);
@@ -163,7 +162,7 @@
   color: var(--color-white);
   border: 1px solid var(--color-primary);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease-in-out;
   width: 100%;
@@ -235,4 +234,71 @@
   align-items: center;
   gap: 16px;
 }
+
+@media all and (min-width: 901px){
+    .pricingSection {
+      padding: 112px 80px;
+    }
+
+    .pricingCard {
+      width: 33.333%;
+    }
+
+    .pricingCards,.pricingContent {
+      width: 100%;
+    }
+
+}
+
+@media all and (max-width: 900px){
+    .pricingSection {
+      padding: 64px 20px;
+    }
+
+    .pricingContent {
+      width: 100%;
+    }
+
+    .pricingCards {
+      flex-flow: column;
+      width: 100%;
+    }
+}
+
+@media all and (min-width: 601px){
+  .price {
+    font-size: 56px;
+  }
+
+  .priceDetails {
+    gap: 32px;
+  }
+
+  .mainTitle {
+    font-size: 48px;
+  }
+}
+
+@media all and (max-width: 600px){
+  .price {
+    font-size: 40px;
+  }
+
+  .mainTitle {
+    font-size: 36px;
+  }
+
+  .priceDetails {
+    gap: 24px;
+  }
+
+  .subtitle {
+    margin: 0;
+  }
+
+  .pricingSection .container {
+    gap: 48px;
+  }
+}
+
 /* No need for a separate rule here, the color will be inherited from .highlightedCard */

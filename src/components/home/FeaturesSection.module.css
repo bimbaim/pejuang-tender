@@ -2,18 +2,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 112px 64px;
   background-color: var(--color-secondary);
 }
 
 .container {
   width: 100%;
-  max-width: 1200px;
 }
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 32px;
 }
 
@@ -26,9 +23,54 @@
 }
 
 .featureText {
-  font-size: 24px;
+  font-family: Saira, sans-serif;
   font-weight: 600;
   line-height: 1.1;
   color: var(--color-white);
   margin: 0;
+  text-transform: uppercase;
+}
+
+@media all and (min-width: 1200px) {
+  .featureText {
+    max-width: 298px;
+  }
+}
+
+@media all and (min-width: 901px) {
+  .featureGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .features {
+    padding: 112px 64px;
+  }
+
+  .featureCard {
+    gap: 24px;
+  }
+
+  .featureText {
+    font-size: 24px;
+  }
+}
+
+@media all and (max-width: 900px) {
+  .features {
+    padding: 64px 20px;
+  }
+
+  .featureCard {
+    gap: 20px;
+  }
+
+  .featureText {
+    font-size: 20px;
+  }
+}
+
+@media all and (min-width: 601px) {
+}
+
+@media all and (max-width: 600px) {
 }

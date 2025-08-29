@@ -1,13 +1,22 @@
-import React from 'react';
-import Image from 'next/image';
-import styles from './FeaturesSection.module.css';
+import React from "react";
+import Image from "next/image";
+import styles from "./FeaturesSection.module.css";
 
 const FeaturesSection = () => {
   const features = [
-    { text: 'Lelah buka portal LPSE satu-persatu?', icon: '/images/icon-1.png' },
-    { text: 'Terlalu banyak informasi tidak relevan?', icon: '/images/icon-2.png' },
-    { text: 'Sering kelewatan jadwal tender?', icon: '/images/icon-3.png' },
-    { text: 'Tidak cukup waktu untuk siapkan dokumen tender?', icon: '/images/icon-4.png' },
+    {
+      text: "Lelah buka portal LPSE satu-persatu?",
+      icon: "/images/icon-1.png",
+    },
+    {
+      text: "Terlalu banyak informasi tidak relevan?",
+      icon: "/images/icon-2.png",
+    },
+    { text: "Sering kelewatan jadwal tender?", icon: "/images/icon-3.png" },
+    {
+      text: "Tidak cukup waktu untuk siapkan dokumen tender?",
+      icon: "/images/icon-4.png",
+    },
   ];
 
   return (

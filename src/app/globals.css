@@ -21,14 +21,19 @@
 }
 
 body {
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   color: var(--color-black);
   margin: 0;
   padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Saira', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Saira", sans-serif;
 }
 a {
   color: var(--color-primary);
@@ -37,4 +42,8 @@ a {
 a:hover {
   color: var(--color-secondary);
   text-decoration: none;
+}
+
+html {
+  scroll-behavior: smooth;
 }

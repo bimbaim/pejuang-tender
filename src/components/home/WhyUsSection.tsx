@@ -26,10 +26,10 @@ const WhyUsSection = () => {
           </div>
           <div className={styles.textColumn}>
             <div className={styles.titleGroup}>
-              <p className={styles.subtitle}>Mengapa Pejuangtender.id</p>
-              <h2 className={styles.mainTitle}>
+              <h2 className={styles.subtitle}>Mengapa Pejuangtender.id</h2>
+              <p className={styles.mainTitle}>
                 Pejuangtender.id membantu Anda mendapatkan notifikasi tender K/L/D/I yang relevan dengan bisnis Anda, sesuai kategori, keyword, lokasi, dan nilai tender yang Anda tentukan
-              </h2>
+              </p>
             </div>
             <div className={styles.benefitsGrid}>
               {benefits.map((benefit, index) => (

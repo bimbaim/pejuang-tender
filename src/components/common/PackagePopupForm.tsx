@@ -123,22 +123,25 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       const start_date = new Date();
       const end_date = new Date();
       // Ensure duration_months is a number before adding to months
-      end_date.setMonth(start_date.getMonth() + (selectedPackage.duration_months || 0));
+      end_date.setMonth(
+        start_date.getMonth() + (selectedPackage.duration_months || 0)
+      );
 
       // 3️⃣ Insert subscription pending
-      const { data: subscriptionData, error: subscriptionError } = await supabase
-        .from("subscriptions")
-        .insert([
-          {
-            user_id,
-            package_id,
-            payment_status: "pending",
-            start_date: start_date.toISOString().split("T")[0],
-            end_date: end_date.toISOString().split("T")[0],
-          },
-        ])
-        .select("id") // Select only id as only subscriptionData.id is used
-        .single();
+      const { data: subscriptionData, error: subscriptionError } =
+        await supabase
+          .from("subscriptions")
+          .insert([
+            {
+              user_id,
+              package_id,
+              payment_status: "pending",
+              start_date: start_date.toISOString().split("T")[0],
+              end_date: end_date.toISOString().split("T")[0],
+            },
+          ])
+          .select("id") // Select only id as only subscriptionData.id is used
+          .single();
 
       if (subscriptionError) throw subscriptionError;
 
@@ -180,13 +183,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       // 6️⃣ Redirect ke Xendit payment URL
       window.location.href = responseData.invoiceUrl;
-    } catch (error: unknown) { // Changed 'any' to 'unknown'
+    } catch (error: unknown) {
+      // Changed 'any' to 'unknown'
       const err = error as ExtendedError; // Safely cast to ExtendedError
       console.error("Error creating subscription or invoice:", err.message);
       alert(`❌ Terjadi kesalahan: ${err.message || "Silakan coba lagi."}`);
     }
   };
-
 
   return (
     <div className="package-popup-overlay" onClick={onClose}>
@@ -219,39 +222,43 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
         <form onSubmit={handleSubmit} className="package-trial-form">
           <div className="package-input-group">
+            <label>Nama</label>
             <input
               type="text"
               id="name"
               name="name"
               value={formData.name}
               onChange={handleChange}
-              placeholder="Nama"
               required
               className="package-text-input"
             />
           </div>
 
           <div className="package-inline-inputs">
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-              required
-              className="package-text-input"
-            />
-            <input
-              type="tel"
-              id="whatsapp"
-              name="whatsapp"
-              value={formData.whatsapp}
-              onChange={handleChange}
-              placeholder="Nomor Whatsapp"
-              required
-              className="package-text-input"
-            />
+            <div className="package-field-inline">
+              <label>Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="package-text-input"
+              />
+            </div>
+            <div className="package-field-inline">
+              <label>Nomor Whatsapp</label>
+              <input
+                type="tel"
+                id="whatsapp"
+                name="whatsapp"
+                value={formData.whatsapp}
+                onChange={handleChange}
+                required
+                className="package-text-input"
+              />
+            </div>
           </div>
 
           <div className="package-radio-group">
@@ -282,50 +289,56 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
           </div>
 
           <div className="package-input-group">
-            <select
-              id="targetSpse"
-              name="targetSpse"
-              value={formData.targetSpse}
-              onChange={handleChange}
-              className="package-select-input"
-              required
-            >
-              <option value="">Pilih SPSE</option>
-              <option value="LPSE A">LPSE A</option>
-              <option value="LPSE B">LPSE B</option>
-              <option value="LPSE C">LPSE C</option>
-            </select>
+            <div className="package-field-input">
+              <label>Target SPSE (https://spse.inaproc/......)</label>
+              <select
+                id="targetSpse"
+                name="targetSpse"
+                value={formData.targetSpse}
+                onChange={handleChange}
+                className="package-select-input"
+                required
+              >
+                <option value="">Pilih SPSE</option>
+                <option value="LPSE A">LPSE A</option>
+                <option value="LPSE B">LPSE B</option>
+                <option value="LPSE C">LPSE C</option>
+              </select>
+            </div>
           </div>
 
           <div className="package-input-group">
-            <div className="package-keywords-input-area">
-              {formData.keywords.map((keyword, index) => (
-                <div key={index} className="package-keyword-tag">
-                  <input
-                    type="text"
-                    value={keyword}
-                    onChange={(e) =>
-                      handleKeywordChange(index, e.target.value)
-                    }
-                    placeholder={`Keyword ${index + 1}`}
-                    className="package-keyword-input"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveKeyword(index)}
-                    className="package-remove-keyword-btn"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={handleAddKeyword}
-                className="package-add-keyword-btn"
-              >
-                + Tambah Keyword
-              </button>
+            <div className="package-field-input">
+              <label>Target Kata Kunci</label>
+              <div className="package-keywords-input-area">
+                {formData.keywords.map((keyword, index) => (
+                  <div key={index} className="package-keyword-tag">
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) =>
+                        handleKeywordChange(index, e.target.value)
+                      }
+                      placeholder={`Keyword ${index + 1}`}
+                      className="package-keyword-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveKeyword(index)}
+                      className="package-remove-keyword-btn"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddKeyword}
+                  className="package-add-keyword-btn"
+                >
+                  + Tambah Keyword
+                </button>
+              </div>
             </div>
           </div>
 
@@ -339,13 +352,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             name="selectedPackage"
             value={JSON.stringify(selectedPackage)}
           />
-          <input type="hidden" name="amount" value={selectedPackage?.price ?? ""} />
+          <input
+            type="hidden"
+            name="amount"
+            value={selectedPackage?.price ?? ""}
+          />
           <input
             type="hidden"
             name="duration_months"
             value={selectedPackage?.duration_months ?? ""}
           />
-          <input type="hidden" name="package_id" value={selectedPackage?.id ?? ""} />
+          <input
+            type="hidden"
+            name="package_id"
+            value={selectedPackage?.id ?? ""}
+          />
 
           <div className="package-submit-button-wrapper">
             <button type="submit" className="package-submit-button">
