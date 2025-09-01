@@ -1,12 +1,10 @@
-// This file should be saved EXACTLY as: src/components/common/PopupForm.tsx
+// This file should be saved EXACTLY as: src/components/common/TrialPopupForm.tsx
 "use client"; // This component uses React hooks, so it must be a Client Component.
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-
-// IMPORTANT: This path './PopupForm.css' is relative to the location of THIS .tsx file.
-// So, PopupForm.css MUST be in the SAME directory as PopupForm.tsx.
+import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./TrialPopupForm.css";
 
 interface PopupFormProps {
@@ -14,10 +12,16 @@ interface PopupFormProps {
   onClose: () => void; // Function to call when the popup needs to be closed
 }
 
-// Interface for safely handling generic errors, ensuring 'message' property exists
 interface ExtendedError extends Error {
   message: string;
 }
+
+interface LpseLocation {
+  id: number;
+  value: string;
+  name: string;
+}
+
 
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
@@ -27,10 +31,33 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     name: "",
     email: "",
     whatsapp: "",
-    category: "", // For radio buttons, will hold the selected category string
-    targetSpse: "", // For select dropdown
-    keywords: [] as string[], // Initial keywords (explicitly typed as string[])
+    category: "",
+    targetSpse: [] as string[], // Keep as string[]
+    keywords: [] as string[],
   });
+
+  // 🔹 state baru untuk LPSE options
+  const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
+
+  // 🔹 fetch data LPSE dari Supabase saat popup dibuka
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchLpseOptions = async () => {
+      const { data, error } = await supabase
+        .from("lpse_locations")
+        .select("id, value, name")
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching LPSE locations:", error.message);
+      } else {
+        setLpseOptions(data || []);
+      }
+    };
+
+    fetchLpseOptions();
+  }, [isOpen]);
 
   // If the popup is not open, render nothing
   if (!isOpen) {
@@ -65,11 +92,19 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Handle adding a new empty keyword input (you might want a dedicated button for this)
+  // Handle adding a new empty keyword input
   const handleAddKeyword = () => {
     setFormData((prev) => ({
       ...prev,
-      keywords: [...prev.keywords, ""], // Add an empty string for a new keyword input
+      keywords: [...prev.keywords, ""],
+    }));
+  };
+
+  // New handler to update targetSpse from the CustomMultiSelect component
+  const handleLpseChange = (selectedValues: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      targetSpse: selectedValues,
     }));
   };
 
@@ -81,7 +116,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       const { data: trialPackage, error: packageError } = await supabase
         .from("packages")
         .select("id")
-        .eq("name", "Free Trial") // Assuming your trial package is named 'Free Trial'
+        .eq("name", "Free Trial")
         .single();
 
       if (packageError || !trialPackage) {
@@ -94,7 +129,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         );
       }
 
-      const package_id = trialPackage.id; // Get the ID
+      const package_id = trialPackage.id;
 
       // 2. Check for existing user or create a new one
       let user_id;
@@ -124,30 +159,28 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         user_id = newUser.id;
       }
 
-      // 3. Insert the new trial subscription using the dynamically fetched package_id
+      // 3. Insert the new trial subscription
       const { error: subscriptionError } = await supabase
         .from("subscriptions")
         .insert([
           {
             user_id,
-            package_id: package_id, // Use the dynamically fetched ID here
-            payment_status: "free-trial", // Set payment status to 'trial'
+            package_id,
+            payment_status: "free-trial",
             start_date: new Date().toISOString().split("T")[0],
             end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
               .toISOString()
-              .split("T")[0], // 7 days from now
+              .split("T")[0],
           },
         ]);
 
       if (subscriptionError) throw subscriptionError;
 
-      // 4. Close the popup and optionally redirect the user
+      // 4. Close popup & redirect
       onClose();
-      // You can redirect to a success page or display a success message
       router.push("/thank-you");
     } catch (error: unknown) {
-      // Changed 'any' to 'unknown'
-      const err = error as ExtendedError; // Safely cast to our ExtendedError interface
+      const err = error as ExtendedError;
       console.error("Error creating trial account:", err.message);
       alert(
         "❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " +
@@ -156,20 +189,20 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     }
   };
 
+  const multiSelectLpseOptions = lpseOptions.map((lpse) => ({
+    value: lpse.value,
+    label: lpse.name,
+  }));
+  
+
   return (
-    // Popup Overlay (fixed position to cover the whole screen)
-    // Clicking on the overlay (outside the content) will close the popup
     <div className="popup-overlay" onClick={onClose}>
-      {/* Popup Content Container */}
-      {/* Clicking inside the content prevents the overlay's click from closing it */}
       <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-        {/* Close Button at the top right */}
         <button
           className="close-button"
           onClick={onClose}
           aria-label="Close popup"
         >
-          {/* SVG for a simple 'X' icon */}
           <svg
             className="w-6 h-6"
             fill="none"
@@ -186,7 +219,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           </svg>
         </button>
 
-        {/* Header Section */}
         <div className="header-section">
           <h2 className="main-title">DAFTAR AKUN TRIAL 7 HARI</h2>
           <p className="subtitle">
@@ -196,11 +228,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           </p>
         </div>
 
-        {/* Wrapper for the scrollable form content */}
         <div className="form-wrapper">
-          {/* Form Section */}
           <form onSubmit={handleSubmit} className="trial-form">
-            {/* Nama (Name) Input */}
+            {/* Nama */}
             <div className="input-group">
               <label htmlFor="name">Nama</label>
               <input
@@ -215,7 +245,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             <div className="form-group-inline">
-              {/* Email Input */}
+              {/* Email */}
               <div className="input-group">
                 <label htmlFor="email">Email</label>
                 <input
@@ -229,11 +259,11 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              {/* Nomor Whatsapp Input */}
+              {/* Whatsapp */}
               <div className="input-group">
                 <label htmlFor="whatsapp">Nomor Whatsapp</label>
                 <input
-                  type="tel" // Use type="tel" for phone numbers
+                  type="tel"
                   id="whatsapp"
                   name="whatsapp"
                   value={formData.whatsapp}
@@ -243,7 +273,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 />
               </div>
             </div>
-            {/* Kategori (Category) Radio Buttons */}
+
+            {/* Kategori */}
             <div className="radio-group">
               <label>Kategori (maks 1 untuk trial)</label>
               <div className="radio-options-grid">
@@ -264,7 +295,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                       value={category}
                       checked={formData.category === category}
                       onChange={handleRadioChange}
-                      required // Make sure at least one category is selected
+                      required
                     />
                     {category}
                   </label>
@@ -272,32 +303,18 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Target SPSE (Select Dropdown) */}
+            {/* 🔹 Target SPSE dari Supabase */}
             <div className="input-group">
-              <label htmlFor="targetSpse">
-                Target SPSE (https://spse.inaproc/......)
-              </label>
-              <div className="select-wrapper">
-                <select
-                  id="targetSpse"
-                  name="targetSpse"
-                  value={formData.targetSpse}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="">Pilih SPSE</option>
-                  <option value="LPSE A">LPSE A</option>
-                  <option value="LPSE B">LPSE B</option>
-                  <option value="LPSE C">LPSE C</option>
-                  <option value="LPSE D">LPSE D</option>
-                  {/* Add more LPSE options as needed */}
-                </select>
-                {/* Dummy arrow for the select dropdown, matched image */}
-                {/* <img src="https://placehold.co/16x16/cccccc/ffffff?text=V" alt="Dropdown arrow" className="select-arrow" /> */}
-              </div>
+              <label>Target SPSE</label>
+              <CustomMultiSelect
+                options={multiSelectLpseOptions}
+                defaultValue={formData.targetSpse}
+                onChange={handleLpseChange}
+                placeholder="Pilih SPSE"
+              />
             </div>
 
-            {/* Target Kata Kunci (Keywords) */}
+            {/* Kata Kunci */}
             <div className="input-group">
               <label>Target Kata Kunci</label>
               <div className="keywords-input-area">
@@ -321,7 +338,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                     </button>
                   </div>
                 ))}
-                {/* Button to add more keyword inputs */}
                 <button
                   type="button"
                   onClick={handleAddKeyword}
@@ -332,7 +348,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button type="submit" className="submit-button">
               DAFTAR SEKARANG
             </button>

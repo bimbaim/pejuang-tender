@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-// Removed useRouter import and usage as it was not used
 import { supabase } from "@/lib/supabase";
+import CustomMultiSelect from "@/components/common/CustomMultiSelect"; // Import the custom component
 import "./PackagePopupForm.css";
+
 
 // Define a specific interface for the features object, based on your usage
 interface PackageFeatures {
@@ -35,21 +36,46 @@ interface ExtendedError extends Error {
   message: string;
 }
 
+interface LpseLocation {
+  id: number;
+  value: string;
+  name: string;
+}
+
 const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   isOpen,
   onClose,
   selectedPackage,
 }) => {
-  // const router = useRouter(); // Removed as it was assigned but never used
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     whatsapp: "",
     category: "",
-    targetSpse: "",
+    targetSpse: [] as string[], // Changed to array for multiple selections
     keywords: [] as string[],
   });
+
+  const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchLpseOptions = async () => {
+      const { data, error } = await supabase
+        .from("lpse_locations")
+        .select("id, value, name")
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching LPSE locations:", error.message);
+      } else {
+        setLpseOptions(data || []);
+      }
+    };
+
+    fetchLpseOptions();
+  }, [isOpen]);
 
   if (!isOpen || !selectedPackage) return null;
 
@@ -62,6 +88,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, category: e.target.value }));
+  };
+
+  const handleLpseChange = (selectedValues: string[]) => {
+    setFormData((prev) => ({
+      ...prev,
+      targetSpse: selectedValues,
+    }));
   };
 
   const handleKeywordChange = (index: number, value: string) => {
@@ -191,6 +224,15 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }
   };
 
+  const multiSelectLpseOptions = lpseOptions.map((lpse) => ({
+    value: lpse.value,
+    label: lpse.name,
+  }));
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('id-ID').format(price);
+  };
+
   return (
     <div className="package-popup-overlay" onClick={onClose}>
       <div
@@ -216,7 +258,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-duration">
               {selectedPackage.duration_months ?? ""} Bulan
             </p>
-            <p className="package-price">IDR {selectedPackage.price}</p>
+            <p className="package-price">IDR {formatPrice(selectedPackage.price)}</p>
           </div>
         </div>
 
@@ -291,19 +333,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
           <div className="package-input-group">
             <div className="package-field-input">
               <label>Target SPSE (https://spse.inaproc/......)</label>
-              <select
-                id="targetSpse"
-                name="targetSpse"
-                value={formData.targetSpse}
-                onChange={handleChange}
-                className="package-select-input"
-                required
-              >
-                <option value="">Pilih SPSE</option>
-                <option value="LPSE A">LPSE A</option>
-                <option value="LPSE B">LPSE B</option>
-                <option value="LPSE C">LPSE C</option>
-              </select>
+              <CustomMultiSelect
+                options={multiSelectLpseOptions}
+                defaultValue={formData.targetSpse}
+                onChange={handleLpseChange}
+                placeholder="Pilih SPSE"
+              />
             </div>
           </div>
 
