@@ -63,7 +63,7 @@
 }
 
 .dropdown-menu {
-  position: absolute;
+  position: relative;
   top: 100%;
   left: 0;
   right: 0;
@@ -80,6 +80,10 @@
 .custom-multi-select .search-input-container {
   padding: 8px 15px;
   border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* to cover the content when scrolling */
+  z-index: 10; /* to be on top of other dropdown items */
 }
 
 .custom-multi-select .search-input {
