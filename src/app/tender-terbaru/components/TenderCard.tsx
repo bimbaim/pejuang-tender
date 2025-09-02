@@ -48,7 +48,6 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
             <a
               className={styles.actionButton}
               target="_blank"
-              rel="noopener noreferrer"
             >
               Cek Tender
             </a>
