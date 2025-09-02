@@ -6,6 +6,25 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect"; // Import the custom component
 import "./PackagePopupForm.css";
 
+const packageLimits: Record<
+  string,
+  { spse: number; keywords: number; category: number }
+> = {
+  "Prajurit Tender": { spse: 20, keywords: 5, category: 1 },
+  "Komandan Tender": { spse: 50, keywords: 10, category: 3 },
+  "Jendral Tender": { spse: 599, keywords: 20, category: 8 },
+};
+
+const allCategories = [
+  "Pengadaan Barang",
+  "Pekerjaan Konstruksi",
+  "Jasa Konsultansi Badan Usaha Konstruksi",
+  "Jasa Konsultansi Perorangan Konstruksi",
+  "Jasa Konsultansi Badan Usaha Non Konstruksi",
+  "Jasa Konsultansi Perorangan Non Konstruksi",
+  "Pekerjaan Konstruksi Terintegrasi",
+  "Jasa Lainnya",
+];
 
 // Define a specific interface for the features object, based on your usage
 interface PackageFeatures {
@@ -51,7 +70,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     name: "",
     email: "",
     whatsapp: "",
-    category: "",
+    category: [] as string[],
     targetSpse: [] as string[], // Changed to array for multiple selections
     keywords: [] as string[],
   });
@@ -59,25 +78,42 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      // Fetch LPSE options when popup opens
+      const fetchLpseOptions = async () => {
+        const { data, error } = await supabase
+          .from("lpse_locations")
+          .select("id, value, name")
+          .order("name", { ascending: true });
 
-    const fetchLpseOptions = async () => {
-      const { data, error } = await supabase
-        .from("lpse_locations")
-        .select("id, value, name")
-        .order("name", { ascending: true });
+        if (error) {
+          console.error("Error fetching LPSE locations:", error.message);
+        } else {
+          setLpseOptions(data || []);
+        }
+      };
 
-      if (error) {
-        console.error("Error fetching LPSE locations:", error.message);
-      } else {
-        setLpseOptions(data || []);
-      }
-    };
-
-    fetchLpseOptions();
+      fetchLpseOptions();
+    } else {
+      // Reset form when popup closes
+      setFormData({
+        name: "",
+        email: "",
+        whatsapp: "",
+        category: [],
+        targetSpse: [],
+        keywords: [],
+      });
+      setLpseOptions([]); // optional, if you want to clear options
+    }
   }, [isOpen]);
 
   if (!isOpen || !selectedPackage) return null;
+
+  // Ambil limit sesuai paket
+  const spseLimit = packageLimits[selectedPackage.name]?.spse ?? 20;
+  const keywordLimit = packageLimits[selectedPackage.name]?.keywords ?? 5;
+  const categoryLimit = packageLimits[selectedPackage.name]?.category ?? 1;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -86,9 +122,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, category: e.target.value }));
-  };
+  // const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setFormData((prev) => ({ ...prev, category: e.target.value }));
+  // };
 
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData((prev) => ({
@@ -111,11 +147,30 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   };
 
   const handleAddKeyword = () => {
-    setFormData((prev) => ({
-      ...prev,
-      keywords: [...prev.keywords, ""],
-    }));
+    if (formData.keywords.length < keywordLimit) {
+      setFormData((prev) => ({
+        ...prev,
+        keywords: [...prev.keywords, ""],
+      }));
+    }
   };
+
+  const handleCategoryChange = (category: string) => {
+    let newCategories = [...formData.category];
+    if (newCategories.includes(category)) {
+      newCategories = newCategories.filter((c) => c !== category);
+    } else if (newCategories.length < categoryLimit) {
+      newCategories.push(category);
+    }
+    setFormData((prev) => ({ ...prev, category: newCategories }));
+  };
+
+  // const handleAddKeyword = () => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     keywords: [...prev.keywords, ""],
+  //   }));
+  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -230,7 +285,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   }));
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID').format(price);
+    return new Intl.NumberFormat("id-ID").format(price);
   };
 
   return (
@@ -258,7 +313,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-duration">
               {selectedPackage.duration_months ?? ""} Bulan
             </p>
-            <p className="package-price">IDR {formatPrice(selectedPackage.price)}</p>
+            <p className="package-price">
+              IDR {formatPrice(selectedPackage.price)}
+            </p>
           </div>
         </div>
 
@@ -303,28 +360,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          <div className="package-radio-group">
-            <label className="package-label">Kategori</label>
-            <div className="package-radio-options-grid">
-              {[
-                "Pengadaan Barang",
-                "Pekerjaan Konstruksi",
-                "Jasa Konsultansi Badan Usaha Konstruksi",
-                "Jasa Konsultansi Perorangan Konstruksi",
-                "Jasa Konsultansi Badan Usaha Non Konstruksi",
-                "Jasa Konsultansi Perorangan Non Konstruksi",
-                "Pekerjaan Konstruksi Terintegrasi",
-                "Jasa Lainnya",
-              ].map((category, index) => (
-                <label key={index} className="package-radio-option">
+          <div className="radio-group">
+            <label>Kategori (maks {categoryLimit})</label>
+            <div className="radio-options-grid">
+              {allCategories.map((cat, index) => (
+                <label key={index} className="radio-option">
                   <input
-                    type="radio"
-                    name="category"
-                    value={category}
-                    checked={formData.category === category}
-                    onChange={handleRadioChange}
+                    type="checkbox"
+                    checked={formData.category.includes(cat)}
+                    onChange={() => handleCategoryChange(cat)}
+                    disabled={
+                      !formData.category.includes(cat) &&
+                      formData.category.length >= categoryLimit
+                    }
                   />
-                  {category}
+                  {cat}
                 </label>
               ))}
             </div>
@@ -338,13 +388,15 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
                 placeholder="Pilih SPSE"
+                limit={spseLimit} // 👈 limit dinamis
               />
             </div>
           </div>
 
+          {/* Target Kata Kunci */}
           <div className="package-input-group">
             <div className="package-field-input">
-              <label>Target Kata Kunci</label>
+              <label>Target Kata Kunci (maks {keywordLimit})</label>
               <div className="package-keywords-input-area">
                 {formData.keywords.map((keyword, index) => (
                   <div key={index} className="package-keyword-tag">
@@ -366,10 +418,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                     </button>
                   </div>
                 ))}
+
                 <button
                   type="button"
                   onClick={handleAddKeyword}
                   className="package-add-keyword-btn"
+                  disabled={formData.keywords.length >= keywordLimit}
                 >
                   + Tambah Kata Kunci
                 </button>

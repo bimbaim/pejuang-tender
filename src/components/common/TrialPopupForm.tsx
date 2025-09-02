@@ -311,33 +311,35 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
                 placeholder="Pilih SPSE"
+                limit={10} // Batasi maksimal 10 SPSE
               />
             </div>
 
             {/* Kata Kunci */}
-            <div className="input-group">
-              <label>Target Kata Kunci</label>
-              <div className="keywords-input-area">
-                {formData.keywords.map((keyword, index) => (
-                  <div key={index} className="keyword-tag">
-                    <input
-                      type="text"
-                      value={keyword}
-                      onChange={(e) =>
-                        handleKeywordChange(index, e.target.value)
-                      }
-                      placeholder={`Keyword ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveKeyword(index)}
-                      className="remove-keyword-btn"
-                      aria-label={`Remove keyword ${keyword}`}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
+          <div className="input-group">
+            <label>Target Kata Kunci</label>
+            <div className="keywords-input-area">
+              {formData.keywords.map((keyword, index) => (
+                <div key={index} className="keyword-tag">
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => handleKeywordChange(index, e.target.value)}
+                    placeholder={`Keyword ${index + 1}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveKeyword(index)}
+                    className="remove-keyword-btn"
+                    aria-label={`Remove keyword ${keyword}`}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+
+              {/* Batasi jumlah keyword */}
+              {formData.keywords.length < 3 && ( // 👈 limit 3 Trial
                 <button
                   type="button"
                   onClick={handleAddKeyword}
@@ -345,8 +347,15 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 >
                   + Tambah Kata Kunci
                 </button>
-              </div>
+              )}
             </div>
+
+  {/* Pesan info jika sudah limit */}
+  {formData.keywords.length >= 5 && (
+    <p className="keyword-limit-msg">Maksimal 5 kata kunci</p>
+  )}
+</div>
+
 
             {/* Submit */}
             <button type="submit" className="submit-button">

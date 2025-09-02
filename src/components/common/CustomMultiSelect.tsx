@@ -13,6 +13,7 @@ interface CustomMultiSelectProps {
   defaultValue: string[];
   onChange: (selectedValues: string[]) => void;
   placeholder?: string;
+  limit?: number; // <-- tambahin limit
 }
 
 const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
@@ -20,13 +21,14 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   defaultValue,
   onChange,
   placeholder = "Pilih SPSE",
+  limit, // <-- props limit
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>(defaultValue);
   const [searchTerm, setSearchTerm] = useState("");
   const componentRef = useRef<HTMLDivElement>(null);
 
-  // Effect to handle clicks outside the component
+  // Close dropdown if click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -47,32 +49,37 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   const handleToggle = () => setIsOpen(!isOpen);
 
   const handleCheckboxChange = (option: MultiSelectOption) => {
-    const newSelected = selected.includes(option.value)
-      ? selected.filter((v) => v !== option.value)
-      : [...selected, option.value];
-
-    setSelected(newSelected);
-    onChange(newSelected); // Pass the updated values to the parent form
+    // Kalau sudah dipilih, bisa dihapus
+    if (selected.includes(option.value)) {
+      const newSelected = selected.filter((v) => v !== option.value);
+      setSelected(newSelected);
+      onChange(newSelected);
+    } else {
+      // Kalau ada limit & jumlah sudah maksimal → jangan tambah lagi
+      if (limit && selected.length >= limit) {
+        return; // stop di sini
+      }
+      const newSelected = [...selected, option.value];
+      setSelected(newSelected);
+      onChange(newSelected);
+    }
   };
 
   const handleRemoveTag = (
     event: React.MouseEvent,
     valueToRemove: string
   ) => {
-    event.stopPropagation(); // Prevent the dropdown from opening
-    handleCheckboxChange({
-      value: valueToRemove,
-      label: "",
-    });
+    event.stopPropagation();
+    handleCheckboxChange({ value: valueToRemove, label: "" });
   };
 
   const getSelectedLabels = () => {
     return selected
       .map((value) => options.find((opt) => opt.value === value)?.label)
-      .filter(Boolean); // Filter out any undefined values
+      .filter(Boolean);
   };
 
-  const filteredOptions = options.filter(option =>
+  const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -87,9 +94,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                 <button
                   type="button"
                   className="remove-tag-btn"
-                  onClick={(e) =>
-                    handleRemoveTag(e, selected[index])
-                  }
+                  onClick={(e) => handleRemoveTag(e, selected[index])}
                 >
                   &times;
                 </button>
@@ -119,6 +124,12 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                 <input
                   type="checkbox"
                   checked={selected.includes(option.value)}
+                  disabled={
+                    // kalau sudah mencapai limit & item ini belum dipilih → disable
+                    limit !== undefined &&
+                    selected.length >= limit &&
+                    !selected.includes(option.value)
+                  }
                   onChange={() => handleCheckboxChange(option)}
                 />
                 {option.label}
