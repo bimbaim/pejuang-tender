@@ -3,58 +3,40 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import CustomMultiSelect from "@/components/common/CustomMultiSelect"; // Import the custom component
+import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./PackagePopupForm.css";
 
-const packageLimits: Record<
-  string,
-  { spse: number; keywords: number; category: number }
-> = {
-  "Prajurit Tender": { spse: 20, keywords: 5, category: 1 },
-  "Komandan Tender": { spse: 50, keywords: 10, category: 3 },
-  "Jendral Tender": { spse: 599, keywords: 20, category: 8 },
-};
-
-const allCategories = [
-  "Pengadaan Barang",
-  "Pekerjaan Konstruksi",
-  "Jasa Konsultansi Badan Usaha Konstruksi",
-  "Jasa Konsultansi Perorangan Konstruksi",
-  "Jasa Konsultansi Badan Usaha Non Konstruksi",
-  "Jasa Konsultansi Perorangan Non Konstruksi",
-  "Pekerjaan Konstruksi Terintegrasi",
-  "Jasa Lainnya",
-];
-
-// Define a specific interface for the features object, based on your usage
+// Tentukan antarmuka untuk fitur-fitur paket
 interface PackageFeatures {
   kategori?: number;
   lpse?: number;
   keywords?: number;
   email_notifikasi?: boolean;
   wa_notifikasi?: boolean;
-  // Add any other feature properties here if they exist in your data
 }
 
+// Tentukan antarmuka untuk paket yang dipilih
 interface SelectedPackage {
   id: string;
   name: string;
   duration_months: number;
   price: number;
-  features?: PackageFeatures; // Changed from Record<string, any> to PackageFeatures
+  features?: PackageFeatures;
 }
 
+// Tentukan antarmuka untuk properti komponen
 interface PackagePopupFormProps {
   isOpen: boolean;
   onClose: () => void;
   selectedPackage: SelectedPackage | null;
 }
 
-// Interface for safely handling generic errors
+// Antarmuka untuk menangani kesalahan
 interface ExtendedError extends Error {
   message: string;
 }
 
+// Antarmuka untuk lokasi LPSE
 interface LpseLocation {
   id: number;
   value: string;
@@ -66,36 +48,39 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   onClose,
   selectedPackage,
 }) => {
+  // Kelola status formulir menggunakan state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     whatsapp: "",
     category: [] as string[],
-    targetSpse: [] as string[], // Changed to array for multiple selections
+    targetSpse: [] as string[],
     keywords: [] as string[],
   });
 
+  // Kelola opsi LPSE yang diambil dari database
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
+  // Gunakan useEffect untuk mengambil data LPSE saat popup dibuka
   useEffect(() => {
+    const fetchLpseOptions = async () => {
+      // Ambil lokasi LPSE dari Supabase
+      const { data, error } = await supabase
+        .from("lpse_locations")
+        .select("id, value, name")
+        .order("name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching LPSE locations:", error.message);
+      } else {
+        setLpseOptions(data || []);
+      }
+    };
+
     if (isOpen) {
-      // Fetch LPSE options when popup opens
-      const fetchLpseOptions = async () => {
-        const { data, error } = await supabase
-          .from("lpse_locations")
-          .select("id, value, name")
-          .order("name", { ascending: true });
-
-        if (error) {
-          console.error("Error fetching LPSE locations:", error.message);
-        } else {
-          setLpseOptions(data || []);
-        }
-      };
-
       fetchLpseOptions();
     } else {
-      // Reset form when popup closes
+      // Reset formulir saat popup ditutup
       setFormData({
         name: "",
         email: "",
@@ -104,17 +89,18 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         targetSpse: [],
         keywords: [],
       });
-      setLpseOptions([]); // optional, if you want to clear options
     }
   }, [isOpen]);
 
+  // Jangan render komponen jika popup tidak terbuka atau tidak ada paket yang dipilih
   if (!isOpen || !selectedPackage) return null;
 
-  // Ambil limit sesuai paket
-  const spseLimit = packageLimits[selectedPackage.name]?.spse ?? 20;
-  const keywordLimit = packageLimits[selectedPackage.name]?.keywords ?? 5;
-  const categoryLimit = packageLimits[selectedPackage.name]?.category ?? 1;
+  // Ambil batasan fitur dari data paket yang dipilih
+  const spseLimit = selectedPackage.features?.lpse ?? 20;
+  const keywordLimit = selectedPackage.features?.keywords ?? 5;
+  const categoryLimit = selectedPackage.features?.kategori ?? 1;
 
+  // Tangani perubahan input teks dan email
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -122,10 +108,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setFormData((prev) => ({ ...prev, category: e.target.value }));
-  // };
-
+  // Tangani perubahan pada pilihan LPSE
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData((prev) => ({
       ...prev,
@@ -133,12 +116,14 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }));
   };
 
+  // Tangani perubahan pada input kata kunci
   const handleKeywordChange = (index: number, value: string) => {
     const newKeywords = [...formData.keywords];
     newKeywords[index] = value;
     setFormData((prev) => ({ ...prev, keywords: newKeywords }));
   };
 
+  // Hapus kata kunci dari daftar
   const handleRemoveKeyword = (indexToRemove: number) => {
     setFormData((prev) => ({
       ...prev,
@@ -146,6 +131,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }));
   };
 
+  // Tambah kata kunci baru jika batas belum tercapai
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
       setFormData((prev) => ({
@@ -155,23 +141,20 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }
   };
 
+  // Tangani perubahan pada pilihan kategori dengan batasan
   const handleCategoryChange = (category: string) => {
     let newCategories = [...formData.category];
     if (newCategories.includes(category)) {
+      // Hapus kategori jika sudah dipilih
       newCategories = newCategories.filter((c) => c !== category);
     } else if (newCategories.length < categoryLimit) {
+      // Tambah kategori jika batas belum tercapai
       newCategories.push(category);
     }
     setFormData((prev) => ({ ...prev, category: newCategories }));
   };
 
-  // const handleAddKeyword = () => {
-  //   setFormData((prev) => ({
-  //     ...prev,
-  //     keywords: [...prev.keywords, ""],
-  //   }));
-  // };
-
+  // Tangani pengiriman formulir
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedPackage) return;
@@ -179,18 +162,20 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     try {
       const package_id = selectedPackage.id;
 
-      // 1️⃣ Cek user
+      // 1. Periksa apakah pengguna sudah ada di database
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
-        .select("id") // Select only id as other fields are not used from existingUsers
+        .select("id")
         .eq("email", formData.email);
 
       if (userError) throw userError;
 
       let user_id: string;
       if (existingUsers && existingUsers.length > 0) {
+        // Gunakan user_id yang sudah ada
         user_id = existingUsers[0].id;
       } else {
+        // Buat pengguna baru jika belum ada
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
           .insert([
@@ -200,22 +185,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               phone: formData.whatsapp,
             },
           ])
-          .select("id") // Select only id for the new user
+          .select("id")
           .single();
 
         if (insertUserError) throw insertUserError;
         user_id = newUser.id;
       }
 
-      // 2️⃣ Hitung tanggal mulai/akhir
+      // 2. Hitung tanggal mulai dan akhir langganan
       const start_date = new Date();
       const end_date = new Date();
-      // Ensure duration_months is a number before adding to months
       end_date.setMonth(
         start_date.getMonth() + (selectedPackage.duration_months || 0)
       );
 
-      // 3️⃣ Insert subscription pending
+      // 3. Masukkan langganan baru dengan status 'pending'
       const { data: subscriptionData, error: subscriptionError } =
         await supabase
           .from("subscriptions")
@@ -228,12 +212,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               end_date: end_date.toISOString().split("T")[0],
             },
           ])
-          .select("id") // Select only id as only subscriptionData.id is used
+          .select("id")
           .single();
 
       if (subscriptionError) throw subscriptionError;
 
-      // 4️⃣ Buat Xendit invoice melalui API route yang sudah ada
+      // 4. Panggil API untuk membuat invoice Xendit
       const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -243,25 +227,24 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
           customer: {
             email: formData.email,
             name: formData.name,
-            whatsapp: formData.whatsapp, // Include whatsapp for Xendit customer details
+            whatsapp: formData.whatsapp,
           },
           subscriptionId: subscriptionData.id,
         }),
       });
 
-      // Type the response data expected from your API route
+      // Antarmuka untuk respons invoice
       interface InvoiceResponse {
         invoiceUrl?: string;
         error?: string;
       }
-
       const responseData: InvoiceResponse = await response.json();
 
       if (!responseData.invoiceUrl) {
         throw new Error(responseData.error || "Gagal membuat invoice Xendit");
       }
 
-      // 5️⃣ Update subscription dengan payment_url
+      // 5. Perbarui langganan dengan URL pembayaran dari Xendit
       const { error: updateError } = await supabase
         .from("subscriptions")
         .update({ payment_url: responseData.invoiceUrl })
@@ -269,24 +252,35 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (updateError) throw updateError;
 
-      // 6️⃣ Redirect ke Xendit payment URL
+      // 6. Redirect ke URL pembayaran Xendit
       window.location.href = responseData.invoiceUrl;
     } catch (error: unknown) {
-      // Changed 'any' to 'unknown'
-      const err = error as ExtendedError; // Safely cast to ExtendedError
+      const err = error as ExtendedError;
       console.error("Error creating subscription or invoice:", err.message);
       alert(`❌ Terjadi kesalahan: ${err.message || "Silakan coba lagi."}`);
     }
   };
 
+  // Format opsi LPSE agar sesuai dengan komponen CustomMultiSelect
   const multiSelectLpseOptions = lpseOptions.map((lpse) => ({
     value: lpse.value,
     label: lpse.name,
   }));
 
+  // Format harga menjadi format mata uang Rupiah
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID").format(price);
   };
+
+  const allCategories = [
+    "Pengadaan Barang",
+    "Pekerjaan Konstruksi",
+    "Jasa Konsultansi Badan Usaha Konstruksi",
+    "Jasa Konsultansi Perorangan Konstruksi",
+    "Jasa Konsultansi Badan Usaha Non Konstruksi",
+    "Pekerjaan Konstruksi Terintegrasi",
+    "Jasa Lainnya",
+  ];
 
   return (
     <div className="package-popup-overlay" onClick={onClose}>
@@ -388,12 +382,11 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
                 placeholder="Pilih SPSE"
-                limit={spseLimit} // 👈 limit dinamis
+                limit={spseLimit}
               />
             </div>
           </div>
 
-          {/* Target Kata Kunci */}
           <div className="package-input-group">
             <div className="package-field-input">
               <label>Target Kata Kunci (maks {keywordLimit})</label>
@@ -419,23 +412,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                   </div>
                 ))}
 
-                <button
-                  type="button"
-                  onClick={handleAddKeyword}
-                  className="package-add-keyword-btn"
-                  disabled={formData.keywords.length >= keywordLimit}
-                >
-                  + Tambah Kata Kunci
-                </button>
+                {/* Tampilkan tombol "Tambah" hanya jika batas belum tercapai */}
+                {formData.keywords.length < keywordLimit && (
+                  <button
+                    type="button"
+                    onClick={handleAddKeyword}
+                    className="package-add-keyword-btn"
+                  >
+                    + Tambah Kata Kunci
+                  </button>
+                )}
               </div>
             </div>
           </div>
 
-          {/* ✅ Hidden fields */}
-          {/* Note: These hidden fields are typically used when submitting forms directly to a server.
-              Since you're using fetch API, the data is explicitly sent in the body of the fetch call.
-              These might not be strictly necessary for the current handleSubmit implementation.
-          */}
+          {/* Kolom tersembunyi untuk data paket */}
           <input
             type="hidden"
             name="selectedPackage"
