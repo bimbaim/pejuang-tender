@@ -89,7 +89,7 @@ useEffect(() => {
 
       let dataQuery = supabase
         .from("lpse_tenders")
-        .select("id, title, agency, budget, source_url, qualification_method, created_at, category")
+        .select("id, title, agency, budget, source_url, status, created_at, category")
         .gte("created_at", startOfYear)
         .order("id", { ascending: false })
         .range(start, end);
