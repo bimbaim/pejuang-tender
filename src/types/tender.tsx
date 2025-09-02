@@ -5,5 +5,6 @@ export interface Tender {
   agency: string;
   budget: string;
   source_url: string; // URL yang akan digunakan pada tombol
-  qualification_method: string;
+  // qualification_method: string;
+  status: string;
 }

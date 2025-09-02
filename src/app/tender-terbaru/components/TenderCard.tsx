@@ -12,7 +12,7 @@ interface TenderCardProps {
 }
 
 const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
-  const { id, title, agency, budget, source_url, qualification_method } =
+  const { id, title, agency, budget, source_url, status } =
     tender;
 
   return (
@@ -28,7 +28,7 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
       <div className={styles.content}>
         <div className={styles.textWrapper}>
           <div className={styles.tags}>
-            <span className={styles.tag}>{qualification_method}</span>
+            <span className={styles.tag}>{status}</span>
           </div>
           <h2 className={styles.title}>{title}</h2>
           <p className={styles.details}>
