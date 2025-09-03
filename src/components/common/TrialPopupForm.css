@@ -161,10 +161,10 @@
 }
 
 .radio-group label:first-child {
-  font-size: 16px;
+  /* font-size: 16px; */
   font-family: var(--font-quicksand);
   color: var(--color-text-dark);
-  font-weight: 500;
+  /* font-weight: 500; */
   margin-bottom: 5px;
 }
 
