@@ -17,7 +17,7 @@ const TenderContent = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const pageSize = 5;
-  const limit = 15; // max item
+  const limit = 5; // max item
 
 
 // ✅ Fetch kategori sekali saja (tahun berjalan)
@@ -72,7 +72,12 @@ useEffect(() => {
       let countQuery = supabase
         .from("lpse_tenders")
         .select("*", { count: "exact", head: true })
-        .gte("created_at", startOfYear);
+        .gte("created_at", startOfYear)
+        .not('status', 'eq', 'Tender Gagal')
+        .not('status', 'eq', 'Tender Batal')
+        .not('status', 'eq', 'Tender Sudah Selesai')
+        .not('status', 'eq', 'Seleksi Batal')
+        .not('status', 'eq', 'Seleksi Gagal');
 
       if (selectedCategory) {
         countQuery = countQuery.ilike("category", `${selectedCategory}%`);
@@ -92,6 +97,11 @@ useEffect(() => {
         .select("id, title, agency, budget, source_url, status, created_at, category")
         .gte("created_at", startOfYear)
         .order("id", { ascending: false })
+        .not('status', 'eq', 'Tender Gagal')
+        .not('status', 'eq', 'Tender Batal')
+        .not('status', 'eq', 'Tender Sudah Selesai')
+        .not('status', 'eq', 'Seleksi Batal')
+        .not('status', 'eq', 'Seleksi Gagal')
         .range(start, end);
 
       if (selectedCategory) {
