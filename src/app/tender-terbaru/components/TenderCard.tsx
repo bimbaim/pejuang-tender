@@ -19,7 +19,7 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
     <div className={styles.tenderCard}>
       <div className={styles.imageWrapper}>
         <Image
-          src="/images/tender-logo.png"
+          src="/images/image-coming-soon.jpg"
           alt="Tender Logo"
           width={163}
           height={163}
