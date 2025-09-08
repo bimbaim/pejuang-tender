@@ -5,12 +5,14 @@ interface TenderSidebarProps {
   categories: string[];
   selectedCategory: string | null;
   onSelectCategory: (cat: string | null) => void;
+  onOpenPopup: () => void;
 }
 
 const TenderSidebar: React.FC<TenderSidebarProps> = ({
   categories,
   selectedCategory,
   onSelectCategory,
+  onOpenPopup,
 }) => {
   return (
     <div className={styles.sidebar}>
@@ -41,7 +43,9 @@ const TenderSidebar: React.FC<TenderSidebarProps> = ({
         <p className={styles.ctaTitle}>
           Ingin Akses Lengkap sesuai kata kunci usaha Anda
         </p>
-        <button className={styles.ctaButton}>COBA SEKARANG</button>
+        <button className={styles.ctaButton} onClick={onOpenPopup}>
+          COBA SEKARANG
+        </button>
       </div>
     </div>
   );

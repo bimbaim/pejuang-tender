@@ -7,7 +7,12 @@ import TenderCard from "./TenderCard";
 import type { Tender } from "@/types/tender";
 import { supabase } from "@/lib/supabase";
 
-const TenderContent = () => {
+interface TenderContentProps {
+  onOpenPopup: () => void;
+}
+
+// ✅ Ubah baris ini untuk menerima props dengan tipe yang sudah Anda definisikan
+const TenderContent: React.FC<TenderContentProps> = ({ onOpenPopup }) => {
   const [tenders, setTenders] = useState<Tender[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,43 +24,39 @@ const TenderContent = () => {
   const pageSize = 5;
   const limit = 5; // max item
 
+  // ✅ Fetch kategori sekali saja (tahun berjalan)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const currentYear = new Date().getFullYear();
+      const startOfYear = new Date(currentYear, 0, 1).toISOString();
 
-// ✅ Fetch kategori sekali saja (tahun berjalan)
-useEffect(() => {
-  const fetchCategories = async () => {
-    const currentYear = new Date().getFullYear();
-    const startOfYear = new Date(currentYear, 0, 1).toISOString();
+      const { data, error } = await supabase
+        .from("lpse_tenders")
+        .select("category")
+        .gte("created_at", startOfYear)
+        .not("category", "is", null);
 
-    const { data, error } = await supabase
-      .from("lpse_tenders")
-      .select("category")
-      .gte("created_at", startOfYear)
-      .not("category", "is", null);
+      if (!error && data) {
+        const normalizedCategories = data.map((t) =>
+          t.category.replace(/\s*-\s*.*$/, "") // hapus " - ..." termasuk tanda "-"
+        );
+        const uniqueCategories = Array.from(new Set(normalizedCategories));
 
-    if (!error && data) {
-      const normalizedCategories = data.map((t) =>
-        t.category.replace(/\s*-\s*.*$/, "") // hapus " - ..." termasuk tanda "-"
-      );
-      const uniqueCategories = Array.from(new Set(normalizedCategories));
+        // ✅ Urutkan Z → A
+        let sortedCategories = uniqueCategories.sort((a, b) =>
+          b.localeCompare(a)
+        );
 
-      // ✅ Urutkan Z → A
-      let sortedCategories = uniqueCategories.sort((a, b) =>
-        b.localeCompare(a)
-      );
+        // ✅ Pastikan "Jasa Lainnya" selalu di akhir
+        sortedCategories = sortedCategories.filter(cat => cat !== "Jasa Lainnya");
+        sortedCategories.push("Jasa Lainnya");
 
-      // ✅ Pastikan "Jasa Lainnya" selalu di akhir
-      sortedCategories = sortedCategories.filter(cat => cat !== "Jasa Lainnya");
-      sortedCategories.push("Jasa Lainnya");
+        setCategories(sortedCategories);
+      }
+    };
 
-      setCategories(sortedCategories);
-    }
-
-  };
-
-  fetchCategories();
-}, []);
-
-
+    fetchCategories();
+  }, []);
 
   // ✅ Fetch tender tiap kali page/category berubah
   useEffect(() => {
@@ -73,11 +74,9 @@ useEffect(() => {
         .from("lpse_tenders")
         .select("*", { count: "exact", head: true })
         .gte("created_at", startOfYear)
-        .not('status', 'eq', 'Tender Gagal')
-        .not('status', 'eq', 'Tender Batal')
-        .not('status', 'eq', 'Tender Sudah Selesai')
-        .not('status', 'eq', 'Seleksi Batal')
-        .not('status', 'eq', 'Seleksi Gagal');
+        .or(
+          'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
+        );
 
       if (selectedCategory) {
         countQuery = countQuery.ilike("category", `${selectedCategory}%`);
@@ -93,16 +92,14 @@ useEffect(() => {
       setTotalTenders(Math.min(count || 0, limit));
 
       let dataQuery = supabase
-        .from("lpse_tenders")
-        .select("id, title, agency, budget, source_url, status, created_at, category")
-        .gte("created_at", startOfYear)
-        .order("id", { ascending: false })
-        .not('status', 'eq', 'Tender Gagal')
-        .not('status', 'eq', 'Tender Batal')
-        .not('status', 'eq', 'Tender Sudah Selesai')
-        .not('status', 'eq', 'Seleksi Batal')
-        .not('status', 'eq', 'Seleksi Gagal')
-        .range(start, end);
+      .from("lpse_tenders")
+      .select("id, title, agency, budget, source_url, status, created_at, category")
+      .gte("created_at", startOfYear)
+      .order("id", { ascending: false })
+      .or(
+        'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
+      )
+      .range(start, end);
 
       if (selectedCategory) {
         dataQuery = dataQuery.ilike("category", `${selectedCategory}%`);
@@ -134,6 +131,8 @@ useEffect(() => {
             setSelectedCategory(cat);
             setPage(1);
           }}
+          // Pastikan prop onOpenPopup diteruskan dengan benar
+          onOpenPopup={onOpenPopup}
         />
         <div className={styles.tenderList}>
           {loading ? (

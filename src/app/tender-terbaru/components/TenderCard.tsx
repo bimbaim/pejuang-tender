@@ -44,13 +44,12 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
         </div>
         <div className={styles.actions}>
           {/* Mengganti elemen <button> dengan komponen <Link> dari Next.js */}
-          <Link href={source_url} passHref legacyBehavior>
-            <a
-              className={styles.actionButton}
-              target="_blank"
-            >
-              Cek Tender
-            </a>
+          <Link
+            href={source_url}
+            className={styles.actionButton}
+            target="_blank"
+          >
+            Cek Tender
           </Link>
         </div>
       </div>
