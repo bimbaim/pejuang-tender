@@ -146,18 +146,20 @@ const TenderContent: React.FC<TenderContentProps> = ({ onOpenPopup }) => {
               {tenders.map((tender) => (
                 <TenderCard key={tender.id} tender={tender} />
               ))}
-              <div className={styles.pagination}>
-                <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
-                  Previous
-                </button>
-                <span>Halaman {page} dari {totalPages}</span>
-                <button
-                  onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                  disabled={page >= totalPages}
-                >
-                  Next
-                </button>
-              </div>
+              {totalPages > 1 && (
+                <div className={styles.pagination}>
+                  <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+                    Previous
+                  </button>
+                  <span>Halaman {page} dari {totalPages}</span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+                    disabled={page >= totalPages}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
