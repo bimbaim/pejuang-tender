@@ -1,6 +1,7 @@
 // File: src/components/tender/TenderCard.tsx
 
-import React from "react";
+// import React from "react";
+import React, { useState } from "react"; 
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./TenderCard.module.css";
@@ -15,14 +16,34 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
   const { id, title, agency, budget, source_url, status } =
     tender;
 
+  // State to track if the agency logo image failed to load
+  const [imageError, setImageError] = useState(false);
+
+  // Clean and format the agency name for the image URL
+  const formattedAgencyName = agency
+    .toLowerCase()
+    .replace(/\./g, "") // Remove all periods
+    .replace(/\//g, "-") // Replace all slashes with hyphens
+    .replace(/\s+/g, "-"); // Replace all spaces with a single hyphen
+
+  // Construct the new image source URL
+  const dynamicImageSrc = `/images/logo/${formattedAgencyName}.png`;
+
+  // Determine the final image source based on the error state
+  const finalImageSrc = imageError ? "/images/image-coming-soon.jpg" : dynamicImageSrc;
+
+
   return (
     <div className={styles.tenderCard}>
       <div className={styles.imageWrapper}>
         <Image
-          src="/images/image-coming-soon.jpg"
-          alt="Tender Logo"
+          src={finalImageSrc}
+          alt={`${agency} Logo`}
           width={163}
           height={163}
+          // The onError prop is a callback that runs if the image fails to load.
+          // We set the imageError state to true, which triggers a re-render.
+          onError={() => setImageError(true)}
         />
       </div>
       <div className={styles.content}>
