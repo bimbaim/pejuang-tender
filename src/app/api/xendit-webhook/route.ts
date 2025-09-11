@@ -9,11 +9,14 @@ import { createClient } from "@supabase/supabase-js";
  */
 interface XenditInvoiceWebhookEvent {
   event: "invoice.paid" | "invoice.expired" | string; // Specific known events, or a string for others
-  external_id: string; // This is the subscriptionId we pass to Xendit
-  id: string; // Xendit's unique invoice ID
-  status: "PAID" | "EXPIRED" | "PENDING" | "SETTLED" | "FAILED" | string; // Specific known statuses
-  // You can add other properties from the Xendit webhook payload if you need to use them,
-  // e.g., amount, currency, payer_email, payment_method, etc.
+  external_id: string;
+  id: string;
+  status: "PAID" | "EXPIRED" | "PENDING" | "SETTLED" | "FAILED" | string;
+  amount?: number;
+  payer_email?: string;
+  payment_method?: string;
+  payment_channel?: string;
+  // [key: string]: any; // allow extra fields
 }
 
 /**
@@ -84,7 +87,7 @@ export async function POST(req: Request) {
     console.log("--- End Xendit Webhook Event ---\n");
 
     // Handle 'invoice.paid' event for successful payments.
-    if (webhookEvent.event === "invoice.paid" && webhookEvent.status === "PAID") {
+    if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID") {
       const subscriptionId = webhookEvent.external_id;
 
       // Ensure the external_id (our subscription ID) is present in the payload.
