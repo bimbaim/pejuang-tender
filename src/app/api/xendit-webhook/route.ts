@@ -43,6 +43,8 @@ export async function POST(req: Request) {
     // Retrieve the X-Callback-Token from the request headers for security verification.
     const xCallbackToken = req.headers.get('x-callback-token');
     // The secret token configured in your Xendit dashboard for this webhook.
+    // NOTE: For best security practices, it is recommended to use a separate, dedicated webhook secret token
+    // instead of the main Xendit API key.
     const xenditWebhookSecret = process.env.XENDIT_SECRET_KEY;
 
     // --- Webhook Security Check ---
