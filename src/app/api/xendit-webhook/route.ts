@@ -51,6 +51,8 @@ export async function POST(req: Request) {
     // It's critical to verify the X-Callback-Token to ensure the webhook event
     // is legitimately coming from Xendit and not a malicious third party.
     if (!xCallbackToken || xCallbackToken !== xenditWebhookSecret) {
+      console.warn("Xendit Secret from Environment:", xenditWebhookSecret);
+      console.warn("x-callback-token from Request Header:", xCallbackToken);
       console.warn(
         "Webhook Warning: Invalid X-Callback-Token received. " +
         "Potential unauthorized access attempt for Xendit webhook."
