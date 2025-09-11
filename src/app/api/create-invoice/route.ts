@@ -89,7 +89,7 @@ export async function POST(req: Request) {
     console.log(`  Customer Name: ${customer.name}`);
 
     // Define the webhook callback URL. IMPORTANT: Replace with your deployed domain for production!
-    const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "https://localhost:3000/api/xendit-webhook";
+    const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "http://pejuang-tender.vercel.app/api/xendit-webhook";
     console.log("Xendit Callback URL set to:", xenditCallbackUrl);
 
     // 6. Call Xendit API to create the invoice
@@ -106,8 +106,8 @@ export async function POST(req: Request) {
             email: customer.email,
             mobileNumber: customer.whatsapp || "+628000000000",
         },
-        successRedirectUrl: "http://localhost:3000/thank-you",
-        failureRedirectUrl: "https://localhost:3000/payment-failed",
+        successRedirectUrl: "http://pejuang-tender.vercel.app/thank-you",
+        failureRedirectUrl: "http://pejuang-tender.vercel.app/payment-failed",
         // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
       },
     });

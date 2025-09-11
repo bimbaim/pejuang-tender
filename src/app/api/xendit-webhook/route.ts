@@ -80,11 +80,11 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Missing subscription ID in webhook" }, { status: 400 });
       }
 
-      // Update the subscription's payment_status to 'success' in Supabase.
+      // Update the subscription's payment_status to 'paid' in Supabase.
       // We only destructure 'error' as 'data' is not used in this context.
       const { error } = await supabase
         .from("subscriptions")
-        .update({ payment_status: "success" })
+        .update({ payment_status: "paid" }) // The value has been changed from "success" to "paid"
         .eq("id", subscriptionId); // Match the record by the subscription ID
 
       if (error) {
@@ -92,7 +92,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Failed to update subscription status" }, { status: 500 });
       }
 
-      console.log(`Subscription ${subscriptionId} payment status updated to 'success' in Supabase.`);
+      console.log(`Subscription ${subscriptionId} payment status updated to 'paid' in Supabase.`);
       return NextResponse.json({ message: "Webhook processed successfully: Invoice Paid" }, { status: 200 });
     }
     
