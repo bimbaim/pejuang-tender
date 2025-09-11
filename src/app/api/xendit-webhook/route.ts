@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     // The secret token configured in your Xendit dashboard for this webhook.
     // NOTE: For best security practices, it is recommended to use a separate, dedicated webhook secret token
     // instead of the main Xendit API key.
-    const xenditWebhookSecret = process.env.XENDIT_SECRET_KEY;
+    const xenditWebhookSecret = process.env.XENDIT_WEBHOOK_SECRET_TOKEN;
 
     console.log("Xendit Secret from Environment:", xenditWebhookSecret);
     console.log("x-callback-token from Request Header:", xCallbackToken);
