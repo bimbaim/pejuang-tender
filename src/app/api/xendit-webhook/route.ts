@@ -47,6 +47,9 @@ export async function POST(req: Request) {
     // instead of the main Xendit API key.
     const xenditWebhookSecret = process.env.XENDIT_SECRET_KEY;
 
+    console.log("Xendit Secret from Environment:", xenditWebhookSecret);
+    console.log("x-callback-token from Request Header:", xCallbackToken);
+
     // --- Webhook Security Check ---
     // It's critical to verify the X-Callback-Token to ensure the webhook event
     // is legitimately coming from Xendit and not a malicious third party.
@@ -57,7 +60,13 @@ export async function POST(req: Request) {
         "Webhook Warning: Invalid X-Callback-Token received. " +
         "Potential unauthorized access attempt for Xendit webhook."
       );
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ 
+        error: "Unauthorized",
+        debug: {
+          secret_from_env: xenditWebhookSecret,
+          token_from_header: xCallbackToken
+        }
+      }, { status: 401 });
     }
     // --- End Webhook Security Check ---
 
