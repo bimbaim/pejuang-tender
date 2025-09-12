@@ -596,3 +596,77 @@
 
 @media all and (max-width: 900px) {
 }
+
+
+
+/* 🔹 Style untuk progress bar di bagian atas halaman */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px; /* Atur ketebalan sesuai kebutuhan */
+  width: 0;
+  background-color: #4f46e5; /* Warna yang cerah untuk bar */
+  z-index: 9999; /* Pastikan di atas semua elemen lain */
+  animation: progress-animation 2s forwards ease-in-out;
+}
+
+/* 🔹 Animasi keyframe untuk membuat bar bergerak dari kiri ke kanan */
+@keyframes progress-animation {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* 🔹 Tambahkan transisi pada tombol untuk efek 'gray-out' yang lebih halus */
+.package-submit-button {
+  /* Pertahankan style yang sudah ada, tambahkan baris ini */
+  transition: all 0.3s ease-in-out;
+}
+
+.package-submit-button:disabled {
+  /* Pertahankan style yang sudah ada */
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Add this to the end of your PackagePopupForm.css file */
+
+/* 🔹 Style untuk progress bar di bagian atas halaman */
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px; /* Atur ketebalan sesuai kebutuhan */
+  width: 0;
+  background-color: #4f46e5; /* Warna yang cerah untuk bar */
+  z-index: 9999; /* Pastikan di atas semua elemen lain */
+  animation: progress-animation 2s forwards ease-in-out;
+}
+
+/* 🔹 Animasi keyframe untuk membuat bar bergerak dari kiri ke kanan */
+@keyframes progress-animation {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* 🔹 Tambahkan transisi pada tombol untuk efek 'gray-out' yang lebih halus */
+.package-submit-button {
+  /* Pertahankan style yang sudah ada, tambahkan baris ini */
+  transition: all 0.3s ease-in-out;
+}
+
+.package-submit-button:disabled {
+  /* Pertahankan style yang sudah ada */
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}

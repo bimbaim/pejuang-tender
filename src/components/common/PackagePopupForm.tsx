@@ -1,3 +1,4 @@
+// This file should be saved EXACTLY as: src/components/common/PackagePopupForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -58,6 +59,10 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     keywords: [] as string[],
   });
 
+  // 🔹 State untuk mengelola status loading dan progress bar
+  const [isLoading, setIsLoading] = useState(false);
+  const [showProgressBar, setShowProgressBar] = useState(false);
+
   // Kelola opsi LPSE yang diambil dari database
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
@@ -89,6 +94,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         targetSpse: [],
         keywords: [],
       });
+      setIsLoading(false);
+      setShowProgressBar(false);
     }
   }, [isOpen]);
 
@@ -158,6 +165,10 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedPackage) return;
+
+    // 🔹 Mulai loading dan tampilkan progress bar
+    setIsLoading(true);
+    setShowProgressBar(true);
 
     try {
       const package_id = selectedPackage.id;
@@ -261,6 +272,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       const err = error as ExtendedError;
       console.error("Error creating subscription or invoice:", err.message);
       alert(`❌ Terjadi kesalahan: ${err.message || "Silakan coba lagi."}`);
+      // 🔹 Matikan loading dan sembunyikan progress bar jika ada error
+      setIsLoading(false);
+      setShowProgressBar(false);
     }
   };
 
@@ -287,6 +301,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
   return (
     <div className="package-popup-overlay" onClick={onClose}>
+      {/* 🔹 Tampilkan progress bar jika showProgressBar true */}
+      {showProgressBar && <div className="loading-bar"></div>}
+
       <div
         className="package-popup-content"
         onClick={(e) => e.stopPropagation()}
@@ -452,8 +469,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
           />
 
           <div className="package-submit-button-wrapper">
-            <button type="submit" className="package-submit-button">
-              DAFTAR SEKARANG
+            <button
+              type="submit"
+              className="package-submit-button"
+              disabled={isLoading} // 🔹 Matikan tombol saat loading
+            >
+              {/* 🔹 Ubah teks tombol saat loading */}
+              {isLoading ? "LOADING..." : "DAFTAR SEKARANG"}
             </button>
 
             <div className="package-payment-partners">
