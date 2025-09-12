@@ -22,6 +22,7 @@ interface LpseLocation {
   name: string;
 }
 
+
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
 
@@ -34,11 +35,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     targetSpse: [] as string[], // Keep as string[]
     keywords: [] as string[],
   });
-
-  // 🔹 State baru untuk status loading
-  const [isLoading, setIsLoading] = useState(false);
-  // 🔹 State baru untuk menampilkan progress bar
-  const [showProgressBar, setShowProgressBar] = useState(false);
 
   // 🔹 state baru untuk LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
@@ -115,10 +111,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // 🔹 Set loading state and show progress bar
-    setIsLoading(true);
-    setShowProgressBar(true);
-
     try {
       // 1. Fetch the ID of the 'Free Trial' package dynamically
       const { data: trialPackage, error: packageError } = await supabase
@@ -184,11 +176,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
       if (subscriptionError) throw subscriptionError;
 
-      // 4. Delay the redirect to show the loading bar for 2 seconds
-      setTimeout(() => {
-        onClose();
-        router.push("/thank-you");
-      }, 2000); // 2000 ms = 2 seconds
+      // 4. Close popup & redirect
+      onClose();
+      router.push("/thank-you");
     } catch (error: unknown) {
       const err = error as ExtendedError;
       console.error("Error creating trial account:", err.message);
@@ -196,9 +186,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         "❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " +
           err.message
       );
-      // 🔹 Hide progress bar and reset loading state on error
-      setShowProgressBar(false);
-      setIsLoading(false);
     }
   };
 
@@ -206,12 +193,10 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     value: lpse.value,
     label: lpse.name,
   }));
+  
 
   return (
     <div className="popup-overlay" onClick={onClose}>
-      {/* 🔹 Tampilkan progress bar jika showProgressBar true */}
-      {showProgressBar && <div className="loading-bar"></div>}
-
       <div className="popup-content" onClick={(e) => e.stopPropagation()}>
         <button
           className="close-button"
@@ -330,56 +315,50 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Kata Kunci */}
-            <div className="input-group">
-              <label>Target Kata Kunci</label>
-              <div className="keywords-input-area">
-                {formData.keywords.map((keyword, index) => (
-                  <div key={index} className="keyword-tag">
-                    <input
-                      type="text"
-                      value={keyword}
-                      onChange={(e) =>
-                        handleKeywordChange(index, e.target.value)
-                      }
-                      placeholder={`Keyword ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveKeyword(index)}
-                      className="remove-keyword-btn"
-                      aria-label={`Remove keyword ${keyword}`}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-
-                {/* Batasi jumlah keyword */}
-                {formData.keywords.length < 3 && ( // 👈 limit 3 Trial
+          <div className="input-group">
+            <label>Target Kata Kunci</label>
+            <div className="keywords-input-area">
+              {formData.keywords.map((keyword, index) => (
+                <div key={index} className="keyword-tag">
+                  <input
+                    type="text"
+                    value={keyword}
+                    onChange={(e) => handleKeywordChange(index, e.target.value)}
+                    placeholder={`Keyword ${index + 1}`}
+                  />
                   <button
                     type="button"
-                    onClick={handleAddKeyword}
-                    className="add-keyword-btn"
+                    onClick={() => handleRemoveKeyword(index)}
+                    className="remove-keyword-btn"
+                    aria-label={`Remove keyword ${keyword}`}
                   >
-                    + Tambah Kata Kunci
+                    &times;
                   </button>
-                )}
-              </div>
+                </div>
+              ))}
 
-              {/* Pesan info jika sudah limit */}
-              {formData.keywords.length >= 5 && (
-                <p className="keyword-limit-msg">Maksimal 5 kata kunci</p>
+              {/* Batasi jumlah keyword */}
+              {formData.keywords.length < 3 && ( // 👈 limit 3 Trial
+                <button
+                  type="button"
+                  onClick={handleAddKeyword}
+                  className="add-keyword-btn"
+                >
+                  + Tambah Kata Kunci
+                </button>
               )}
             </div>
 
+  {/* Pesan info jika sudah limit */}
+  {formData.keywords.length >= 5 && (
+    <p className="keyword-limit-msg">Maksimal 5 kata kunci</p>
+  )}
+</div>
+
+
             {/* Submit */}
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {/* 🔹 Tampilkan teks atau loader berdasarkan status loading */}
-              {isLoading ? "LOADING..." : "DAFTAR SEKARANG"}
+            <button type="submit" className="submit-button">
+              DAFTAR SEKARANG
             </button>
           </form>
         </div>
