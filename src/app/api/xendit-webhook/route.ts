@@ -50,8 +50,8 @@ export async function POST(req: Request) {
     // instead of the main Xendit API key.
     const xenditWebhookSecret = process.env.XENDIT_WEBHOOK_SECRET_TOKEN;
 
-    console.log("Xendit Secret from Environment:", xenditWebhookSecret);
-    console.log("x-callback-token from Request Header:", xCallbackToken);
+    console.warn("Xendit Secret from Environment:", xenditWebhookSecret);
+    console.warn("x-callback-token from Request Header:", xCallbackToken);
 
     // --- Webhook Security Check ---
     // It's critical to verify the X-Callback-Token to ensure the webhook event
@@ -78,13 +78,13 @@ export async function POST(req: Request) {
     webhookEvent = await req.json() as XenditInvoiceWebhookEvent;
 
     // --- Detailed Logging of the Webhook Event ---
-    console.log("\n--- Xendit Webhook Event Received ---");
-    console.log("Webhook Event Type:", webhookEvent.event);
-    console.log("External ID (Subscription ID):", webhookEvent.external_id);
-    console.log("Xendit Invoice ID:", webhookEvent.id);
-    console.log("Invoice Status:", webhookEvent.status);
-    console.log("Full Webhook Payload:", JSON.stringify(webhookEvent, null, 2));
-    console.log("--- End Xendit Webhook Event ---\n");
+    console.warn("\n--- Xendit Webhook Event Received ---");
+    console.warn("Webhook Event Type:", webhookEvent.event);
+    console.warn("External ID (Subscription ID):", webhookEvent.external_id);
+    console.warn("Xendit Invoice ID:", webhookEvent.id);
+    console.warn("Invoice Status:", webhookEvent.status);
+    console.warn("Full Webhook Payload:", JSON.stringify(webhookEvent, null, 2));
+    console.warn("--- End Xendit Webhook Event ---\n");
 
     // Handle 'invoice.paid' event for successful payments.
     if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID" || webhookEvent.event === "payment.capture") {
@@ -108,7 +108,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Failed to update subscription status" }, { status: 500 });
       }
 
-      console.log(`Subscription ${subscriptionId} payment status updated to 'paid' in Supabase.`);
+      console.warn(`Subscription ${subscriptionId} payment status updated to 'paid' in Supabase.`);
       return NextResponse.json({ message: "Webhook processed successfully: Invoice Paid" }, { status: 200 });
     }
     
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
             if (error) {
               console.error("Supabase Update Error for 'invoice.expired':", error.message);
             }
-            console.log(`Subscription ${subscriptionId} payment status updated to 'failed' due to invoice expiration.`);
+            console.warn(`Subscription ${subscriptionId} payment status updated to 'failed' due to invoice expiration.`);
         }
         return NextResponse.json({ message: "Webhook processed successfully: Invoice Expired" }, { status: 200 });
     }

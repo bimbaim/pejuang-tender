@@ -55,12 +55,12 @@ export async function POST(req: Request) {
     const { amount, customer, subscriptionId } = requestData;
 
     // --- Comprehensive Debugging Logs (for development) ---
-    console.log("\n--- Incoming Request Data for Invoice Creation ---");
-    console.log("Raw parsed data:", JSON.stringify(requestData, null, 2));
-    console.log("Amount received:", amount, "| Type:", typeof amount);
-    console.log("Customer object received:", customer, "| Type:", typeof customer);
-    console.log("Subscription ID received:", subscriptionId, "| Type:", typeof subscriptionId);
-    console.log("--- End Incoming Request Data ---\n");
+    console.warn("\n--- Incoming Request Data for Invoice Creation ---");
+    console.warn("Raw parsed data:", JSON.stringify(requestData, null, 2));
+    console.warn("Amount received:", amount, "| Type:", typeof amount);
+    console.warn("Customer object received:", customer, "| Type:", typeof customer);
+    console.warn("Subscription ID received:", subscriptionId, "| Type:", typeof subscriptionId);
+    console.warn("--- End Incoming Request Data ---\n");
 
     // 4. Validate Amount: Ensure it's a valid positive number
     const finalAmount = Number(amount);
@@ -82,15 +82,15 @@ export async function POST(req: Request) {
     }
 
     // Log the data that will be sent to Xendit
-    console.log("Attempting to create invoice with:");
-    console.log(`  External ID: ${subscriptionId}`); // Using subscriptionId as externalId
-    console.log(`  Amount: ${finalAmount}`);
-    console.log(`  Customer Email: ${customer.email}`);
-    console.log(`  Customer Name: ${customer.name}`);
+    console.warn("Attempting to create invoice with:");
+    console.warn(`  External ID: ${subscriptionId}`); // Using subscriptionId as externalId
+    console.warn(`  Amount: ${finalAmount}`);
+    console.warn(`  Customer Email: ${customer.email}`);
+    console.warn(`  Customer Name: ${customer.name}`);
 
     // Define the webhook callback URL. IMPORTANT: Replace with your deployed domain for production!
     const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "http://pejuang-tender.vercel.app/api/xendit-webhook";
-    console.log("Xendit Callback URL set to:", xenditCallbackUrl);
+    console.warn("Xendit Callback URL set to:", xenditCallbackUrl);
 
     // 6. Call Xendit API to create the invoice
     // CORRECTED: All invoice creation parameters are now correctly nested inside the 'data' property.
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Invoice created successfully:", invoice.id, "URL:", invoice.invoiceUrl);
+    console.warn("Invoice created successfully:", invoice.id, "URL:", invoice.invoiceUrl);
     return NextResponse.json({ invoiceUrl: invoice.invoiceUrl });
 
   } catch (error: unknown) {
