@@ -210,6 +210,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               payment_status: "pending",
               start_date: start_date.toISOString().split("T")[0],
               end_date: end_date.toISOString().split("T")[0],
+              keyword: formData.keywords,
+              category: formData.category,
+              spse: formData.targetSpse,
             },
           ])
           .select("id")
