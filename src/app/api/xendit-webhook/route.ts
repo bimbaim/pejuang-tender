@@ -133,11 +133,19 @@ export async function POST(req: Request) {
     
     // For any other webhook events (e.g., invoice.created, invoice.payment_attempted, etc.)
     // we acknowledge receipt but do not perform a status update in the database.
-    console.log(`Webhook event type '${webhookEvent.event}' received but not explicitly processed for status update.`);
-    return NextResponse.json(
-      { message: "Webhook event received but not processed for specific status update" },
-      { status: 200 }
-    );
+    console.warn(`Event type '${webhookEvent.event}' received but not handled by the code.`);
+      
+      return NextResponse.json(
+        { 
+          message: "Webhook event received but not processed for specific status update",
+          debug: {
+            event: webhookEvent.event,
+            status: webhookEvent.status,
+            fullPayload: webhookEvent
+          }
+        },
+        { status: 200 }
+      );
 
   } catch (error: unknown) {
     // Catch block for any unexpected errors during webhook processing.
