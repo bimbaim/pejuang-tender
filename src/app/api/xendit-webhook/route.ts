@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
  * It includes key properties used for processing payment statuses.
  */
 interface XenditInvoiceWebhookEvent {
-  event: "invoice.paid" | "invoice.expired" | string; // Specific known events, or a string for others
+  event: "invoice.paid" | "invoice.expired" | "payment.capture" |string; // Specific known events, or a string for others
   external_id: string;
   id: string;
   status: "PAID" | "EXPIRED" | "PENDING" | "SETTLED" | "FAILED" | string;
@@ -87,7 +87,7 @@ export async function POST(req: Request) {
     console.log("--- End Xendit Webhook Event ---\n");
 
     // Handle 'invoice.paid' event for successful payments.
-    if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID") {
+    if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID" || webhookEvent.event === "payment.capture") {
       const subscriptionId = webhookEvent.external_id;
 
       // Ensure the external_id (our subscription ID) is present in the payload.
@@ -146,7 +146,7 @@ export async function POST(req: Request) {
         },
         { status: 200 }
       ); 
-      
+
 
   } catch (error: unknown) {
     // Catch block for any unexpected errors during webhook processing.
