@@ -50,13 +50,13 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
 
     webhookEvent = await req.json() as XenditInvoiceWebhookEvent;
 
-    console.warn("\n--- Xendit Webhook Event Received ---");
-    console.warn("Webhook Event Type:", webhookEvent.event);
-    console.warn("External ID (Subscription ID):", webhookEvent.external_id);
-    console.warn("Xendit Invoice ID:", webhookEvent.id);
-    console.warn("Invoice Status:", webhookEvent.status);
-    console.warn("Full Webhook Payload:", JSON.stringify(webhookEvent, null, 2));
-    console.warn("--- End Xendit Webhook Event ---\n");
+    console.log("\n--- Xendit Webhook Event Received ---");
+    console.log("Webhook Event Type:", webhookEvent.event);
+    console.log("External ID (Subscription ID):", webhookEvent.external_id);
+    console.log("Xendit Invoice ID:", webhookEvent.id);
+    console.log("Invoice Status:", webhookEvent.status);
+    console.log("Full Webhook Payload:", JSON.stringify(webhookEvent, null, 2));
+    console.log("--- End Xendit Webhook Event ---\n");
 
     if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID" || webhookEvent.event === "payment.capture") {
       let subscriptionId = webhookEvent.external_id;
@@ -134,7 +134,7 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         return NextResponse.json({ message: "Webhook processed successfully: Invoice Expired" }, { status: 200 });
     }
     
-    console.warn(`Event type '${webhookEvent.event}' received but not handled by the code.`);
+    console.log(`Event type '${webhookEvent.event}' received but not handled by the code.`);
       
       return NextResponse.json(
         { 
