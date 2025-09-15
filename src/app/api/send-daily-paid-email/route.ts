@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+// import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 
 // --- Inisialisasi Klien Supabase ---
