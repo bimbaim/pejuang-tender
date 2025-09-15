@@ -22,6 +22,10 @@ interface LpseLocation {
   name: string;
 }
 
+// Define the limits as constants
+const spseLimit = 10;
+const keywordLimit = 3;
+
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
 
@@ -31,14 +35,14 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     email: "",
     whatsapp: "",
     category: "",
-    targetSpse: [] as string[], // Keep as string[]
+    targetSpse: [] as string[],
     keywords: [] as string[],
   });
 
-  // 🔹 state baru untuk LPSE options
+  // State for LPSE options fetched from Supabase
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
-  // 🔹 fetch data LPSE dari Supabase saat popup dibuka
+  // Fetch LPSE data from Supabase when the popup is opened
   useEffect(() => {
     if (!isOpen) return;
 
@@ -177,23 +181,24 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             start_date: new Date().toISOString().split("T")[0],
             end_date: endDateISO,
             category: [formData.category], // Convert to array
-            keyword: formData.keywords,    // Already an array
-            spse: formData.targetSpse,     // Already an array
+            keyword: formData.keywords, // Already an array
+            spse: formData.targetSpse, // Already an array
           },
         ]);
 
       if (subscriptionError) throw subscriptionError;
 
-      // 🔹 Panggil API Route untuk mengirim email
+      // Call API Route to send email
       try {
-        const response = await fetch('/api/sendgrid', {
-          method: 'POST',
+        const response = await fetch("/api/sendgrid", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             to: formData.email,
-            subject: "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
+            subject:
+              "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
             templateName: "trialWelcome",
             data: {
               name: formData.name,
@@ -204,10 +209,10 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.message || 'Failed to send email via API.');
+          throw new Error(errorData.message || "Failed to send email via API.");
         }
 
-        console.log('Email berhasil dikirim via API!');
+        console.log("Email berhasil dikirim via API!");
       } catch (apiError: unknown) {
         const err = apiError as ExtendedError;
         console.error("Gagal mengirim email via API:", err.message);
@@ -230,7 +235,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     value: lpse.value,
     label: lpse.name,
   }));
-  
 
   return (
     <div className="popup-overlay" onClick={onClose}>
@@ -339,7 +343,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* 🔹 Target SPSE dari Supabase */}
+            {/* Target SPSE from Supabase */}
             <div className="input-group">
               <label>Target SPSE</label>
               <CustomMultiSelect
@@ -347,51 +351,50 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
                 placeholder="Pilih SPSE"
-                limit={10} // Batasi maksimal 10 SPSE
+                limit={spseLimit}
               />
             </div>
 
             {/* Kata Kunci */}
-          <div className="input-group">
-            <label>Target Kata Kunci</label>
-            <div className="keywords-input-area">
-              {formData.keywords.map((keyword, index) => (
-                <div key={index} className="keyword-tag">
-                  <input
-                    type="text"
-                    value={keyword}
-                    onChange={(e) => handleKeywordChange(index, e.target.value)}
-                    placeholder={`Keyword ${index + 1}`}
-                  />
+            <div className="input-group">
+              <label>Target Kata Kunci</label>
+              <div className="keywords-input-area">
+                {formData.keywords.map((keyword, index) => (
+                  <div key={index} className="keyword-tag">
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) =>
+                        handleKeywordChange(index, e.target.value)
+                      }
+                      placeholder={`Keyword ${index + 1}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveKeyword(index)}
+                      className="remove-keyword-btn"
+                      aria-label={`Remove keyword ${keyword}`}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+                {formData.keywords.length < keywordLimit && (
                   <button
                     type="button"
-                    onClick={() => handleRemoveKeyword(index)}
-                    className="remove-keyword-btn"
-                    aria-label={`Remove keyword ${keyword}`}
+                    onClick={handleAddKeyword}
+                    className="add-keyword-btn"
                   >
-                    &times;
+                    + Tambah Kata Kunci
                   </button>
-                </div>
-              ))}
-
-              {/* Batasi jumlah keyword */}
-              {formData.keywords.length < 3 && ( // 👈 limit 3 Trial
-                <button
-                  type="button"
-                  onClick={handleAddKeyword}
-                  className="add-keyword-btn"
-                >
-                  + Tambah Kata Kunci
-                </button>
+                )}
+              </div>
+              {formData.keywords.length >= keywordLimit && (
+                <p className="keyword-limit-msg">
+                  Maksimal {keywordLimit} kata kunci
+                </p>
               )}
             </div>
-
-  {/* Pesan info jika sudah limit */}
-  {formData.keywords.length >= 5 && (
-    <p className="keyword-limit-msg">Maksimal 5 kata kunci</p>
-  )}
-</div>
-
 
             {/* Submit */}
             <button type="submit" className="submit-button">
