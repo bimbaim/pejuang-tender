@@ -3,9 +3,8 @@
 import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
 import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
+import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome'; // Import new template
 
-// Define a type for the potential SendGrid error
-// This makes the code more robust and easy to read
 interface SendGridError extends Error {
   response?: {
     body?: {
@@ -16,7 +15,6 @@ interface SendGridError extends Error {
   };
 }
 
-// Set SendGrid API Key from environment variable
 sgMail.setApiKey(process.env.SENDGRID_API_KEY as string);
 
 export async function POST(req: Request) {
@@ -29,50 +27,46 @@ export async function POST(req: Request) {
 
     let emailBody = '';
     
-    // Select template based on templateName
     switch (templateName) {
       case 'trialWelcome':
-        // Type check the data for the specific template
         if (!data || typeof data.name !== 'string' || typeof data.trialEndDate !== 'string') {
           return NextResponse.json({ message: 'Missing or invalid data for trialWelcome template' }, { status: 400 });
         }
         emailBody = trialWelcomeTemplate(data.name, data.trialEndDate);
         break;
+
+      case 'subscriptionWelcome':
+        if (!data || typeof data.name !== 'string' || typeof data.packageName !== 'string') {
+          return NextResponse.json({ message: 'Missing or invalid data for subscriptionWelcome template' }, { status: 400 });
+        }
+        emailBody = subscriptionWelcomeTemplate(data.name, data.packageName);
+        break;
       
-      // Add more cases for other templates here
-        
       default:
         return NextResponse.json({ message: 'Invalid template name' }, { status: 400 });
     }
 
-    // Create the message object
     const msg = {
       to,
-      from: "info@pejuangtender.id",
+      from: "info@pejuangtender.id", // Ganti dengan email pengirim terverifikasi Anda
       subject,
       html: emailBody,
     };
 
-    // Send the email
     await sgMail.send(msg);
 
     return NextResponse.json({ message: 'Email sent successfully!' });
 
   } catch (error: unknown) {
-    // Safely check the type of the error object
     if (error instanceof Error) {
-      const sgError = error as SendGridError; // Cast to the defined type
-
+      const sgError = error as SendGridError;
       let errorMessage = sgError.message;
       if (sgError.response?.body?.errors?.length) {
-        // Concatenate all error messages from SendGrid's response body
         errorMessage = sgError.response.body.errors.map(err => err.message).join(', ');
       }
-
       console.error("Failed to send email:", errorMessage);
       return NextResponse.json({ message: 'Failed to send email', error: errorMessage }, { status: 500 });
     } else {
-      // Handle cases where the error is not an Error object (e.g., a string or number)
       console.error("An unexpected error occurred:", error);
       return NextResponse.json({ message: 'Failed to send email', error: 'An unexpected error occurred.' }, { status: 500 });
     }
