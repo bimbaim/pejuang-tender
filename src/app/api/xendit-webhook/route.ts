@@ -21,7 +21,6 @@ interface ExtendedError extends Error {
 
 // --- Supabase Client Initialization ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -57,7 +56,7 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
     console.log("Xendit Invoice ID:", webhookEvent.id);
     console.log("Invoice Status:", webhookEvent.status);
     console.log("Full Webhook Payload:", JSON.stringify(webhookEvent, null, 2));
-    console.log("--- End Xendit Webhook Event ---\n");
+    console.warn("--- End Xendit Webhook Event ---\n");
 
     if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID" || webhookEvent.event === "payment.capture") {
       let subscriptionId = webhookEvent.external_id;
@@ -135,7 +134,7 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         return NextResponse.json({ message: "Webhook processed successfully: Invoice Expired" }, { status: 200 });
     }
     
-    console.log(`Event type '${webhookEvent.event}' received but not handled by the code.`);
+    console.warn(`Event type '${webhookEvent.event}' received but not handled by the code.`);
       
       return NextResponse.json(
         { 
