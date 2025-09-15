@@ -1,12 +1,11 @@
 // src/lib/emailTemplates/dailyTenderPaid.ts
 
+// This interface now correctly reflects the columns available in your 'lpse_tenders' table.
 interface Tender {
   title: string;
   agency: string;
   budget: number;
-  // ✅ PERBAIKAN: Ganti 'url' menjadi 'source_url'
   source_url: string; 
-  end_date: string;
 }
 
 /**
@@ -24,7 +23,6 @@ export const dailyTenderPaidEmailTemplate = (name: string, tenders: Tender[]): s
       </td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${tender.agency}</td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: right;">IDR ${new Intl.NumberFormat("id-ID").format(tender.budget)}</td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${tender.end_date}</td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: center;">
         <a href="${tender.source_url}" style="display:inline-block;padding:8px 15px;background-color:#1a237e;color:#ffffff;text-decoration:none;border-radius:5px;font-size:14px;">Lihat</a>
       </td>
@@ -83,14 +81,13 @@ export const dailyTenderPaidEmailTemplate = (name: string, tenders: Tender[]): s
                       <th style="padding: 12px 15px; text-align: left;">Nama</th>
                       <th style="padding: 12px 15px; text-align: left;">Instansi</th>
                       <th style="padding: 12px 15px; text-align: right;">HPS</th>
-                      <th style="padding: 12px 15px; text-align: left;">Akhir Pendaftaran</th>
                       <th style="padding: 12px 15px; text-align: center;">Link</th>
                     </tr>
                   </thead>
                   <tbody>
                     ${tenders.length > 0 ? tenderListHtml : `
                       <tr>
-                        <td colspan="6" style="padding: 20px; text-align: center; color: #666;">Tidak ada tender baru yang ditemukan hari ini.</td>
+                        <td colspan="5" style="padding: 20px; text-align: center; color: #666;">Tidak ada tender baru yang ditemukan hari ini.</td>
                       </tr>
                     `}
                   </tbody>
@@ -99,7 +96,7 @@ export const dailyTenderPaidEmailTemplate = (name: string, tenders: Tender[]): s
                 <div style="background-color: #f7f9fc; padding: 15px; border-left: 4px solid #4CAF50; border-radius: 4px; margin-bottom: 25px;">
                   <p style="margin: 0; font-weight: bold;">Tips:</p>
                   <ul style="margin: 5px 0 0; padding-left: 20px; font-size: 14px; color: #555;">
-                    <li style="margin-bottom: 5px;">Cek detail tender sesegera mungkin sebelum batas waktu berakhir.</li>
+                    <li style="margin-bottom: 5px;">Cek detail tender sesegera mungkin.</li>
                     <li>Simpan tender yang relevan untuk persiapan dokumen penawaran.</li>
                   </ul>
                 </div>
