@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
           .from("subscriptions")
           .update({ payment_status: "paid" })
           .eq("id", subscriptionId)
-          .select(`*, users(name, email), packages(name)`)
+          .select(`*, users(name, email), packages(alternative_name)`)
           .single();
 
       if (updateError) {
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
 
       if (subscriptionData && subscriptionData.users && subscriptionData.packages) {
         const { name, email } = subscriptionData.users;
-        const packageName = subscriptionData.packages.name;
+        const packageName = subscriptionData.packages.alternative_name;
         
         try {
           await fetch(`${req.nextUrl.origin}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
