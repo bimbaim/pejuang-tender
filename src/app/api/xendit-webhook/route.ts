@@ -88,7 +88,11 @@ export async function POST(req: Request) {
 
     // Handle 'invoice.paid' event for successful payments.
     if (webhookEvent.event === "invoice.paid" || webhookEvent.status === "PAID" || webhookEvent.event === "payment.capture") {
-      const subscriptionId = webhookEvent.external_id;
+      let subscriptionId = webhookEvent.external_id;
+
+      if (subscriptionId.startsWith("invoice_")) {
+        subscriptionId = subscriptionId.replace("invoice_", "");
+      }
 
       // Ensure the external_id (our subscription ID) is present in the payload.
       if (!subscriptionId) {
