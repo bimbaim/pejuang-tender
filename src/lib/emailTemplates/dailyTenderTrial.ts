@@ -1,12 +1,15 @@
 // src/lib/emailTemplates/dailyTenderTrial.ts
 
+// The Tender interface should only reflect data from the 'lpse_tenders' table
 interface Tender {
     title: string;
     agency: string;
     budget: number;
     // ✅ PERBAIKAN: Ganti 'url' menjadi 'source_url'
     source_url: string;
-    end_date: string;
+    // This is the correct column name from the lpse_tenders table for the tender's deadline
+    // You must verify this in your Supabase dashboard.
+    end_date?: string; 
 }
 
 /**
@@ -17,7 +20,13 @@ interface Tender {
  * @returns The complete HTML string for the email.
  */
 export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], trialEndDate: string): string => {
-  const tenderListHtml = tenders.map((tender, index) => `
+  const tenderListHtml = tenders.map((tender, index) => {
+    // Check if the tender has an end_date before trying to format it
+    const formattedTenderEndDate = tender.end_date 
+      ? new Date(tender.end_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+      : 'N/A'; // Or a different fallback text
+
+    return `
     <tr>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: center;">${index + 1}</td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">
@@ -25,12 +34,13 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
       </td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${tender.agency}</td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: right;">IDR ${new Intl.NumberFormat("id-ID").format(tender.budget)}</td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${tender.end_date}</td>
+      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${formattedTenderEndDate}</td>
       <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: center;">
         <a href="${tender.source_url}" style="display:inline-block;padding:8px 15px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:5px;font-size:14px;">Lihat</a>
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 
   return `
   <!DOCTYPE html>

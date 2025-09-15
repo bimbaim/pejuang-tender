@@ -20,6 +20,8 @@ interface SubscriptionWithDetails {
   category: string[] | null;
   spse: string[] | null;
   start_date: string;
+  // end_date is now used for the filter and passed to the template
+  end_date: string;
   users: {
     name: string;
     email: string;
@@ -33,22 +35,24 @@ interface Tender {
     budget: number;
     // Perbaikan: Ganti 'url' menjadi 'source_url'
     source_url: string;
-    end_date: string;
+    // We will no longer try to select 'end_date' here, as it doesn't exist
+    // You may have another column for the tender's deadline, like 'deadline_date'
+    // For now, let's remove it to fix the error.
 }
 
 // --- POST Handler untuk Mengirim Email Harian ---
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
-    const twoWeeksAgo = new Date(today);
-    twoWeeksAgo.setDate(today.getDate() - 14);
+    // Format today's date to a string without time, e.g., "2025-09-15"
+    const todayISOString = today.toISOString().split('T')[0];
 
-    // 1. Ambil semua langganan yang berstatus 'trial'
+    // 1. Ambil semua langganan yang berstatus 'free-trial' DAN end_date-nya adalah hari ini
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
-      .select(`user_id, keyword, category, spse, start_date, users(name, email)`)
+      .select(`user_id, keyword, category, spse, start_date, end_date, users(name, email)`)
       .eq("payment_status", "free-trial")
-      .gte("start_date", twoWeeksAgo.toISOString().split('T')[0]);
+      .eq("end_date", todayISOString); // <-- This is the correct filter
 
     if (subsError) {
       console.error("Error fetching trial subscriptions:", subsError.message);
@@ -56,28 +60,27 @@ export async function POST(req: NextRequest) {
     }
 
     if (!subscriptions || subscriptions.length === 0) {
-      return NextResponse.json({ message: "No active trial subscriptions found." });
+      return NextResponse.json({ message: "No active trial subscriptions found with today as the end date." });
     }
 
     // 2. Iterasi setiap pengguna trial
-    // Perbaikan: Gunakan 'as unknown as SubscriptionWithDetails[]' untuk mengatasi error TypeScript
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
-      const { user_id, keyword, category, spse, users, start_date } = subscription;
+      const { user_id, keyword, category, spse, users, end_date } = subscription;
       
       if (!users || !users.email) {
           console.warn(`Skipping user ID ${user_id} due to missing email.`);
           continue;
       }
 
-      // Hitung tanggal akhir trial (7 hari setelah start_date)
-      const trialStartDate = new Date(start_date);
-      const trialEndDate = new Date(trialStartDate.setDate(trialStartDate.getDate() + 7));
+      // Format the trial end date for the email template
+      const trialEndDate = new Date(end_date);
       const formattedTrialEndDate = trialEndDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
       // Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url, end_date`) // Perbaikan: Gunakan 'source_url'
+          // FIX: Removed 'end_date' from the select statement as it doesn't exist in this table
+          .select(`id, title, agency, budget, source_url`) 
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order("created_at", { ascending: false });
 
@@ -115,8 +118,7 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({
           to: users.email,
           subject: "Update Tender Hari Ini",
-        //   templateName: "dailyTenderTrial",
-        html: emailBody,
+          html: emailBody,
           data: {
             name: users.name,
             tenders: tenders,
@@ -134,8 +136,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "Daily emails sent successfully." });
 
-  } catch (error: unknown) { // Perbaikan: Tangkap error sebagai 'unknown'
-    const err = error as Error; // Type assertion yang lebih aman
+  } catch (error: unknown) {
+    const err = error as Error;
     console.error("Error in daily email script:", err.message);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
