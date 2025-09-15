@@ -22,7 +22,6 @@ interface LpseLocation {
   name: string;
 }
 
-
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
 
@@ -160,6 +159,14 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       }
 
       // 3. Insert the new trial subscription
+      const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const endDateISO = endDate.toISOString().split("T")[0];
+      const endDateFormatted = endDate.toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
       const { error: subscriptionError } = await supabase
         .from("subscriptions")
         .insert([
@@ -168,13 +175,40 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             package_id,
             payment_status: "free-trial",
             start_date: new Date().toISOString().split("T")[0],
-            end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-              .toISOString()
-              .split("T")[0],
+            end_date: endDateISO,
           },
         ]);
 
       if (subscriptionError) throw subscriptionError;
+
+      // 🔹 Panggil API Route untuk mengirim email
+      try {
+        const response = await fetch('/api/sendgrid', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            to: formData.email,
+            subject: "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
+            templateName: "trialWelcome",
+            data: {
+              name: formData.name,
+              trialEndDate: endDateFormatted,
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to send email via API.');
+        }
+
+        console.log('Email berhasil dikirim via API!');
+      } catch (apiError: unknown) {
+        const err = apiError as ExtendedError;
+        console.error("Gagal mengirim email via API:", err.message);
+      }
 
       // 4. Close popup & redirect
       onClose();
