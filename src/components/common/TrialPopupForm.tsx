@@ -7,22 +7,37 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./TrialPopupForm.css";
 
-interface PopupFormProps {
-  isOpen: boolean; // Controls whether the popup is visible
-  onClose: () => void; // Function to call when the popup needs to be closed
+// Interface to define the features of the selected package
+interface PackageFeatures {
+  lpse?: number;
+  keywords?: number;
 }
 
+// Interface for the selected package (simplified for this component)
+interface SelectedPackage {
+  features?: PackageFeatures;
+}
+
+// Defines the component's props, now including the selectedPackage
+interface PopupFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedPackage: SelectedPackage | null; // The selected package, now a required prop
+}
+
+// Interface to handle errors
 interface ExtendedError extends Error {
   message: string;
 }
 
+// Interface for LPSE locations
 interface LpseLocation {
   id: number;
   value: string;
   name: string;
 }
 
-const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
+const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose, selectedPackage }) => {
   const router = useRouter();
 
   // State to manage all form data
@@ -31,14 +46,18 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     email: "",
     whatsapp: "",
     category: "",
-    targetSpse: [] as string[], // Keep as string[]
+    targetSpse: [] as string[],
     keywords: [] as string[],
   });
 
-  // 🔹 state baru untuk LPSE options
+  // State for LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
-  // 🔹 fetch data LPSE dari Supabase saat popup dibuka
+  // 🔹 Get feature limits from the selected package, with defaults
+  const spseLimit = selectedPackage?.features?.lpse ?? 10;
+  const keywordLimit = selectedPackage?.features?.keywords ?? 3;
+
+  // Fetch LPSE data from Supabase when the popup opens
   useEffect(() => {
     if (!isOpen) return;
 
@@ -91,15 +110,17 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     }));
   };
 
-  // Handle adding a new empty keyword input
+  // Handle adding a new empty keyword input, checking against the limit
   const handleAddKeyword = () => {
-    setFormData((prev) => ({
-      ...prev,
-      keywords: [...prev.keywords, ""],
-    }));
+    if (formData.keywords.length < keywordLimit) {
+      setFormData((prev) => ({
+        ...prev,
+        keywords: [...prev.keywords, ""],
+      }));
+    }
   };
 
-  // New handler to update targetSpse from the CustomMultiSelect component
+  // Handler to update targetSpse from the CustomMultiSelect component
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData((prev) => ({
       ...prev,
@@ -130,7 +151,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
       const package_id = trialPackage.id;
 
-      // 2. Check for existing user or create a new one
+      // 2. Check for an existing user or create a new one
       let user_id;
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
@@ -176,7 +197,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             payment_status: "free-trial",
             start_date: new Date().toISOString().split("T")[0],
             end_date: endDateISO,
-            category: [formData.category], // Convert to array because the database column is jsonb
+            category: [formData.category], // Convert to array
             keyword: formData.keywords,    // Already an array
             spse: formData.targetSpse,     // Already an array
           },
@@ -184,7 +205,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
       if (subscriptionError) throw subscriptionError;
 
-      // 🔹 Panggil API Route untuk mengirim email
+      // 4. Call the API Route to send the email
       try {
         const response = await fetch('/api/sendgrid', {
           method: 'POST',
@@ -193,7 +214,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           },
           body: JSON.stringify({
             to: formData.email,
-            subject: "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
+            subject: "7-Day Trial with pejuangtender.id: Daily Tender Updates in Your Email",
             templateName: "trialWelcome",
             data: {
               name: formData.name,
@@ -207,25 +228,26 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           throw new Error(errorData.message || 'Failed to send email via API.');
         }
 
-        console.log('Email berhasil dikirim via API!');
+        console.log('Email sent successfully via API!');
       } catch (apiError: unknown) {
         const err = apiError as ExtendedError;
-        console.error("Gagal mengirim email via API:", err.message);
+        console.error("Failed to send email via API:", err.message);
       }
 
-      // 4. Close popup & redirect
+      // 5. Close popup & redirect
       onClose();
       router.push("/thank-you");
     } catch (error: unknown) {
       const err = error as ExtendedError;
       console.error("Error creating trial account:", err.message);
       alert(
-        "❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " +
+        "❌ An error occurred while registering the trial account, please try again: " +
           err.message
       );
     }
   };
 
+  // Format LPSE options to be compatible with the CustomMultiSelect component
   const multiSelectLpseOptions = lpseOptions.map((lpse) => ({
     value: lpse.value,
     label: lpse.name,
@@ -257,26 +279,24 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         </button>
 
         <div className="header-section">
-          <h2 className="main-title">DAFTAR AKUN TRIAL 7 HARI</h2>
+          <h2 className="main-title">REGISTER FOR A 7-DAY TRIAL ACCOUNT</h2>
           <p className="subtitle">
-            Buat akun gratis Anda sekarang dan dapatkan notifikasi harian untuk
-            tender dari LPSE target Anda. Tidak perlu kartu kredit untuk
-            memulai.
+            Create your free account now and get daily tender notifications from your target LPSE. No credit card required to start.
           </p>
         </div>
 
         <div className="form-wrapper">
           <form onSubmit={handleSubmit} className="trial-form">
-            {/* Nama */}
+            {/* Name */}
             <div className="input-group">
-              <label htmlFor="name">Nama</label>
+              <label htmlFor="name">Name</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Masukkan nama Anda"
+                placeholder="Enter your name"
                 required
               />
             </div>
@@ -291,29 +311,29 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Masukkan email Anda"
+                  placeholder="Enter your email"
                   required
                 />
               </div>
 
               {/* Whatsapp */}
               <div className="input-group">
-                <label htmlFor="whatsapp">Nomor Whatsapp</label>
+                <label htmlFor="whatsapp">Whatsapp Number</label>
                 <input
                   type="tel"
                   id="whatsapp"
                   name="whatsapp"
                   value={formData.whatsapp}
                   onChange={handleChange}
-                  placeholder="Masukkan nomor Whatsapp Anda"
+                  placeholder="Enter your Whatsapp number"
                   required
                 />
               </div>
             </div>
 
-            {/* Kategori */}
+            {/* Category */}
             <div className="radio-group">
-              <label>Kategori (maks 1 untuk trial)</label>
+              <label>Kategori (maks 1 )</label>
               <div className="radio-options-grid">
                 {[
                   "Pengadaan Barang",
@@ -339,63 +359,62 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* 🔹 Target SPSE dari Supabase */}
+            {/* 🔹 Target SPSE from Supabase */}
             <div className="input-group">
               <label>Target SPSE</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
-                placeholder="Pilih SPSE"
-                limit={10} // Batasi maksimal 10 SPSE
+                placeholder="Select SPSE"
+                limit={spseLimit}
               />
             </div>
 
-            {/* Kata Kunci */}
-          <div className="input-group">
-            <label>Target Kata Kunci</label>
-            <div className="keywords-input-area">
-              {formData.keywords.map((keyword, index) => (
-                <div key={index} className="keyword-tag">
-                  <input
-                    type="text"
-                    value={keyword}
-                    onChange={(e) => handleKeywordChange(index, e.target.value)}
-                    placeholder={`Keyword ${index + 1}`}
-                  />
+            {/* Keywords */}
+            <div className="input-group">
+              <label>Target Keywords</label>
+              <div className="keywords-input-area">
+                {formData.keywords.map((keyword, index) => (
+                  <div key={index} className="keyword-tag">
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={(e) => handleKeywordChange(index, e.target.value)}
+                      placeholder={`Keyword ${index + 1}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveKeyword(index)}
+                      className="remove-keyword-btn"
+                      aria-label={`Remove keyword ${keyword}`}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              
+                {/* Limit the number of keywords */}
+                {formData.keywords.length < keywordLimit && (
                   <button
                     type="button"
-                    onClick={() => handleRemoveKeyword(index)}
-                    className="remove-keyword-btn"
-                    aria-label={`Remove keyword ${keyword}`}
+                    onClick={handleAddKeyword}
+                    className="add-keyword-btn"
                   >
-                    &times;
+                    + Add Keyword
                   </button>
-                </div>
-              ))}
-
-              {/* Batasi jumlah keyword */}
-              {formData.keywords.length < 3 && ( // 👈 limit 3 Trial
-                <button
-                  type="button"
-                  onClick={handleAddKeyword}
-                  className="add-keyword-btn"
-                >
-                  + Tambah Kata Kunci
-                </button>
+                )}
+              </div>
+            
+              {/* Info message if the limit has been reached */}
+              {formData.keywords.length >= keywordLimit && (
+                <p className="keyword-limit-msg">Maximum {keywordLimit} keywords</p>
               )}
             </div>
 
-  {/* Pesan info jika sudah limit */}
-  {formData.keywords.length >= 5 && (
-    <p className="keyword-limit-msg">Maksimal 5 kata kunci</p>
-  )}
-</div>
-
-
             {/* Submit */}
             <button type="submit" className="submit-button">
-              DAFTAR SEKARANG
+              REGISTER NOW
             </button>
           </form>
         </div>
