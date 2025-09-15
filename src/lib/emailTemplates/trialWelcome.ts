@@ -2,34 +2,108 @@
 
 export const trialWelcomeTemplate = (name: string, trialEndDate: string): string => {
   return `
-  Halo ${name},
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selamat Datang di pejuangtender.id!</title>
+    <style>
+      body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+      table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      img { -ms-interpolation-mode: bicubic; }
+      a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
+      @media only screen and (max-width: 600px) {
+        .inner-container { padding: 20px !important; }
+        .button { width: 100% !important; }
+      }
+    </style>
+  </head>
+  <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333333; background-color: #f4f4f4;">
 
-  Terima kasih telah mencoba pejuangtender.id!
-  Selama 7 hari ke depan, Anda akan menerima update tender harian langsung di email ini, sesuai kategori & keyword yang Anda pilih saat pendaftaran.
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
+      <tr>
+        <td align="center" style="background-color: #f4f4f4; padding: 20px 0;">
+          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            
+            <tr>
+              <td style="padding: 40px 30px 20px 30px; text-align: center; border-bottom: 1px solid #eeeeee;">
+                <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #1a237e;">
+                  Selamat Datang di pejuangtender.id!
+                </h1>
+                <p style="margin-top: 10px; font-size: 16px; color: #666666;">
+                  Trial Anda telah aktif.
+                </p>
+              </td>
+            </tr>
+            
+            <tr>
+              <td class="inner-container" style="padding: 40px 30px;">
+                <p style="margin: 0 0 20px;">Halo ${name},</p>
+                <p style="margin: 0 0 20px;">
+                  Terima kasih telah mencoba pejuangtender.id! Selama <strong>7 hari</strong> ke depan, Anda akan menerima update tender harian langsung di email ini, sesuai kategori & keyword yang Anda pilih saat pendaftaran.
+                </p>
 
-  Yang Akan Anda Terima Setiap Hari
-  • Daftar tender terbaru sesuai kategori & keyword pilihan Anda.
-  • Informasi lengkap: nama paket, instansi, nilai proyek, dan batas waktu.
-  • Link langsung ke sumber LPSE resmi untuk detail lebih lanjut.
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 20px; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                  <tr>
+                    <td style="padding: 15px; background-color: #f9f9f9; font-weight: bold; color: #1a237e;">
+                      Yang Akan Anda Terima Setiap Hari
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 15px; background-color: #ffffff;">
+                      <ul style="margin: 0; padding-left: 20px; list-style: disc;">
+                        <li style="margin-bottom: 10px;">Daftar tender terbaru sesuai kategori & keyword pilihan Anda.</li>
+                        <li style="margin-bottom: 10px;">Informasi lengkap: nama paket, instansi, nilai proyek, dan batas waktu.</li>
+                        <li>Link langsung ke sumber LPSE resmi untuk detail lebih lanjut.</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </table>
 
-  Tips Memaksimalkan Trial Anda:
-  • Cek email update tender setiap pagi untuk melihat peluang terbaru.
-  • Simpan atau tandai tender yang menarik agar mudah diakses nanti.
-  • Segera hubungi instansi atau siapkan dokumen jika menemukan tender yang sesuai.
+                <p style="margin: 0 0 10px; font-weight: bold;">Tips Memaksimalkan Trial Anda:</p>
+                <ul style="margin: 0 0 20px; padding-left: 20px; list-style: disc;">
+                  <li style="margin-bottom: 5px;">Cek email update tender setiap pagi.</li>
+                  <li style="margin-bottom: 5px;">Simpan atau tandai tender yang menarik.</li>
+                  <li>Segera hubungi instansi untuk tender yang sesuai.</li>
+                </ul>
 
-  Catatan Penting:
-  Trial Anda akan berakhir pada ${trialEndDate}.
-  Untuk terus mendapatkan update tender harian, upgrade paket Anda sebelum masa trial berakhir.
-  
-  <a href="[Link untuk upgrade]" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:5px;">Upgrade Paket Anda</a>
+                <div style="background-color: #f7f9fc; padding: 15px; border-left: 4px solid #4CAF50; border-radius: 4px; margin-bottom: 25px;">
+                  <p style="margin: 0; font-weight: bold;">Catatan Penting:</p>
+                  <p style="margin: 5px 0 0; font-size: 14px;">
+                    Trial Anda akan berakhir pada <strong>${trialEndDate}</strong>. Untuk terus mendapatkan update tender harian, upgrade paket Anda sebelum masa trial berakhir.
+                  </p>
+                </div>
 
-  Butuh Bantuan?
-  Email: info@pejuangtender.id
-  WhatsApp: +62822 8478 3855
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td align="center" style="padding-bottom: 25px;">
+                      <a href="https://pejuang-tender.vercel.app/#paket" class="button" style="display:inline-block;padding:12px 25px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:50px;font-weight:bold;">
+                        Upgrade Paket Anda
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-  Selamat berjuang & semoga sukses memenangkan tender!
-  Salam,
-  Tim pejuangtender.id
-  “Tender Tepat, Lebih Cepat”
+                <p style="margin: 0 0 5px; font-weight: bold;">Butuh Bantuan?</p>
+                <p style="margin: 0 0 5px;"><a href="mailto:info@pejuangtender.id" style="color: #1a237e;">Email: info@pejuangtender.id</a></p>
+                <p style="margin: 0 0 20px;"><a href="https://wa.me/6282284783855" style="color: #1a237e;">WhatsApp: +62822 8478 3855</a></p>
+              </td>
+            </tr>
+            
+            <tr>
+              <td style="padding: 20px 30px 40px 30px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;">
+                <p style="margin: 0;">&copy; 2025 pejuangtender.id. All rights reserved.</p>
+                <p style="margin: 5px 0 0;">“Tender Tepat, Lebih Cepat”</p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+  </html>
   `;
 };
