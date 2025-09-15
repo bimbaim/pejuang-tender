@@ -8,7 +8,7 @@ import { createClient } from "@supabase/supabase-js";
  * It includes key properties used for processing payment statuses.
  */
 interface XenditInvoiceWebhookEvent {
-  event: "invoice.paid" | "invoice.expired" | "payment.capture" |string; // Specific known events, or a string for others
+  event: "invoice.paid" | "invoice.expired" | "payment.capture" | string; // Specific known events, or a string for others
   external_id: string;
   id: string;
   status: "PAID" | "EXPIRED" | "PENDING" | "SETTLED" | "FAILED" | string;
