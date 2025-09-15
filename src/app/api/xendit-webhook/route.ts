@@ -118,7 +118,10 @@ export async function POST(req: Request) {
     
     // Handle 'invoice.expired' event for payments that were not completed in time.
     else if (webhookEvent.event === "invoice.expired" && webhookEvent.status === "EXPIRED") {
-        const subscriptionId = webhookEvent.external_id;
+        let subscriptionId = webhookEvent.external_id;
+        if (subscriptionId.startsWith("invoice_")) {
+          subscriptionId = subscriptionId.replace("invoice_", "");
+        }
 
         if (subscriptionId) {
             // Update the subscription's payment_status to 'failed' or 'expired' in Supabase.
