@@ -12,15 +12,12 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // --- Antarmuka (Interfaces) ---
-// Perbaikan: Properti users sekarang adalah objek tunggal, bukan array
-// Perbaikan: Properti keyword, category, dan spse dapat berupa null
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
   category: string[] | null;
   spse: string[] | null;
   start_date: string;
-  // end_date is now used for the filter and passed to the template
   end_date: string;
   users: {
     name: string;
@@ -33,11 +30,7 @@ interface Tender {
     title: string;
     agency: string;
     budget: number;
-    // Perbaikan: Ganti 'url' menjadi 'source_url'
     source_url: string;
-    // We will no longer try to select 'end_date' here, as it doesn't exist
-    // You may have another column for the tender's deadline, like 'deadline_date'
-    // For now, let's remove it to fix the error.
 }
 
 // --- POST Handler untuk Mengirim Email Harian ---
@@ -47,12 +40,12 @@ export async function POST(req: NextRequest) {
     // Format today's date to a string without time, e.g., "2025-09-15"
     const todayISOString = today.toISOString().split('T')[0];
 
-    // 1. Ambil semua langganan yang berstatus 'free-trial' DAN end_date-nya adalah hari ini
+    // 1. Ambil semua langganan yang berstatus 'free-trial' DAN end_date-nya BELUM hari ini
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, start_date, end_date, users(name, email)`)
       .eq("payment_status", "free-trial")
-      .eq("end_date", todayISOString); // <-- This is the correct filter
+      .gte("end_date", todayISOString); // <--- Changed from .eq to .gte
 
     if (subsError) {
       console.error("Error fetching trial subscriptions:", subsError.message);
@@ -60,7 +53,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!subscriptions || subscriptions.length === 0) {
-      return NextResponse.json({ message: "No active trial subscriptions found with today as the end date." });
+      return NextResponse.json({ message: "No active trial subscriptions found." });
     }
 
     // 2. Iterasi setiap pengguna trial
@@ -79,7 +72,6 @@ export async function POST(req: NextRequest) {
       // Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
-          // FIX: Removed 'end_date' from the select statement as it doesn't exist in this table
           .select(`id, title, agency, budget, source_url`) 
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order("created_at", { ascending: false });
