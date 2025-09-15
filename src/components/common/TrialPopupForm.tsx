@@ -317,7 +317,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
             {/* Kategori */}
             <div className="radio-group">
-              <label>Kategori (maks 1 untuk trial)</label>
+              <label>Kategori (maks 1)</label>
               <div className="radio-options-grid">
                 {[
                   "Pengadaan Barang",
@@ -345,7 +345,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
             {/* Target SPSE from Supabase */}
             <div className="input-group">
-              <label>Target SPSE</label>
+              <label>Target SPSE (https://spse.inaproc/......)</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
@@ -357,7 +357,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
             {/* Kata Kunci */}
             <div className="input-group">
-              <label>Target Kata Kunci</label>
+              <label>Target Kata Kunci (maks {keywordLimit})</label>
               <div className="keywords-input-area">
                 {formData.keywords.map((keyword, index) => (
                   <div key={index} className="keyword-tag">
