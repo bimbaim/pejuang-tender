@@ -37,14 +37,13 @@ const TenderCard: React.FC<TenderCardProps> = ({ tender }) => {
     <div className={styles.tenderCard}>
       <div className={styles.imageWrapper}>
         <Image
-          src={finalImageSrc}
-          alt={`${agency} Logo`}
-          width={163}
-          height={163}
-          // The onError prop is a callback that runs if the image fails to load.
-          // We set the imageError state to true, which triggers a re-render.
-          onError={() => setImageError(true)}
-        />
+            src={finalImageSrc}
+            alt={`${agency} Logo`}
+            fill // Replaces width and height
+            style={{ objectFit: 'contain' }}
+            sizes="(max-width: 768px) 100vw, 50vw" // Required when using `fill`
+            onError={() => setImageError(true)}
+          />
       </div>
       <div className={styles.content}>
         <div className={styles.textWrapper}>
