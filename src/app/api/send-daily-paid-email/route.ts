@@ -11,6 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
     }
 });
 
+
 // --- Antarmuka (Interfaces) ---
 // Perbaikan: Users sekarang adalah objek tunggal, bukan array
 interface SubscriptionWithDetails {
