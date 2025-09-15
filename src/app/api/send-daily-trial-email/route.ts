@@ -37,15 +37,13 @@ interface Tender {
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
-    // Format today's date to a string without time, e.g., "2025-09-15"
     const todayISOString = today.toISOString().split('T')[0];
 
-    // 1. Ambil semua langganan yang berstatus 'free-trial' DAN end_date-nya BELUM hari ini
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, start_date, end_date, users(name, email)`)
       .eq("payment_status", "free-trial")
-      .gte("end_date", todayISOString); // <--- Changed from .eq to .gte
+      .gte("end_date", todayISOString);
 
     if (subsError) {
       console.error("Error fetching trial subscriptions:", subsError.message);
@@ -56,7 +54,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "No active trial subscriptions found." });
     }
 
-    // 2. Iterasi setiap pengguna trial
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
       const { user_id, keyword, category, spse, users, end_date } = subscription;
       
@@ -65,11 +62,9 @@ export async function POST(req: NextRequest) {
           continue;
       }
 
-      // Format the trial end date for the email template
       const trialEndDate = new Date(end_date);
       const formattedTrialEndDate = trialEndDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 
-      // Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
           .select(`id, title, agency, budget, source_url`) 
@@ -78,7 +73,9 @@ export async function POST(req: NextRequest) {
 
       // Tambahkan filter secara kondisional
       if (category && category.length > 0) {
-          tenderQuery = tenderQuery.filter("category", "cs", `({${category.join(',')}})`);
+          // Changed from `cs` to `ilike` and joined with OR
+          const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
+          tenderQuery = tenderQuery.or(categoryFilters);
       }
 
       if (spse && spse.length > 0) {
@@ -86,7 +83,9 @@ export async function POST(req: NextRequest) {
       }
 
       if (keyword && keyword.length > 0) {
-          tenderQuery = tenderQuery.filter("title", "cs", `({${keyword.join(',')}})`);
+          // Changed from `cs` to `ilike` and joined with OR
+          const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
+          tenderQuery = tenderQuery.or(keywordFilters);
       }
 
       tenderQuery = tenderQuery.or(
@@ -100,10 +99,8 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Buat konten email
       const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
 
-      // Kirim email via API SendGrid Anda
       const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
