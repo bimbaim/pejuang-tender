@@ -176,6 +176,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             payment_status: "free-trial",
             start_date: new Date().toISOString().split("T")[0],
             end_date: endDateISO,
+            category: [formData.category], // Convert to array because the database column is jsonb
+            keyword: formData.keywords,    // Already an array
+            spse: formData.targetSpse,     // Already an array
           },
         ]);
 
