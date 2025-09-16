@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
 import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
 import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome'; // Import new template
+import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial"; // Import the new template
 
 interface SendGridError extends Error {
   response?: {
@@ -40,6 +41,14 @@ export async function POST(req: Request) {
           return NextResponse.json({ message: 'Missing or invalid data for subscriptionWelcome template' }, { status: 400 });
         }
         emailBody = subscriptionWelcomeTemplate(data.name, data.packageName);
+        break;
+
+      case 'dailyTenderTrial':
+        // Add a check for the expected data for this template
+        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
+          return NextResponse.json({ message: 'Missing or invalid data for dailyTenderTrial template' }, { status: 400 });
+        }
+        emailBody = dailyTenderTrialEmailTemplate(data.name, data.tenders, data.trialEndDate);
         break;
       
       default:

@@ -98,21 +98,22 @@ export async function POST(req: NextRequest) {
                 continue;
             }
 
-            const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
+            // const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
 
             const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    to: users.email,
-                    subject: "Update Tender Hari Ini",
-                    html: emailBody,
-                    data: {
-                        name: users.name,
-                        tenders: tenders,
-                        trialEndDate: formattedTrialEndDate
-                    }
-                }),
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                to: users.email,
+                subject: "Update Tender Hari Ini",
+                // Pass the template name and data instead of the pre-built HTML
+                templateName: 'dailyTenderTrial', 
+                data: {
+                  name: users.name,
+                  tenders: tenders,
+                  trialEndDate: formattedTrialEndDate
+                }
+              }),
             });
 
             if (!response.ok) {
