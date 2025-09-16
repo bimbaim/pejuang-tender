@@ -676,15 +676,14 @@
 
 /* Warna untuk input yang valid (Hijau) */
 .package-input-group.valid input,
-.package-input-group.valid textarea,
-.package-input-group.valid .custom-multi-select .select-box {
+.package-input-group.valid textarea {
   border-color: #4CAF50 !important; /* Hijau */
 }
 
+
 /* Warna untuk input yang tidak valid (Merah) */
 .package-input-group.invalid input,
-.package-input-group.invalid textarea,
-.package-input-group.invalid .custom-multi-select .select-box {
+.package-input-group.invalid textarea {
   border-color: #f44336 !important; /* Merah */
 }
 
