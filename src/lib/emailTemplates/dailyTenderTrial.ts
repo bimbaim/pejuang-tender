@@ -71,7 +71,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
               <tr>
                 <td align="left">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="https://your-domain.com/images/logo.png" alt="PEJUANG Tender Logo" width="44" height="44" style="display: block;">
+                    <img src="/images/company-logo.png" alt="PEJUANG Tender Logo" width="44" height="44" style="display: block;">
                     <p style="font-size: 18px; font-weight: bold; margin: 0;">PEJUANG Tender</p>
                   </div>
                 </td>
