@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./PackagePopupForm.css";
 
-// Tentukan antarmuka untuk fitur-fitur paket
 interface PackageFeatures {
   kategori?: number;
   lpse?: number;
@@ -16,7 +15,6 @@ interface PackageFeatures {
   wa_notifikasi?: boolean;
 }
 
-// Tentukan antarmuka untuk paket yang dipilih
 interface SelectedPackage {
   id: string;
   name: string;
@@ -25,19 +23,16 @@ interface SelectedPackage {
   features?: PackageFeatures;
 }
 
-// Tentukan antarmuka untuk properti komponen
 interface PackagePopupFormProps {
   isOpen: boolean;
   onClose: () => void;
   selectedPackage: SelectedPackage | null;
 }
 
-// Antarmuka untuk menangani kesalahan
 interface ExtendedError extends Error {
   message: string;
 }
 
-// Antarmuka untuk lokasi LPSE
 interface LpseLocation {
   id: number;
   value: string;
@@ -49,7 +44,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   onClose,
   selectedPackage,
 }) => {
-  // Kelola status formulir menggunakan state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -59,17 +53,31 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     keywords: [] as string[],
   });
 
-  // 🔹 State untuk mengelola status loading dan progress bar
+  // 🔹 State untuk validasi dan field yang disentuh
+  const [validationState, setValidationState] = useState({
+    name: null as boolean | null,
+    email: null as boolean | null,
+    whatsapp: null as boolean | null,
+    category: null as boolean | null,
+    targetSpse: null as boolean | null,
+    keywords: null as boolean | null,
+  });
+
+  const [touchedState, setTouchedState] = useState({
+    name: false,
+    email: false,
+    whatsapp: false,
+    category: false,
+    targetSpse: false,
+    keywords: false,
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressBar, setShowProgressBar] = useState(false);
-
-  // Kelola opsi LPSE yang diambil dari database
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
-  // Gunakan useEffect untuk mengambil data LPSE saat popup dibuka
   useEffect(() => {
     const fetchLpseOptions = async () => {
-      // Ambil lokasi LPSE dari Supabase
       const { data, error } = await supabase
         .from("lpse_locations")
         .select("id, value, name")
@@ -85,7 +93,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     if (isOpen) {
       fetchLpseOptions();
     } else {
-      // Reset formulir saat popup ditutup
       setFormData({
         name: "",
         email: "",
@@ -94,86 +101,130 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         targetSpse: [],
         keywords: [],
       });
+      // 🔹 Reset state validasi dan touched saat ditutup
+      setValidationState({
+        name: null,
+        email: null,
+        whatsapp: null,
+        category: null,
+        targetSpse: null,
+        keywords: null,
+      });
+      setTouchedState({
+        name: false,
+        email: false,
+        whatsapp: false,
+        category: false,
+        targetSpse: false,
+        keywords: false,
+      });
       setIsLoading(false);
       setShowProgressBar(false);
     }
   }, [isOpen]);
 
-  // Jangan render komponen jika popup tidak terbuka atau tidak ada paket yang dipilih
   if (!isOpen || !selectedPackage) return null;
 
-  // Ambil batasan fitur dari data paket yang dipilih
   const spseLimit = selectedPackage.features?.lpse ?? 20;
   const keywordLimit = selectedPackage.features?.keywords ?? 5;
   const categoryLimit = selectedPackage.features?.kategori ?? 1;
 
-  // Tangani perubahan input teks dan email
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  // 🔹 Fungsi validasi yang baru
+  const validateForm = (data: typeof formData) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isNameValid = data.name.trim() !== "";
+    const isEmailValid = emailRegex.test(data.email);
+    const isWhatsappValid = data.whatsapp.trim() !== "";
+    const isCategoryValid = data.category.length > 0;
+    const isSpseValid = data.targetSpse.length > 0;
+    const isKeywordsValid = data.keywords.some(keyword => keyword.trim() !== "");
+
+    return {
+      name: isNameValid,
+      email: isEmailValid,
+      whatsapp: isWhatsappValid,
+      category: isCategoryValid,
+      targetSpse: isSpseValid,
+      keywords: isKeywordsValid,
+    };
+  };
+  
+  // 🔹 Fungsi untuk menangani event blur (saat user pindah dari kolom)
+  const handleBlur = (field: keyof typeof touchedState) => {
+    setTouchedState(prev => ({ ...prev, [field]: true }));
+    setValidationState(validateForm(formData));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Tangani perubahan pada pilihan LPSE
   const handleLpseChange = (selectedValues: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      targetSpse: selectedValues,
-    }));
+    setFormData((prev) => ({ ...prev, targetSpse: selectedValues }));
+    handleBlur('targetSpse'); // 🔹 Panggil handleBlur di sini
   };
 
-  // Tangani perubahan pada input kata kunci
   const handleKeywordChange = (index: number, value: string) => {
     const newKeywords = [...formData.keywords];
     newKeywords[index] = value;
     setFormData((prev) => ({ ...prev, keywords: newKeywords }));
   };
 
-  // Hapus kata kunci dari daftar
   const handleRemoveKeyword = (indexToRemove: number) => {
     setFormData((prev) => ({
       ...prev,
       keywords: prev.keywords.filter((_, i) => i !== indexToRemove),
     }));
+    handleBlur('keywords'); // 🔹 Panggil handleBlur di sini
   };
 
-  // Tambah kata kunci baru jika batas belum tercapai
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
-      setFormData((prev) => ({
-        ...prev,
-        keywords: [...prev.keywords, ""],
-      }));
+      setFormData((prev) => ({ ...prev, keywords: [...prev.keywords, ""] }));
+      handleBlur('keywords'); // 🔹 Panggil handleBlur di sini
     }
   };
 
-  // Tangani perubahan pada pilihan kategori dengan batasan
   const handleCategoryChange = (category: string) => {
     let newCategories = [...formData.category];
     if (newCategories.includes(category)) {
-      // Hapus kategori jika sudah dipilih
       newCategories = newCategories.filter((c) => c !== category);
     } else if (newCategories.length < categoryLimit) {
-      // Tambah kategori jika batas belum tercapai
       newCategories.push(category);
     }
     setFormData((prev) => ({ ...prev, category: newCategories }));
+    handleBlur('category'); // 🔹 Panggil handleBlur di sini
   };
-
-  // Tangani pengiriman formulir
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedPackage) return;
 
-    // 🔹 Mulai loading dan tampilkan progress bar
+    // 🔹 Tandai semua field sebagai touched sebelum validasi akhir
+    setTouchedState({
+      name: true,
+      email: true,
+      whatsapp: true,
+      category: true,
+      targetSpse: true,
+      keywords: true,
+    });
+
+    const formValidationResult = validateForm(formData);
+    setValidationState(formValidationResult);
+    
+    const isFormValid = Object.values(formValidationResult).every(Boolean);
+    if (!isFormValid) {
+      console.log("Form is not valid. Please correct the errors.");
+      return;
+    }
+    
     setIsLoading(true);
     setShowProgressBar(true);
 
     try {
       const package_id = selectedPackage.id;
-
-      // 1. Periksa apakah pengguna sudah ada di database
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
         .select("id")
@@ -183,10 +234,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       let user_id: string;
       if (existingUsers && existingUsers.length > 0) {
-        // Gunakan user_id yang sudah ada
         user_id = existingUsers[0].id;
       } else {
-        // Buat pengguna baru jika belum ada
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
           .insert([
@@ -203,14 +252,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         user_id = newUser.id;
       }
 
-      // 2. Hitung tanggal mulai dan akhir langganan
       const start_date = new Date();
       const end_date = new Date();
       end_date.setMonth(
         start_date.getMonth() + (selectedPackage.duration_months || 0)
       );
 
-      // 3. Masukkan langganan baru dengan status 'pending'
       const { data: subscriptionData, error: subscriptionError } =
         await supabase
           .from("subscriptions")
@@ -231,7 +278,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (subscriptionError) throw subscriptionError;
 
-      // 4. Panggil API untuk membuat invoice Xendit
       const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -247,7 +293,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         }),
       });
 
-      // Antarmuka untuk respons invoice
       interface InvoiceResponse {
         invoiceUrl?: string;
         error?: string;
@@ -258,7 +303,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         throw new Error(responseData.error || "Gagal membuat invoice Xendit");
       }
 
-      // 5. Perbarui langganan dengan URL pembayaran dari Xendit
       const { error: updateError } = await supabase
         .from("subscriptions")
         .update({ payment_url: responseData.invoiceUrl })
@@ -266,25 +310,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (updateError) throw updateError;
 
-      // 6. Redirect ke URL pembayaran Xendit
       window.location.href = responseData.invoiceUrl;
     } catch (error: unknown) {
       const err = error as ExtendedError;
       console.error("Error creating subscription or invoice:", err.message);
       alert(`❌ Terjadi kesalahan: ${err.message || "Silakan coba lagi."}`);
-      // 🔹 Matikan loading dan sembunyikan progress bar jika ada error
       setIsLoading(false);
       setShowProgressBar(false);
     }
   };
 
-  // Format opsi LPSE agar sesuai dengan komponen CustomMultiSelect
   const multiSelectLpseOptions = lpseOptions.map((lpse) => ({
     value: lpse.value,
     label: lpse.name,
   }));
 
-  // Format harga menjadi format mata uang Rupiah
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID").format(price);
   };
@@ -300,9 +340,19 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     "Jasa Lainnya",
   ];
 
+  // 🔹 Fungsi untuk mendapatkan kelas validasi
+  const getValidationClass = (field: keyof typeof validationState) => {
+    const state = validationState[field];
+    const isTouched = touchedState[field];
+    
+    if (isTouched && state !== null) {
+      return state === true ? 'valid' : 'invalid';
+    }
+    return '';
+  };
+
   return (
     <div className="package-popup-overlay" onClick={onClose}>
-      {/* 🔹 Tampilkan progress bar jika showProgressBar true */}
       {showProgressBar && <div className="loading-bar"></div>}
 
       <div
@@ -335,7 +385,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="package-trial-form">
-          <div className="package-input-group">
+          {/* 🔹 Tambahkan kelas validasi dan onBlur */}
+          <div className={`package-input-group ${getValidationClass('name')}`}>
             <label>Nama</label>
             <input
               type="text"
@@ -343,13 +394,15 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               name="name"
               value={formData.name}
               onChange={handleChange}
+              onBlur={() => handleBlur('name')}
               required
               className="package-text-input"
             />
           </div>
 
           <div className="package-inline-inputs">
-            <div className="package-field-inline">
+            {/* 🔹 Tambahkan kelas validasi dan onBlur */}
+            <div className={`package-field-inline ${getValidationClass('email')}`}>
               <label>Email</label>
               <input
                 type="email"
@@ -357,11 +410,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                onBlur={() => handleBlur('email')}
                 required
                 className="package-text-input"
               />
             </div>
-            <div className="package-field-inline">
+            {/* 🔹 Tambahkan kelas validasi dan onBlur */}
+            <div className={`package-field-inline ${getValidationClass('whatsapp')}`}>
               <label>Nomor Whatsapp</label>
               <input
                 type="tel"
@@ -369,15 +424,17 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleChange}
+                onBlur={() => handleBlur('whatsapp')}
                 required
                 className="package-text-input"
               />
             </div>
           </div>
 
-          <div className="radio-group">
+          {/* 🔹 Tambahkan kelas validasi dan onBlur */}
+          <div className={`radio-group ${getValidationClass('category')}`}>
             <label>Kategori (maks {categoryLimit})</label>
-            <div className="radio-options-grid">
+            <div className="radio-options-grid" onBlur={() => handleBlur('category')}>
               {allCategories.map((cat, index) => (
                 <label key={index} className="radio-option">
                   <input
@@ -395,23 +452,26 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          <div className="package-input-group">
+          {/* 🔹 Tambahkan kelas validasi */}
+          <div className={`package-input-group ${getValidationClass('targetSpse')}`}>
             <div className="package-field-input">
               <label>Target SPSE (https://spse.inaproc/......)</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
+                onBlur={() => handleBlur('targetSpse')} // 🔹 onBlur di sini
                 placeholder="Pilih SPSE"
                 limit={spseLimit}
               />
             </div>
           </div>
 
-          <div className="package-input-group">
+          {/* 🔹 Tambahkan kelas validasi */}
+          <div className={`package-input-group ${getValidationClass('keywords')}`}>
             <div className="package-field-input">
               <label>Target Kata Kunci (maks {keywordLimit})</label>
-              <div className="package-keywords-input-area">
+              <div className="package-keywords-input-area" onBlur={() => handleBlur('keywords')}>
                 {formData.keywords.map((keyword, index) => (
                   <div key={index} className="package-keyword-tag">
                     <input
@@ -432,8 +492,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                     </button>
                   </div>
                 ))}
-
-                {/* Tampilkan tombol "Tambah" hanya jika batas belum tercapai */}
                 {formData.keywords.length < keywordLimit && (
                   <button
                     type="button"
@@ -447,7 +505,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          {/* Kolom tersembunyi untuk data paket */}
           <input
             type="hidden"
             name="selectedPackage"
@@ -473,9 +530,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <button
               type="submit"
               className="package-submit-button"
-              disabled={isLoading} // 🔹 Matikan tombol saat loading
+              disabled={isLoading}
             >
-              {/* 🔹 Ubah teks tombol saat loading */}
               {isLoading ? "LOADING..." : "DAFTAR SEKARANG"}
             </button>
 
