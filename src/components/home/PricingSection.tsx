@@ -175,13 +175,14 @@ const PricingSection: React.FC<PricingSectionProps> = ({
             )}
           </div>
         </div>
-      </div>
-      <div>
+        <div className={styles.taxNoteContainer}>
         {/* ✅ Ditambahkan: Catatan Harga */}
           <p className={styles.taxNote}>
-            Harga belum termasuk PPN 11%
+            *Harga belum termasuk PPN 11%
           </p>
       </div>
+      </div>
+      
     </section>
   );
 };

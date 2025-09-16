@@ -307,3 +307,15 @@
 }
 
 /* No need for a separate rule here, the color will be inherited from .highlightedCard */
+.taxNoteContainer {
+  text-align: center;
+    min-width: 99%;
+    margin-top: -85px;
+}
+
+.taxNote {
+    color: var(--color-black);
+    font-size: 17px;
+    text-align: left;
+    font-weight: 500;
+}

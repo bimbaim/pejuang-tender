@@ -461,7 +461,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
           <div className={`package-input-group ${getValidationClass('targetSpse')}`}>
             <div className="package-field-input">
-              <label>Target SPSE (https://spse.inaproc/......)</label>
+              <label>Target SPSE (maks {spseLimit})</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
