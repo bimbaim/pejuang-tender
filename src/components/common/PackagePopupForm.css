@@ -672,42 +672,38 @@
 }
 
 
-/* --- Validasi CSS Baru --- */
+/* Styling for form validation feedback */
 
-/* Gaya untuk input yang valid */
-.input-group.valid input,
-.input-group.valid .multi-select-container {
-  border: 1px solid #4caf50 !important; /* Green border */
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
+/* Warna untuk input yang valid (Hijau) */
+.package-input-group.valid input,
+.package-input-group.valid textarea,
+.package-input-group.valid .custom-multi-select .select-box {
+  border-color: #4CAF50 !important; /* Hijau */
 }
 
-/* Gaya untuk input yang tidak valid */
-.input-group.invalid input,
-.input-group.invalid .multi-select-container {
-  border: 1px solid #f44336 !important; /* Red border */
-  box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); /* Red shadow */
+/* Warna untuk input yang tidak valid (Merah) */
+.package-input-group.invalid input,
+.package-input-group.invalid textarea,
+.package-input-group.invalid .custom-multi-select .select-box {
+  border-color: #f44336 !important; /* Merah */
 }
 
-/* Gaya untuk radio group yang tidak valid */
-.radio-group.invalid {
-  border: 1px solid #f44336;
-  border-radius: 8px;
-  padding: 10px;
+/* Warna untuk label yang tidak valid */
+.package-input-group.invalid label {
+  color: #f44336; /* Merah */
 }
 
-/* Jika Anda ingin mengubah warna label juga */
-.input-group.invalid label,
+/* Warna untuk label yang valid */
+.package-input-group.valid label {
+  color: #4CAF50; /* Hijau */
+}
+
+
+/* Styling khusus untuk grup radio button */
 .radio-group.invalid label {
-  color: #f44336;
+  color: #f44336; /* Merah */
 }
 
-/* Gaya untuk input keyword yang valid */
-.input-group.valid .keyword-tag input {
-  border: 1px solid #4caf50 !important;
+.radio-group.valid label {
+  color: #4CAF50; /* Hijau */
 }
-
-/* Gaya untuk input keyword yang tidak valid */
-.input-group.invalid .keyword-tag input {
-  border: 1px solid #f44336 !important;
-}
-/* --- Akhir Validasi CSS Baru --- */
