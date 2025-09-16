@@ -53,7 +53,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     keywords: [] as string[],
   });
 
-  // 🔹 State untuk validasi dan field yang disentuh
   const [validationState, setValidationState] = useState({
     name: null as boolean | null,
     email: null as boolean | null,
@@ -101,7 +100,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         targetSpse: [],
         keywords: [],
       });
-      // 🔹 Reset state validasi dan touched saat ditutup
       setValidationState({
         name: null,
         email: null,
@@ -129,7 +127,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const keywordLimit = selectedPackage.features?.keywords ?? 5;
   const categoryLimit = selectedPackage.features?.kategori ?? 1;
 
-  // 🔹 Fungsi validasi yang baru
   const validateForm = (data: typeof formData) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isNameValid = data.name.trim() !== "";
@@ -149,7 +146,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     };
   };
   
-  // 🔹 Fungsi untuk menangani event blur (saat user pindah dari kolom)
   const handleBlur = (field: keyof typeof touchedState) => {
     setTouchedState(prev => ({ ...prev, [field]: true }));
     setValidationState(validateForm(formData));
@@ -162,7 +158,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData((prev) => ({ ...prev, targetSpse: selectedValues }));
-    handleBlur('targetSpse'); // 🔹 Panggil handleBlur di sini
+    handleBlur('targetSpse');
   };
 
   const handleKeywordChange = (index: number, value: string) => {
@@ -176,32 +172,40 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       ...prev,
       keywords: prev.keywords.filter((_, i) => i !== indexToRemove),
     }));
-    handleBlur('keywords'); // 🔹 Panggil handleBlur di sini
+    handleBlur('keywords');
   };
 
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
       setFormData((prev) => ({ ...prev, keywords: [...prev.keywords, ""] }));
-      handleBlur('keywords'); // 🔹 Panggil handleBlur di sini
+      handleBlur('keywords');
     }
   };
 
+  // 🔹 Logika yang diperbarui untuk radio button dan checkbox
   const handleCategoryChange = (category: string) => {
-    let newCategories = [...formData.category];
-    if (newCategories.includes(category)) {
-      newCategories = newCategories.filter((c) => c !== category);
-    } else if (newCategories.length < categoryLimit) {
-      newCategories.push(category);
+    let newCategories: string[] = [];
+
+    if (categoryLimit === 1) {
+      // Jika limit 1, hanya izinkan satu pilihan (radio button)
+      newCategories = [category];
+    } else {
+      // Jika limit > 1, kelola sebagai checkbox
+      newCategories = [...formData.category];
+      if (newCategories.includes(category)) {
+        newCategories = newCategories.filter((c) => c !== category);
+      } else if (newCategories.length < categoryLimit) {
+        newCategories.push(category);
+      }
     }
     setFormData((prev) => ({ ...prev, category: newCategories }));
-    handleBlur('category'); // 🔹 Panggil handleBlur di sini
+    handleBlur('category');
   };
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedPackage) return;
 
-    // 🔹 Tandai semua field sebagai touched sebelum validasi akhir
     setTouchedState({
       name: true,
       email: true,
@@ -340,7 +344,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     "Jasa Lainnya",
   ];
 
-  // 🔹 Fungsi untuk mendapatkan kelas validasi
   const getValidationClass = (field: keyof typeof validationState) => {
     const state = validationState[field];
     const isTouched = touchedState[field];
@@ -385,7 +388,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="package-trial-form">
-          {/* 🔹 Tambahkan kelas validasi dan onBlur */}
           <div className={`package-input-group ${getValidationClass('name')}`}>
             <label>Nama</label>
             <input
@@ -401,7 +403,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
           </div>
 
           <div className="package-inline-inputs">
-            {/* 🔹 Tambahkan kelas validasi dan onBlur */}
             <div className={`package-field-inline ${getValidationClass('email')}`}>
               <label>Email</label>
               <input
@@ -415,7 +416,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 className="package-text-input"
               />
             </div>
-            {/* 🔹 Tambahkan kelas validasi dan onBlur */}
             <div className={`package-field-inline ${getValidationClass('whatsapp')}`}>
               <label>Nomor Whatsapp</label>
               <input
@@ -431,17 +431,21 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          {/* 🔹 Tambahkan kelas validasi dan onBlur */}
           <div className={`radio-group ${getValidationClass('category')}`}>
             <label>Kategori (maks {categoryLimit})</label>
             <div className="radio-options-grid" onBlur={() => handleBlur('category')}>
               {allCategories.map((cat, index) => (
                 <label key={index} className="radio-option">
                   <input
-                    type="checkbox"
-                    checked={formData.category.includes(cat)}
+                    // 🔹 Ubah tipe input secara dinamis
+                    type={categoryLimit === 1 ? 'radio' : 'checkbox'}
+                    name="category"
+                    // 🔹 Ubah prop 'checked' secara dinamis
+                    checked={categoryLimit === 1 ? formData.category[0] === cat : formData.category.includes(cat)}
                     onChange={() => handleCategoryChange(cat)}
+                    // 🔹 Hapus atau sesuaikan 'disabled' jika diperlukan
                     disabled={
+                      categoryLimit > 1 &&
                       !formData.category.includes(cat) &&
                       formData.category.length >= categoryLimit
                     }
@@ -452,7 +456,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          {/* 🔹 Tambahkan kelas validasi */}
           <div className={`package-input-group ${getValidationClass('targetSpse')}`}>
             <div className="package-field-input">
               <label>Target SPSE (https://spse.inaproc/......)</label>
@@ -460,14 +463,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
-                onBlur={() => handleBlur('targetSpse')} // 🔹 onBlur di sini
+                onBlur={() => handleBlur('targetSpse')}
                 placeholder="Pilih SPSE"
                 limit={spseLimit}
               />
             </div>
           </div>
 
-          {/* 🔹 Tambahkan kelas validasi */}
           <div className={`package-input-group ${getValidationClass('keywords')}`}>
             <div className="package-field-input">
               <label>Target Kata Kunci (maks {keywordLimit})</label>
