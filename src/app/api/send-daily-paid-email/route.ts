@@ -32,7 +32,7 @@ interface Tender {
     agency: string;
     budget: number;
     source_url: string;
-    end_date: string;
+    // end_date: string;
 }
 
 /**
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       // 3. Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url, end_date`)
+          .select(`id, title, agency, budget, source_url`)
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order("created_at", { ascending: false });
       
