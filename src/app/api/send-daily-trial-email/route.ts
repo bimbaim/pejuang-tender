@@ -1,6 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
+// import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -25,13 +25,13 @@ interface SubscriptionWithDetails {
     };
 }
 
-interface Tender {
-    id: string;
-    title: string;
-    agency: string;
-    budget: number;
-    source_url: string;
-}
+// interface Tender {
+//     id: string;
+//     title: string;
+//     agency: string;
+//     budget: number;
+//     source_url: string;
+// }
 
 // --- POST Handler untuk Mengirim Email Harian ---
 export async function POST(req: NextRequest) {
@@ -81,6 +81,11 @@ export async function POST(req: NextRequest) {
             // if (spse && spse.length > 0) {
             //     tenderQuery = tenderQuery.in("lpse", spse);
             // }
+
+            if (spse && spse.length > 0) {
+                const spseFilters = spse.map(site => `source_url.like.%//spse.inaproc.id/${site}/%`).join(',');
+                tenderQuery = tenderQuery.or(spseFilters);
+            }
 
             if (keyword && keyword.length > 0) {
                 const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
