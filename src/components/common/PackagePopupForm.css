@@ -696,13 +696,3 @@
 .package-input-group.valid label {
   color: #4CAF50; /* Hijau */
 }
-
-
-/* Styling khusus untuk grup radio button */
-.radio-group.invalid label {
-  color: #f44336; /* Merah */
-}
-
-.radio-group.valid label {
-  color: #4CAF50; /* Hijau */
-}
