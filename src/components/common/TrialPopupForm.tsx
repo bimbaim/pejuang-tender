@@ -21,14 +21,12 @@ interface LpseLocation {
   name: string;
 }
 
-// Define the limits as constants
 const spseLimit = 10;
 const keywordLimit = 3;
 
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
 
-  // State to manage all form data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,7 +36,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: [] as string[],
   });
 
-  // State untuk melacak status validasi setiap field
   const [validationState, setValidationState] = useState({
     name: null as boolean | null,
     email: null as boolean | null,
@@ -48,13 +45,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: null as boolean | null,
   });
 
-  // State untuk LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
-
-  // State to track form submission attempt
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Fetch LPSE data from Supabase when the popup is opened
   useEffect(() => {
     if (!isOpen) return;
 
@@ -74,22 +67,21 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     fetchLpseOptions();
   }, [isOpen]);
 
-  // If the popup is not open, render nothing
   if (!isOpen) {
     return null;
   }
 
-  // --- Fungsi Validasi Baru ---
-  const validateForm = () => {
+  // Fungsi validasi yang diperbarui
+  const validateForm = (data: typeof formData) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isNameValid = formData.name.trim() !== "";
-    const isEmailValid = emailRegex.test(formData.email);
-    const isWhatsappValid = formData.whatsapp.trim() !== "";
-    const isCategoryValid = formData.category !== "";
-    const isSpseValid = formData.targetSpse.length > 0;
-    const isKeywordsValid = formData.keywords.some(keyword => keyword.trim() !== "");
+    const isNameValid = data.name.trim() !== "";
+    const isEmailValid = emailRegex.test(data.email);
+    const isWhatsappValid = data.whatsapp.trim() !== "";
+    const isCategoryValid = data.category !== "";
+    const isSpseValid = data.targetSpse.length > 0;
+    const isKeywordsValid = data.keywords.some(keyword => keyword.trim() !== "");
 
-    const newValidationState = {
+    return {
       name: isNameValid,
       email: isEmailValid,
       whatsapp: isWhatsappValid,
@@ -97,84 +89,71 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       targetSpse: isSpseValid,
       keywords: isKeywordsValid,
     };
-
-    setValidationState(newValidationState);
-    
-    return isNameValid && isEmailValid && isWhatsappValid && isCategoryValid && isSpseValid && isKeywordsValid;
   };
-  // --- Akhir Fungsi Validasi Baru ---
 
-  // Handle changes for text inputs
+  const handleValidation = (data: typeof formData) => {
+    if (isSubmitted) {
+      const newValidationState = validateForm(data);
+      setValidationState(newValidationState);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (isSubmitted) {
-      // Re-validate if form has been submitted
-      validateForm();
-    }
+    const newData = { ...formData, [name]: value };
+    setFormData(newData);
+    handleValidation(newData);
   };
 
-  // Handle changes for radio buttons
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, category: e.target.value }));
-    if (isSubmitted) {
-      validateForm();
-    }
+    const newData = { ...formData, category: e.target.value };
+    setFormData(newData);
+    handleValidation(newData);
   };
 
-  // Handle changes for individual keyword inputs
   const handleKeywordChange = (index: number, value: string) => {
     const newKeywords = [...formData.keywords];
     newKeywords[index] = value;
-    setFormData((prev) => ({ ...prev, keywords: newKeywords }));
-    if (isSubmitted) {
-      validateForm();
-    }
+    const newData = { ...formData, keywords: newKeywords };
+    setFormData(newData);
+    handleValidation(newData);
   };
 
-  // Handle removing a keyword
   const handleRemoveKeyword = (indexToRemove: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      keywords: prev.keywords.filter((_, index) => index !== indexToRemove),
-    }));
-    if (isSubmitted) {
-      validateForm();
-    }
+    const newKeywords = formData.keywords.filter((_, index) => index !== indexToRemove);
+    const newData = { ...formData, keywords: newKeywords };
+    setFormData(newData);
+    handleValidation(newData);
   };
 
-  // Handle adding a new empty keyword input
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
-      setFormData((prev) => ({
-        ...prev,
-        keywords: [...prev.keywords, ""],
-      }));
+      const newData = { ...formData, keywords: [...formData.keywords, ""] };
+      setFormData(newData);
+      handleValidation(newData);
     }
   };
 
-  // New handler to update targetSpse from the CustomMultiSelect component
   const handleLpseChange = (selectedValues: string[]) => {
-    setFormData((prev) => ({
-      ...prev,
-      targetSpse: selectedValues,
-    }));
-    if (isSubmitted) {
-      validateForm();
-    }
+    const newData = { ...formData, targetSpse: selectedValues };
+    setFormData(newData);
+    handleValidation(newData);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitted(true); // Tandai form sebagai sudah disubmit
+    setIsSubmitted(true);
 
-    const isFormValid = validateForm();
+    const formValidationResult = validateForm(formData);
+    setValidationState(formValidationResult);
+
+    const isFormValid = Object.values(formValidationResult).every(Boolean);
     if (!isFormValid) {
-      // Jika form tidak valid, hentikan proses submit
       console.log("Form is not valid. Please correct the errors.");
       return;
     }
 
+    // Lanjutkan dengan logika submit ke Supabase
     try {
       const { data: trialPackage, error: packageError } = await supabase
         .from("packages")
@@ -286,9 +265,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     label: lpse.name,
   }));
 
-  // Helper untuk mendapatkan kelas validasi
   const getValidationClass = (field: keyof typeof validationState) => {
-    if (!isSubmitted) return '';
     const state = validationState[field];
     return state === true ? 'valid' : state === false ? 'invalid' : '';
   };
