@@ -325,7 +325,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   "Jasa Konsultansi Badan Usaha Konstruksi",
                   "Jasa Konsultansi Perorangan Konstruksi",
                   "Jasa Konsultansi Perorangan Non Konstruksi",
-                  "Jasa Konsultansi Badan Usaha Konstruksi",
                   "Jasa Konsultansi Badan Usaha Non Konstruksi",
                   "Pekerjaan Konstruksi Terintegrasi",
                   "Jasa Lainnya",
