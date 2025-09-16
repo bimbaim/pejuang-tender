@@ -1,8 +1,6 @@
 // File: src/app/api/cron/dailyTenderPaid/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-// Hapus baris ini karena kita akan menggunakan template dinamis dari SendGrid
-// import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -26,24 +24,20 @@ interface SubscriptionWithDetails {
   };
 }
 
-interface Tender {
-    id: string;
-    title: string;
-    agency: string;
-    budget: number;
-    source_url: string;
-    // end_date: string;
-}
+// interface Tender {
+//     id: string;
+//     title: string;
+//     agency: string;
+//     budget: number;
+//     source_url: string;
+//     // end_date: string;
+// }
 
-/**
- * POST handler untuk mengirim email harian ke pelanggan berbayar.
- */
 export async function POST(req: NextRequest) {
   try {
-    const today = new Date();
+    // const today = new Date();
     const sentEmails: string[] = [];
     
-    // 1. Ambil semua langganan yang berstatus 'paid'
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, users(name, email)`)
@@ -58,7 +52,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "No active paid subscriptions found." });
     }
 
-    // 2. Iterasi setiap pengguna berbayar
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
       const { user_id, keyword, category, spse, users } = subscription;
       
@@ -67,14 +60,12 @@ export async function POST(req: NextRequest) {
           continue;
       }
 
-      // 3. Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
           .select(`id, title, agency, budget, source_url`)
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order("created_at", { ascending: false });
       
-      // Menggabungkan semua filter ke dalam satu `.or()` statement
       const filterConditions = [];
 
       if (category && category.length > 0) {
@@ -82,7 +73,6 @@ export async function POST(req: NextRequest) {
           filterConditions.push(categoryFilters);
       }
       
-      // Menggunakan logika yang sama dengan versi trial untuk filter SPSE
       if (spse && spse.length > 0) {
           const spseFilters = spse.map(site => `source_url.like.%//spse.inaproc.id/${site}/%`).join(',');
           filterConditions.push(spseFilters);
@@ -93,12 +83,10 @@ export async function POST(req: NextRequest) {
           filterConditions.push(keywordFilters);
       }
 
-      // Menambahkan filter status tender
       filterConditions.push(
         'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
       );
       
-      // Terapkan semua filter ke query
       if (filterConditions.length > 0) {
         tenderQuery = tenderQuery.or(filterConditions.join(','));
       }
@@ -110,7 +98,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
       
-      // 4. Kirim email via API SendGrid menggunakan template dinamis
+      // ✅ Perbaikan: Hapus 'html: emailBody' dan pastikan hanya 'templateName' dan 'data' yang dikirim.
       const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

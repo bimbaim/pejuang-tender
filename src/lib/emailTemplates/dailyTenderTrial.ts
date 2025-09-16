@@ -23,12 +23,12 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
       ? new Date(tender.end_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
       : '-';
 
-    const formattedBudget = new Intl.NumberFormat("id-ID", {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(tender.budget);
+    // const formattedBudget = new Intl.NumberFormat("id-ID", {
+    //   style: 'currency',
+    //   currency: 'IDR',
+    //   minimumFractionDigits: 0,
+    //   maximumFractionDigits: 0,
+    // }).format(tender.budget);
 
     return `
     <tr style="background-color: #ffffff; border: 1px solid #f5f5f5;">
