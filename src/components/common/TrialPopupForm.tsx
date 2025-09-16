@@ -47,6 +47,16 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: null as boolean | null,
   });
 
+  // State untuk melacak field yang sudah disentuh (touched)
+  const [touchedState, setTouchedState] = useState({
+    name: false,
+    email: false,
+    whatsapp: false,
+    category: false,
+    targetSpse: false,
+    keywords: false,
+  });
+
   // State untuk LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
 
@@ -73,7 +83,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     return null;
   }
 
-  // Fungsi validasi yang diperbarui
   const validateForm = (data: typeof formData) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isNameValid = data.name.trim() !== "";
@@ -93,58 +102,61 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     };
   };
 
-  // Fungsi penanganan yang memicu validasi secara langsung
-  const handleValidation = (data: typeof formData) => {
-    const newValidationState = validateForm(data);
+  // Fungsi untuk memicu validasi pada field yang disentuh
+  const handleBlur = (field: keyof typeof touchedState) => {
+    setTouchedState(prev => ({ ...prev, [field]: true }));
+    const newValidationState = validateForm(formData);
     setValidationState(newValidationState);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const newData = { ...formData, [name]: value };
-    setFormData(newData);
-    handleValidation(newData);
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newData = { ...formData, category: e.target.value };
-    setFormData(newData);
-    handleValidation(newData);
+    setFormData(prev => ({ ...prev, category: e.target.value }));
+    handleBlur('category');
   };
 
   const handleKeywordChange = (index: number, value: string) => {
     const newKeywords = [...formData.keywords];
     newKeywords[index] = value;
-    const newData = { ...formData, keywords: newKeywords };
-    setFormData(newData);
-    handleValidation(newData);
+    setFormData(prev => ({ ...prev, keywords: newKeywords }));
   };
-
+  
   const handleRemoveKeyword = (indexToRemove: number) => {
     const newKeywords = formData.keywords.filter((_, index) => index !== indexToRemove);
-    const newData = { ...formData, keywords: newKeywords };
-    setFormData(newData);
-    handleValidation(newData);
+    setFormData(prev => ({ ...prev, keywords: newKeywords }));
+    handleBlur('keywords');
   };
-
+  
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
-      const newData = { ...formData, keywords: [...formData.keywords, ""] };
-      setFormData(newData);
-      handleValidation(newData);
+      setFormData(prev => ({ ...prev, keywords: [...prev.keywords, ""] }));
+      handleBlur('keywords');
     }
   };
-
+  
   const handleLpseChange = (selectedValues: string[]) => {
-    const newData = { ...formData, targetSpse: selectedValues };
-    setFormData(newData);
-    handleValidation(newData);
+    setFormData(prev => ({ ...prev, targetSpse: selectedValues }));
+    handleBlur('targetSpse');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Jalankan validasi terakhir sebelum submit
+    // Tandai semua field sebagai touched sebelum validasi akhir
+    setTouchedState({
+      name: true,
+      email: true,
+      whatsapp: true,
+      category: true,
+      targetSpse: true,
+      keywords: true,
+    });
+    
+    // Jalankan validasi terakhir
     const formValidationResult = validateForm(formData);
     setValidationState(formValidationResult);
 
@@ -265,10 +277,16 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     value: lpse.value,
     label: lpse.name,
   }));
-
+  
   const getValidationClass = (field: keyof typeof validationState) => {
+    // Validasi hanya jika field sudah disentuh DAN status validasinya tidak null
     const state = validationState[field];
-    return state === true ? 'valid' : state === false ? 'invalid' : '';
+    const isTouched = touchedState[field];
+    
+    if (isTouched && state !== null) {
+      return state === true ? 'valid' : 'invalid';
+    }
+    return '';
   };
 
   return (
@@ -315,6 +333,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
+                onBlur={() => handleBlur('name')}
                 placeholder="Masukkan nama Anda"
                 required
               />
@@ -330,6 +349,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('email')}
                   placeholder="Masukkan email Anda"
                   required
                 />
@@ -344,6 +364,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   name="whatsapp"
                   value={formData.whatsapp}
                   onChange={handleChange}
+                  onBlur={() => handleBlur('whatsapp')}
                   placeholder="Masukkan nomor Whatsapp Anda"
                   required
                 />
@@ -353,7 +374,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             {/* Kategori */}
             <div className={`radio-group ${getValidationClass('category')}`}>
               <label>Kategori (maks 1)</label>
-              <div className="radio-options-grid">
+              <div className="radio-options-grid" onBlur={() => handleBlur('category')}>
                 {[
                   "Pengadaan Barang",
                   "Pekerjaan Konstruksi",
@@ -386,6 +407,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
+                onBlur={() => handleBlur('targetSpse')}
                 placeholder="Pilih SPSE"
                 limit={spseLimit}
               />
@@ -394,7 +416,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             {/* Kata Kunci */}
             <div className={`input-group ${getValidationClass('keywords')}`}>
               <label>Target Kata Kunci (maks {keywordLimit})</label>
-              <div className="keywords-input-area">
+              <div className="keywords-input-area" onBlur={() => handleBlur('keywords')}>
                 {formData.keywords.map((keyword, index) => (
                   <div key={index} className="keyword-tag">
                     <input
