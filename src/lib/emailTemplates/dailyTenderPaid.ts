@@ -1,6 +1,6 @@
 // src/lib/emailTemplates/dailyTenderPaid.ts
 
-// This interface now correctly reflects the columns available in your 'lpse_tenders' table.
+// ✅ Diperbarui: Interface ini sekarang hanya berisi data yang dibutuhkan untuk template berbayar.
 interface Tender {
   title: string;
   agency: string;
@@ -10,24 +10,33 @@ interface Tender {
 
 /**
  * Generates the daily email template with a list of tenders for paid users.
+ * Menggunakan desain dari template trial namun dengan konten berbayar.
  * @param name The user's name.
  * @param tenders An array of tender objects to display.
  * @returns The complete HTML string for the email.
  */
 export const dailyTenderPaidEmailTemplate = (name: string, tenders: Tender[]): string => {
-  const tenderListHtml = tenders.map((tender, index) => `
-    <tr>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: center;">${index + 1}</td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">
-        <h4 style="margin: 0; font-size: 16px; color: #1a237e;">${tender.title}</h4>
-      </td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">${tender.agency}</td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: right;">IDR ${new Intl.NumberFormat("id-ID").format(tender.budget)}</td>
-      <td style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0; text-align: center;">
-        <a href="${tender.source_url}" style="display:inline-block;padding:8px 15px;background-color:#1a237e;color:#ffffff;text-decoration:none;border-radius:5px;font-size:14px;">Lihat</a>
+  const tenderListHtml = tenders.map((tender, index) => {
+    // Memformat budget ke Rupiah
+    const formattedBudget = new Intl.NumberFormat("id-ID", {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(tender.budget);
+
+    return `
+    <tr style="background-color: #ffffff; border: 1px solid #f5f5f5;">
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${index + 1}</td>
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.title}</td>
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.agency}</td>
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${formattedBudget}</td>
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px;">
+        <a href="${tender.source_url}" style="color: #0093dd; text-decoration: underline; font-family: Quicksand, sans-serif;">Lihat</a>
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 
   return `
   <!DOCTYPE html>
@@ -41,83 +50,98 @@ export const dailyTenderPaidEmailTemplate = (name: string, tenders: Tender[]): s
       table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
       img { -ms-interpolation-mode: bicubic; }
       a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
-      @media only screen and (max-width: 600px) {
-        .inner-container { padding: 20px !important; }
-        .responsive-table { width: 100% !important; display: block; }
-        .responsive-table td { display: block; text-align: left !important; }
-        .responsive-table th { display: none; }
+      @media only screen and (max-width: 640px) {
+        .email-container { width: 100% !important; }
+        .user-table { width: 100% !important; }
       }
     </style>
   </head>
-  <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #333333; background-color: #f4f4f4;">
+  <body style="margin: 0; padding: 0; background-color: #f4f4f4; text-align: center;">
 
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;">
-      <tr>
-        <td align="center" style="background-color: #f4f4f4; padding: 20px 0;">
-          <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            
-            <tr>
-              <td style="padding: 40px 30px 20px 30px; text-align: center; border-bottom: 1px solid #eeeeee;">
-                <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #1a237e;">
-                  Update Tender Hari Ini
-                </h1>
-                <p style="margin-top: 10px; font-size: 16px; color: #666666;">
-                  ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
-                </p>
-              </td>
-            </tr>
-            
-            <tr>
-              <td class="inner-container" style="padding: 40px 30px;">
-                <p style="margin: 0 0 20px;">Halo ${name} 👋,</p>
-                <p style="margin: 0 0 20px;">
-                  Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:
-                </p>
+    <div style="background-color: #f4f4f4; padding: 20px;">
+      <table border="0" cellpadding="0" cellspacing="0" width="640" style="max-width: 640px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
+        <tr>
+          <td style="padding: 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td align="left">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" alt="PEJUANG Tender Logo" width="44" height="44" style="display: block;">
+                    <p style="font-size: 18px; font-weight: bold; margin: 0;">PEJUANG Tender</p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px 0 10px;">
+                  <p style="font-size: 20px; font-family: Saira, sans-serif; margin: 0; text-align: center;">Halo ${name}, 👋</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0;">
+                  <p style="font-size: 16px; font-family: Saira, sans-serif; margin: 0; text-align: left;">Daftar Tender Terbaru</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 10px 0 20px;">
+                  <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0; line-height: 150%; text-align: left;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
+                </td>
+              </tr>
+            </table>
 
-                <table class="responsive-table" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 25px; border-collapse: collapse; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0;">
-                  <thead>
-                    <tr style="background-color: #1a237e; color: #ffffff;">
-                      <th style="padding: 12px 15px; text-align: center;">No</th>
-                      <th style="padding: 12px 15px; text-align: left;">Nama</th>
-                      <th style="padding: 12px 15px; text-align: left;">Instansi</th>
-                      <th style="padding: 12px 15px; text-align: right;">HPS</th>
-                      <th style="padding: 12px 15px; text-align: center;">Link</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${tenders.length > 0 ? tenderListHtml : `
-                      <tr>
-                        <td colspan="5" style="padding: 20px; text-align: center; color: #666;">Tidak ada tender baru yang ditemukan hari ini.</td>
-                      </tr>
-                    `}
-                  </tbody>
-                </table>
+            <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #f5f5f5;">
+              <thead>
+                <tr style="background-color: #f5f5f5; border: 1px solid #000000;">
+                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">No</th>
+                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Nama</th>
+                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Instansi</th>
+                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">HPS</th>
+                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Link</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tenders.length > 0 ? tenderListHtml : `
+                  <tr style="background-color: #ffffff;">
+                    <td colspan="5" style="padding: 20px; text-align: center; color: #666; font-family: Quicksand, sans-serif;">Tidak ada tender baru yang ditemukan hari ini.</td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
 
-                <div style="background-color: #f7f9fc; padding: 15px; border-left: 4px solid #4CAF50; border-radius: 4px; margin-bottom: 25px;">
-                  <p style="margin: 0; font-weight: bold;">Tips:</p>
-                  <ul style="margin: 5px 0 0; padding-left: 20px; font-size: 14px; color: #555;">
-                    <li style="margin-bottom: 5px;">Cek detail tender sesegera mungkin.</li>
-                    <li>Simpan tender yang relevan untuk persiapan dokumen penawaran.</li>
-                  </ul>
-                </div>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td style="padding: 25px 0 10px;">
+                  <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
+                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0 0 10px; font-weight: bold;">TIPS:</p>
+                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0; line-height: 150%;">Cek detail tender sesegera mungkin. Simpan tender yang relevan untuk persiapan dokumen penawaran.</p>
+                  </div>
+                </td>
+              </tr>
+            </table>
 
-                <p style="margin: 0 0 5px; font-weight: bold;">Butuh Bantuan?</p>
-                <p style="margin: 0 0 5px;"><a href="mailto:info@pejuangtender.id" style="color: #1a237e;">Email: info@pejuangtender.id</a></p>
-                <p style="margin: 0 0 20px;"><a href="https://wa.me/6282284783855" style="color: #1a237e;">WhatsApp: +62822 8478 3855</a></p>
-              </td>
-            </tr>
-            
-            <tr>
-              <td style="padding: 20px 30px 40px 30px; text-align: center; font-size: 12px; color: #999999; border-top: 1px solid #eeeeee;">
-                <p style="margin: 0;">&copy; 2025 pejuangtender.id. All rights reserved.</p>
-                <p style="margin: 5px 0 0;">“Tender Tepat, Lebih Cepat”</p>
-              </td>
-            </tr>
+            <div style="background-color: #191919; padding: 30px; color: #ffffff; text-align: left; font-size: 12px; border-radius: 0 0 10px 10px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td width="70%" style="padding-right: 20px;">
+                    <p style="margin: 0 0 15px; line-height: 150%;">Selamat berjuang & semoga sukses memenangkan tender! Salam, Tim pejuangtender.id<br/>“Tender Tepat, Lebih Cepat”</p>
+                  </td>
+                  <td width="30%" align="right">
+                    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" alt="Logo" width="44" height="44" style="display: block; margin-left: auto;">
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="padding-top: 20px;">
+                    <div style="border-top: 1px solid #444444; margin-top: 20px;"></div>
+                    <p style="margin: 10px 0 0; font-weight: bold; text-align: right;">BUTUH BANTUAN?</p>
+                    <p style="margin: 5px 0 0; text-align: right; line-height: 150%;">Email: info@pejuangtender.id<br/>WhatsApp: +62822 8478 3855</p>
+                  </td>
+                </tr>
+              </table>
+            </div>
 
-          </table>
-        </td>
-      </tr>
-    </table>
+          </td>
+        </tr>
+      </table>
+    </div>
 
   </body>
   </html>

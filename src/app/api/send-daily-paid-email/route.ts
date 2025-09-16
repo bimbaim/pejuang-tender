@@ -1,7 +1,8 @@
+// File: src/app/api/cron/dailyTenderPaid/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+// Hapus baris ini karena kita akan menggunakan template dinamis dari SendGrid
 // import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
-import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -14,7 +15,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 
 // --- Antarmuka (Interfaces) ---
-// Perbaikan: Users sekarang adalah objek tunggal, bukan array
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
@@ -31,7 +31,7 @@ interface Tender {
     title: string;
     agency: string;
     budget: number;
-    source_url: string; // Perbaikan: Ganti 'source_url'
+    source_url: string;
     end_date: string;
 }
 
@@ -40,6 +40,9 @@ interface Tender {
  */
 export async function POST(req: NextRequest) {
   try {
+    const today = new Date();
+    const sentEmails: string[] = [];
+    
     // 1. Ambil semua langganan yang berstatus 'paid'
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
@@ -56,7 +59,6 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Iterasi setiap pengguna berbayar
-    // Perbaikan: Tambahkan `as unknown as SubscriptionWithDetails[]` untuk mengatasi TypeScript
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
       const { user_id, keyword, category, spse, users } = subscription;
       
@@ -68,28 +70,39 @@ export async function POST(req: NextRequest) {
       // 3. Bangun query tender secara dinamis
       let tenderQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url, end_date`) // Perbaikan: Ganti 'source_url'
+          .select(`id, title, agency, budget, source_url, end_date`)
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
           .order("created_at", { ascending: false });
-
-      // Tambahkan filter secara kondisional
-      if (keyword && keyword.length > 0) {
-          tenderQuery = tenderQuery.filter("title", "cs", `({${keyword.join(',')}})`);
-      }
+      
+      // Menggabungkan semua filter ke dalam satu `.or()` statement
+      const filterConditions = [];
 
       if (category && category.length > 0) {
-          tenderQuery = tenderQuery.filter("category", "cs", `({${category.join(',')}})`);
+          const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
+          filterConditions.push(categoryFilters);
       }
-
+      
+      // Menggunakan logika yang sama dengan versi trial untuk filter SPSE
       if (spse && spse.length > 0) {
-          tenderQuery = tenderQuery.in("lpse", spse);
+          const spseFilters = spse.map(site => `source_url.like.%//spse.inaproc.id/${site}/%`).join(',');
+          filterConditions.push(spseFilters);
       }
 
-      // Tambahkan filter status untuk tender yang relevan
-      tenderQuery = tenderQuery.or(
-          'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
-      );
+      if (keyword && keyword.length > 0) {
+          const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
+          filterConditions.push(keywordFilters);
+      }
 
+      // Menambahkan filter status tender
+      filterConditions.push(
+        'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
+      );
+      
+      // Terapkan semua filter ke query
+      if (filterConditions.length > 0) {
+        tenderQuery = tenderQuery.or(filterConditions.join(','));
+      }
+      
       const { data: tenders, error: tendersError } = await tenderQuery;
 
       if (tendersError) {
@@ -97,22 +110,17 @@ export async function POST(req: NextRequest) {
         continue;
       }
       
-      // 4. Buat konten email menggunakan template berbayar
-      const emailBody = dailyTenderPaidEmailTemplate(users.name, tenders as Tender[]);
-
-      // 5. Kirim email via API SendGrid
+      // 4. Kirim email via API SendGrid menggunakan template dinamis
       const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: users.email,
           subject: "Update Tender Hari Ini",
-        //   templateName: "dailyTenderPaid",
-          html: emailBody, 
+          templateName: "dailyTenderPaid", // Gunakan nama template
           data: {
             name: users.name,
             tenders: tenders,
-            
           }
         }),
       });
@@ -121,13 +129,17 @@ export async function POST(req: NextRequest) {
         console.error(`Gagal mengirim email ke ${users.email}. Status: ${response.status}`);
       } else {
         console.log(`Email harian berhasil dikirim ke ${users.email}.`);
+        sentEmails.push(users.email);
       }
     }
 
-    return NextResponse.json({ message: "Daily emails sent successfully." });
+    return NextResponse.json({ 
+      message: "Daily emails sent successfully.",
+      emails_sent_to: sentEmails
+    });
 
-  } catch (error: unknown) { // Perbaikan: Tangkap error sebagai unknown
-    const err = error as Error; // Type assertion lebih aman
+  } catch (error: unknown) {
+    const err = error as Error;
     console.error("Error in daily email script:", err.message);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
