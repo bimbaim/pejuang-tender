@@ -27,6 +27,7 @@ const keywordLimit = 3;
 const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
 
+  // State to manage all form data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,6 +37,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: [] as string[],
   });
 
+  // State untuk melacak status validasi setiap field
   const [validationState, setValidationState] = useState({
     name: null as boolean | null,
     email: null as boolean | null,
@@ -45,8 +47,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: null as boolean | null,
   });
 
+  // State untuk LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -91,11 +93,10 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     };
   };
 
+  // Fungsi penanganan yang memicu validasi secara langsung
   const handleValidation = (data: typeof formData) => {
-    if (isSubmitted) {
-      const newValidationState = validateForm(data);
-      setValidationState(newValidationState);
-    }
+    const newValidationState = validateForm(data);
+    setValidationState(newValidationState);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -142,8 +143,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitted(true);
 
+    // Jalankan validasi terakhir sebelum submit
     const formValidationResult = validateForm(formData);
     setValidationState(formValidationResult);
 
