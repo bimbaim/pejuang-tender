@@ -5,6 +5,7 @@ import sgMail from '@sendgrid/mail';
 import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
 import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome'; // Import new template
 import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial"; // Import the new template
+import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid"; // Import the new template
 
 interface SendGridError extends Error {
   response?: {
@@ -49,6 +50,15 @@ export async function POST(req: Request) {
           return NextResponse.json({ message: 'Missing or invalid data for dailyTenderTrial template' }, { status: 400 });
         }
         emailBody = dailyTenderTrialEmailTemplate(data.name, data.tenders, data.trialEndDate);
+        break;
+
+      case 'dailyTenderPaid':
+        // Add a check for the expected data for this template
+        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
+          return NextResponse.json({ message: 'Missing or invalid data for dailyTenderPaid template' }, { status: 400 });
+        }
+      
+        emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
         break;
       
       default:
