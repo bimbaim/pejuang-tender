@@ -1,3 +1,4 @@
+// File: src/components/common/CustomMultiSelect.tsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -12,16 +13,18 @@ interface CustomMultiSelectProps {
   options: MultiSelectOption[];
   defaultValue: string[];
   onChange: (selectedValues: string[]) => void;
+  onBlur?: () => void;
   placeholder?: string;
-  limit?: number; // <-- tambahin limit
+  limit?: number;
 }
 
 const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   options,
   defaultValue,
   onChange,
+  onBlur,
   placeholder = "Pilih SPSE",
-  limit, // <-- props limit
+  limit,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>(defaultValue);
@@ -49,15 +52,13 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   const handleToggle = () => setIsOpen(!isOpen);
 
   const handleCheckboxChange = (option: MultiSelectOption) => {
-    // Kalau sudah dipilih, bisa dihapus
     if (selected.includes(option.value)) {
       const newSelected = selected.filter((v) => v !== option.value);
       setSelected(newSelected);
       onChange(newSelected);
     } else {
-      // Kalau ada limit & jumlah sudah maksimal → jangan tambah lagi
       if (limit && selected.length >= limit) {
-        return; // stop di sini
+        return;
       }
       const newSelected = [...selected, option.value];
       setSelected(newSelected);
@@ -84,7 +85,12 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   );
 
   return (
-    <div className="custom-multi-select" ref={componentRef}>
+    <div 
+      className="custom-multi-select" 
+      ref={componentRef}
+      onBlur={onBlur} // Attach onBlur event here
+      tabIndex={0} // Make the div focusable so onBlur works
+    >
       <div className="select-box" onClick={handleToggle}>
         <div className="selected-tags-container">
           {getSelectedLabels().length > 0 ? (
@@ -125,7 +131,6 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                   type="checkbox"
                   checked={selected.includes(option.value)}
                   disabled={
-                    // kalau sudah mencapai limit & item ini belum dipilih → disable
                     limit !== undefined &&
                     selected.length >= limit &&
                     !selected.includes(option.value)
