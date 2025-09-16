@@ -13,16 +13,16 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 // --- Antarmuka (Interfaces) ---
 interface SubscriptionWithDetails {
-  user_id: string;
-  keyword: string[] | null;
-  category: string[] | null;
-  spse: string[] | null;
-  start_date: string;
-  end_date: string;
-  users: {
-    name: string;
-    email: string;
-  };
+    user_id: string;
+    keyword: string[] | null;
+    category: string[] | null;
+    spse: string[] | null;
+    start_date: string;
+    end_date: string;
+    users: {
+        name: string;
+        email: string;
+    };
 }
 
 interface Tender {
@@ -35,99 +35,103 @@ interface Tender {
 
 // --- POST Handler untuk Mengirim Email Harian ---
 export async function POST(req: NextRequest) {
-  try {
-    const today = new Date();
-    const todayISOString = today.toISOString().split('T')[0];
+    try {
+        const today = new Date();
+        const todayISOString = today.toISOString().split('T')[0];
+        const sentEmails: string[] = []; // Array to store emails of recipients
 
-    const { data: subscriptions, error: subsError } = await supabase
-      .from("subscriptions")
-      .select(`user_id, keyword, category, spse, start_date, end_date, users(name, email)`)
-      .eq("payment_status", "free-trial")
-      .gte("end_date", todayISOString);
+        const { data: subscriptions, error: subsError } = await supabase
+            .from("subscriptions")
+            .select(`user_id, keyword, category, spse, start_date, end_date, users(name, email)`)
+            .eq("payment_status", "free-trial")
+            .gte("end_date", todayISOString);
 
-    if (subsError) {
-      console.error("Error fetching trial subscriptions:", subsError.message);
-      return NextResponse.json({ error: "Failed to fetch subscriptions" }, { status: 500 });
+        if (subsError) {
+            console.error("Error fetching trial subscriptions:", subsError.message);
+            return NextResponse.json({ error: "Failed to fetch subscriptions" }, { status: 500 });
+        }
+
+        if (!subscriptions || subscriptions.length === 0) {
+            return NextResponse.json({ message: "No active trial subscriptions found." });
+        }
+
+        for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
+            const { user_id, keyword, category, spse, users, end_date } = subscription;
+
+            if (!users || !users.email) {
+                console.warn(`Skipping user ID ${user_id} due to missing email.`);
+                continue;
+            }
+
+            const trialEndDate = new Date(end_date);
+            const formattedTrialEndDate = trialEndDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+
+            let tenderQuery = supabase
+                .from("lpse_tenders")
+                .select(`id, title, agency, budget, source_url`)
+                .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+                .order("created_at", { ascending: false });
+
+            // Tambahkan filter secara kondisional
+            if (category && category.length > 0) {
+                const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
+                tenderQuery = tenderQuery.or(categoryFilters);
+            }
+
+            if (spse && spse.length > 0) {
+                tenderQuery = tenderQuery.in("lpse", spse);
+            }
+
+            if (keyword && keyword.length > 0) {
+                const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
+                tenderQuery = tenderQuery.or(keywordFilters);
+            }
+
+            tenderQuery = tenderQuery.or(
+                'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
+            );
+
+            const { data: tenders, error: tendersError } = await tenderQuery;
+
+            if (tendersError) {
+                console.error("Error fetching tenders for user", user_id, ":", tendersError.message);
+                continue;
+            }
+
+            const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
+
+            const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    to: users.email,
+                    subject: "Update Tender Hari Ini",
+                    html: emailBody,
+                    data: {
+                        name: users.name,
+                        tenders: tenders,
+                        trialEndDate: formattedTrialEndDate
+                    }
+                }),
+            });
+
+            if (!response.ok) {
+                console.error(`Gagal mengirim email ke ${users.email}. Status: ${response.status}`);
+            } else {
+                console.log(`Email harian berhasil dikirim ke ${users.email}.`);
+                sentEmails.push(users.email); // Add email to the list
+            }
+        }
+
+        // Return the final response with the list of sent emails
+        return NextResponse.json({
+            message: "Daily emails sent successfully.",
+            emails_sent_to: sentEmails
+        });
+
+    } catch (error: unknown) {
+        const err = error as Error;
+        console.error("Error in daily email script:", err.message);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
-
-    if (!subscriptions || subscriptions.length === 0) {
-      return NextResponse.json({ message: "No active trial subscriptions found." });
-    }
-
-    for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
-      const { user_id, keyword, category, spse, users, end_date } = subscription;
-      
-      if (!users || !users.email) {
-          console.warn(`Skipping user ID ${user_id} due to missing email.`);
-          continue;
-      }
-
-      const trialEndDate = new Date(end_date);
-      const formattedTrialEndDate = trialEndDate.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-
-      let tenderQuery = supabase
-          .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url`) 
-          .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .order("created_at", { ascending: false });
-
-      // Tambahkan filter secara kondisional
-      if (category && category.length > 0) {
-          // Changed from `cs` to `ilike` and joined with OR
-          const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
-          tenderQuery = tenderQuery.or(categoryFilters);
-      }
-
-      if (spse && spse.length > 0) {
-          tenderQuery = tenderQuery.in("lpse", spse);
-      }
-
-      if (keyword && keyword.length > 0) {
-          // Changed from `cs` to `ilike` and joined with OR
-          const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
-          tenderQuery = tenderQuery.or(keywordFilters);
-      }
-
-      tenderQuery = tenderQuery.or(
-          'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
-      );
-
-      const { data: tenders, error: tendersError } = await tenderQuery;
-
-      if (tendersError) {
-        console.error("Error fetching tenders for user", user_id, ":", tendersError.message);
-        continue;
-      }
-
-      const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
-
-      const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: users.email,
-          subject: "Update Tender Hari Ini",
-          html: emailBody,
-          data: {
-            name: users.name,
-            tenders: tenders,
-            trialEndDate: formattedTrialEndDate
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        console.error(`Gagal mengirim email ke ${users.email}. Status: ${response.status}`);
-      } else {
-        console.log(`Email harian berhasil dikirim ke ${users.email}.`);
-      }
-    }
-
-    return NextResponse.json({ message: "Daily emails sent successfully." });
-
-  } catch (error: unknown) {
-    const err = error as Error;
-    console.error("Error in daily email script:", err.message);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-  }
 }
