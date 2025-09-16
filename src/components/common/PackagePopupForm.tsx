@@ -388,7 +388,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </p>
             {/* ✅ Diperbarui: Menampilkan harga total dengan PPN */}
             <p className="package-price">
-              IDR {formatPrice(Math.round(totalPrice))}
+              IDR {formatPrice(selectedPackage.price)}
             </p>
           </div>
         </div>
