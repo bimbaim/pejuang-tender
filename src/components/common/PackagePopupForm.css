@@ -687,12 +687,3 @@
   border-color: #f44336 !important; /* Merah */
 }
 
-/* Warna untuk label yang tidak valid */
-.package-input-group.invalid label {
-  color: #f44336; /* Merah */
-}
-
-/* Warna untuk label yang valid */
-.package-input-group.valid label {
-  color: #4CAF50; /* Hijau */
-}
