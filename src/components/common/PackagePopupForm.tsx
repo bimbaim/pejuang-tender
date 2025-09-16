@@ -182,15 +182,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }
   };
 
-  // 🔹 Logika yang diperbarui untuk radio button dan checkbox
   const handleCategoryChange = (category: string) => {
     let newCategories: string[] = [];
 
     if (categoryLimit === 1) {
-      // Jika limit 1, hanya izinkan satu pilihan (radio button)
       newCategories = [category];
     } else {
-      // Jika limit > 1, kelola sebagai checkbox
       newCategories = [...formData.category];
       if (newCategories.includes(category)) {
         newCategories = newCategories.filter((c) => c !== category);
@@ -437,13 +434,10 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               {allCategories.map((cat, index) => (
                 <label key={index} className="radio-option">
                   <input
-                    // 🔹 Ubah tipe input secara dinamis
                     type={categoryLimit === 1 ? 'radio' : 'checkbox'}
                     name="category"
-                    // 🔹 Ubah prop 'checked' secara dinamis
                     checked={categoryLimit === 1 ? formData.category[0] === cat : formData.category.includes(cat)}
                     onChange={() => handleCategoryChange(cat)}
-                    // 🔹 Hapus atau sesuaikan 'disabled' jika diperlukan
                     disabled={
                       categoryLimit > 1 &&
                       !formData.category.includes(cat) &&
