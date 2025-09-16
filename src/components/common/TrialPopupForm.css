@@ -421,3 +421,46 @@
     margin: 80px 20px;
   }
 }
+
+
+/* ...existing CSS for TrialPopupForm... */
+
+/* --- Validasi CSS Baru --- */
+
+/* Gaya untuk input yang valid */
+.input-group.valid input,
+.input-group.valid .multi-select-container {
+  border: 1px solid #4caf50; /* Green border */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
+}
+
+/* Gaya untuk input yang tidak valid */
+.input-group.invalid input,
+.input-group.invalid .multi-select-container {
+  border: 1px solid #f44336; /* Red border */
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); /* Red shadow */
+}
+
+/* Gaya untuk radio group yang tidak valid */
+.radio-group.invalid {
+  border: 1px solid #f44336;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Jika Anda ingin mengubah warna label juga */
+.input-group.invalid label,
+.radio-group.invalid label {
+  color: #f44336;
+}
+
+/* Gaya untuk input keyword yang valid */
+.input-group.valid .keyword-tag input {
+  border: 1px solid #4caf50;
+}
+
+/* Gaya untuk input keyword yang tidak valid */
+.input-group.invalid .keyword-tag input {
+  border: 1px solid #f44336;
+}
+/* --- Akhir Validasi CSS Baru --- */

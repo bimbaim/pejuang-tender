@@ -1,5 +1,4 @@
-// This file should be saved EXACTLY as: src/components/common/TrialPopupForm.tsx
-"use client"; // This component uses React hooks, so it must be a Client Component.
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -8,8 +7,8 @@ import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./TrialPopupForm.css";
 
 interface PopupFormProps {
-  isOpen: boolean; // Controls whether the popup is visible
-  onClose: () => void; // Function to call when the popup needs to be closed
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 interface ExtendedError extends Error {
@@ -39,8 +38,21 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: [] as string[],
   });
 
-  // State for LPSE options fetched from Supabase
+  // State untuk melacak status validasi setiap field
+  const [validationState, setValidationState] = useState({
+    name: null as boolean | null,
+    email: null as boolean | null,
+    whatsapp: null as boolean | null,
+    category: null as boolean | null,
+    targetSpse: null as boolean | null,
+    keywords: null as boolean | null,
+  });
+
+  // State untuk LPSE options
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
+
+  // State to track form submission attempt
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Fetch LPSE data from Supabase when the popup is opened
   useEffect(() => {
@@ -67,17 +79,47 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     return null;
   }
 
-  // Handle changes for text inputs and select dropdown
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  // --- Fungsi Validasi Baru ---
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isNameValid = formData.name.trim() !== "";
+    const isEmailValid = emailRegex.test(formData.email);
+    const isWhatsappValid = formData.whatsapp.trim() !== "";
+    const isCategoryValid = formData.category !== "";
+    const isSpseValid = formData.targetSpse.length > 0;
+    const isKeywordsValid = formData.keywords.some(keyword => keyword.trim() !== "");
+
+    const newValidationState = {
+      name: isNameValid,
+      email: isEmailValid,
+      whatsapp: isWhatsappValid,
+      category: isCategoryValid,
+      targetSpse: isSpseValid,
+      keywords: isKeywordsValid,
+    };
+
+    setValidationState(newValidationState);
+    
+    return isNameValid && isEmailValid && isWhatsappValid && isCategoryValid && isSpseValid && isKeywordsValid;
+  };
+  // --- Akhir Fungsi Validasi Baru ---
+
+  // Handle changes for text inputs
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (isSubmitted) {
+      // Re-validate if form has been submitted
+      validateForm();
+    }
   };
 
   // Handle changes for radio buttons
   const handleRadioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, category: e.target.value }));
+    if (isSubmitted) {
+      validateForm();
+    }
   };
 
   // Handle changes for individual keyword inputs
@@ -85,6 +127,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     const newKeywords = [...formData.keywords];
     newKeywords[index] = value;
     setFormData((prev) => ({ ...prev, keywords: newKeywords }));
+    if (isSubmitted) {
+      validateForm();
+    }
   };
 
   // Handle removing a keyword
@@ -93,14 +138,19 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       ...prev,
       keywords: prev.keywords.filter((_, index) => index !== indexToRemove),
     }));
+    if (isSubmitted) {
+      validateForm();
+    }
   };
 
   // Handle adding a new empty keyword input
   const handleAddKeyword = () => {
-    setFormData((prev) => ({
-      ...prev,
-      keywords: [...prev.keywords, ""],
-    }));
+    if (formData.keywords.length < keywordLimit) {
+      setFormData((prev) => ({
+        ...prev,
+        keywords: [...prev.keywords, ""],
+      }));
+    }
   };
 
   // New handler to update targetSpse from the CustomMultiSelect component
@@ -109,13 +159,23 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       ...prev,
       targetSpse: selectedValues,
     }));
+    if (isSubmitted) {
+      validateForm();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubmitted(true); // Tandai form sebagai sudah disubmit
+
+    const isFormValid = validateForm();
+    if (!isFormValid) {
+      // Jika form tidak valid, hentikan proses submit
+      console.log("Form is not valid. Please correct the errors.");
+      return;
+    }
 
     try {
-      // 1. Fetch the ID of the 'Free Trial' package dynamically
       const { data: trialPackage, error: packageError } = await supabase
         .from("packages")
         .select("id")
@@ -123,18 +183,12 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         .single();
 
       if (packageError || !trialPackage) {
-        console.error(
-          "Error fetching trial package:",
-          packageError?.message || "Trial package not found."
-        );
-        throw new Error(
-          "Trial package not found in the database. Please ensure a package named 'Free Trial' exists."
-        );
+        console.error("Error fetching trial package:", packageError?.message || "Trial package not found.");
+        throw new Error("Trial package not found in the database. Please ensure a package named 'Free Trial' exists.");
       }
 
       const package_id = trialPackage.id;
 
-      // 2. Check for existing user or create a new one
       let user_id;
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
@@ -162,7 +216,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         user_id = newUser.id;
       }
 
-      // 3. Insert the new trial subscription
       const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       const endDateISO = endDate.toISOString().split("T")[0];
       const endDateFormatted = endDate.toLocaleDateString("id-ID", {
@@ -180,15 +233,14 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             payment_status: "free-trial",
             start_date: new Date().toISOString().split("T")[0],
             end_date: endDateISO,
-            category: [formData.category], // Convert to array
-            keyword: formData.keywords, // Already an array
-            spse: formData.targetSpse, // Already an array
+            category: [formData.category],
+            keyword: formData.keywords,
+            spse: formData.targetSpse,
           },
         ]);
 
       if (subscriptionError) throw subscriptionError;
 
-      // Call API Route to send email
       try {
         const response = await fetch("/api/sendgrid", {
           method: "POST",
@@ -197,8 +249,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           },
           body: JSON.stringify({
             to: formData.email,
-            subject:
-              "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
+            subject: "Trial 7 Hari pejuangtender.id : Update Tender Setiap Hari di Email Anda",
             templateName: "trialWelcome",
             data: {
               name: formData.name,
@@ -218,7 +269,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         console.error("Gagal mengirim email via API:", err.message);
       }
 
-      // 4. Close popup & redirect
       onClose();
       router.push("/thank-you");
     } catch (error: unknown) {
@@ -235,6 +285,13 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     value: lpse.value,
     label: lpse.name,
   }));
+
+  // Helper untuk mendapatkan kelas validasi
+  const getValidationClass = (field: keyof typeof validationState) => {
+    if (!isSubmitted) return '';
+    const state = validationState[field];
+    return state === true ? 'valid' : state === false ? 'invalid' : '';
+  };
 
   return (
     <div className="popup-overlay" onClick={onClose}>
@@ -272,7 +329,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         <div className="form-wrapper">
           <form onSubmit={handleSubmit} className="trial-form">
             {/* Nama */}
-            <div className="input-group">
+            <div className={`input-group ${getValidationClass('name')}`}>
               <label htmlFor="name">Nama</label>
               <input
                 type="text"
@@ -287,7 +344,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
             <div className="form-group-inline">
               {/* Email */}
-              <div className="input-group">
+              <div className={`input-group ${getValidationClass('email')}`}>
                 <label htmlFor="email">Email</label>
                 <input
                   type="email"
@@ -301,7 +358,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Whatsapp */}
-              <div className="input-group">
+              <div className={`input-group ${getValidationClass('whatsapp')}`}>
                 <label htmlFor="whatsapp">Nomor Whatsapp</label>
                 <input
                   type="tel"
@@ -316,7 +373,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Kategori */}
-            <div className="radio-group">
+            <div className={`radio-group ${getValidationClass('category')}`}>
               <label>Kategori (maks 1)</label>
               <div className="radio-options-grid">
                 {[
@@ -345,8 +402,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Target SPSE from Supabase */}
-            <div className="input-group">
-              <label>Target SPSE (https://spse.inaproc/......)</label>
+            <div className={`input-group ${getValidationClass('targetSpse')}`}>
+              <label>Target SPSE (maks {spseLimit})</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
@@ -357,7 +414,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Kata Kunci */}
-            <div className="input-group">
+            <div className={`input-group ${getValidationClass('keywords')}`}>
               <label>Target Kata Kunci (maks {keywordLimit})</label>
               <div className="keywords-input-area">
                 {formData.keywords.map((keyword, index) => (
@@ -365,9 +422,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                     <input
                       type="text"
                       value={keyword}
-                      onChange={(e) =>
-                        handleKeywordChange(index, e.target.value)
-                      }
+                      onChange={(e) => handleKeywordChange(index, e.target.value)}
                       placeholder={`Keyword ${index + 1}`}
                     />
                     <button
