@@ -78,9 +78,9 @@ export async function POST(req: NextRequest) {
                 tenderQuery = tenderQuery.or(categoryFilters);
             }
 
-            if (spse && spse.length > 0) {
-                tenderQuery = tenderQuery.in("lpse", spse);
-            }
+            // if (spse && spse.length > 0) {
+            //     tenderQuery = tenderQuery.in("lpse", spse);
+            // }
 
             if (keyword && keyword.length > 0) {
                 const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
