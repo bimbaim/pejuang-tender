@@ -35,7 +35,6 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${index + 1}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.title}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.agency}</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${formattedBudget}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${formattedTenderEndDate}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px;">
         <a href="${tender.source_url}" style="color: #0093dd; text-decoration: underline; font-family: Quicksand, sans-serif;">Link SPSE</a>
@@ -100,7 +99,6 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">No</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Nama</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Instansi</th>
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">HPS</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Akhir Pendaftaran</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Link SPSE</th>
                 </tr>
