@@ -279,11 +279,16 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (subscriptionError) throw subscriptionError;
 
+      // ✅ Ditambahkan: Hitung total harga dengan PPN 11%
+      const basePrice = selectedPackage.price;
+      const totalPrice = basePrice * 1.11;
+
       const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: selectedPackage.price,
+          // ✅ Diperbarui: Mengirim totalPrice, bukan basePrice
+          amount: Math.round(totalPrice), // Memastikan nilai adalah integer
           currency: "IDR",
           customer: {
             email: formData.email,
@@ -329,6 +334,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID").format(price);
   };
+  
+  // ✅ Ditambahkan: Hitung harga total dengan PPN 11% untuk ditampilkan
+  const totalPrice = selectedPackage.price * 1.11;
 
   const allCategories = [
     "Pengadaan Barang",
@@ -378,8 +386,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-duration">
               {selectedPackage.duration_months ?? ""} Bulan
             </p>
+            {/* ✅ Diperbarui: Menampilkan harga total dengan PPN */}
             <p className="package-price">
-              IDR {formatPrice(selectedPackage.price)}
+              IDR {formatPrice(Math.round(totalPrice))}
             </p>
           </div>
         </div>
@@ -506,10 +515,11 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             name="selectedPackage"
             value={JSON.stringify(selectedPackage)}
           />
+          {/* ✅ Diperbarui: Menggunakan totalPrice yang sudah termasuk PPN */}
           <input
             type="hidden"
             name="amount"
-            value={selectedPackage?.price ?? ""}
+            value={Math.round(totalPrice)}
           />
           <input
             type="hidden"
