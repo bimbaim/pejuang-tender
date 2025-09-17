@@ -72,7 +72,7 @@ export const dailyTenderPaidEmailTemplate = (
 <body style="margin: 0; padding: 0; background-color: #f4f4f4; text-align: center; font-family: Saira, Quicksand, sans-serif;">
 
   <div style="background-color: #f4f4f4; padding: 20px;">
-    <table border="0" cellpadding="0" cellspacing="0" width="640" style="max-width: 640px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
+    <table border="0" cellpadding="0" cellspacing="0" width="850" style="max-width: 850px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
       <tr>
         <td style="padding: 30px;">
           <table border="0" cellpadding="0" cellspacing="0" width="100%">
