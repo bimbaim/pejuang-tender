@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
           .from("lpse_tenders")
           .select(`id, title, agency, budget, source_url`)
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })
+          .limit(5);
       
       const filterConditions = [];
 
