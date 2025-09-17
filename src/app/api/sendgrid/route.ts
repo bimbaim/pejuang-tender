@@ -3,9 +3,10 @@
 import { NextResponse } from 'next/server';
 import sgMail from '@sendgrid/mail';
 import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
-import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome'; // Import new template
-import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial"; // Import the new template
-import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid"; // Import the new template
+import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome';
+import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
+import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
+import { reminderTrialEmailTemplate } from '@/lib/emailTemplates/reminderTrial';
 
 interface SendGridError extends Error {
   response?: {
@@ -59,6 +60,13 @@ export async function POST(req: Request) {
         }
       
         emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
+        break;
+
+      case 'reminderTrial':
+        if (!data || typeof data.name !== 'string' || typeof data.trialEndDate !== 'string') {
+          return NextResponse.json({ message: 'Missing or invalid data for reminderTrial template' }, { status: 400 });
+        }
+        emailBody = reminderTrialEmailTemplate(data.name, data.trialEndDate);
         break;
       
       default:
