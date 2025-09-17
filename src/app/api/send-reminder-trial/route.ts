@@ -1,4 +1,4 @@
-// File: src/app/api/cron/reminderTrial/route.ts
+// File: src/app/api/send-reminder-trial/route.ts
 
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 to: users.email,
-                subject: "Masa Percobaan Anda Segera Berakhir",
+                subject: "2 Hari Lagi! Trial pejuangtender.id Anda Berakhir",
                 templateName: 'reminderTrial', // ✅ Menggunakan template baru
                 data: {
                   name: users.name,

@@ -7,6 +7,7 @@ import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWe
 import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
 import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 import { reminderTrialEmailTemplate } from '@/lib/emailTemplates/reminderTrial';
+import { reminderPaidEmailTemplate } from '@/lib/emailTemplates/reminderPaid';
 
 interface SendGridError extends Error {
   response?: {
@@ -67,6 +68,13 @@ export async function POST(req: Request) {
           return NextResponse.json({ message: 'Missing or invalid data for reminderTrial template' }, { status: 400 });
         }
         emailBody = reminderTrialEmailTemplate(data.name, data.trialEndDate);
+        break;
+
+      case 'reminderPaid':
+        if (!data || typeof data.name !== 'string' || typeof data.subscriptionEndDate !== 'string' || typeof data.packageName !== 'string') {
+          return NextResponse.json({ message: 'Missing or invalid data for reminderPaid template' }, { status: 400 });
+        }
+        emailBody = reminderPaidEmailTemplate(data.name, data.packageName, data.subscriptionEndDate);
         break;
       
       default:
