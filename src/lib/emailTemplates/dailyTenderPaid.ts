@@ -4,7 +4,7 @@
 interface Tender {
   title: string;
   agency: string;
-  budget: number;
+  budget: string;
   source_url: string;
 }
 
@@ -22,12 +22,12 @@ export const dailyTenderPaidEmailTemplate = (
   const tenderListHtml = tenders
     .map((tender, index) => {
       // Memformat budget ke Rupiah
-      const formattedBudget = new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(tender.budget);
+      // const formattedBudget = new Intl.NumberFormat("id-ID", {
+      //   style: "currency",
+      //   currency: "IDR",
+      //   minimumFractionDigits: 0,
+      //   maximumFractionDigits: 0,
+      // }).format(tender.budget);
 
       return `
     <tr style="background-color: #ffffff; border: 1px solid #f5f5f5;">
@@ -40,7 +40,7 @@ export const dailyTenderPaidEmailTemplate = (
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${
         tender.agency
       }</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${formattedBudget}</td>
+      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">Rp. ${tender.budget}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px;">
         <a href="${
           tender.source_url
