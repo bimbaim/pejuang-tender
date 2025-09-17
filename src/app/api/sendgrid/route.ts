@@ -5,9 +5,10 @@ import sgMail from '@sendgrid/mail';
 import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
 import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome';
 import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
-import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
+// import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 import { reminderTrialEmailTemplate } from '@/lib/emailTemplates/reminderTrial';
 import { reminderPaidEmailTemplate } from '@/lib/emailTemplates/reminderPaid';
+import { dailyTenderPaidEmailTemplate } from '@/lib/emailTemplates/dailyTenderPaid';
 
 interface SendGridError extends Error {
   response?: {
@@ -54,12 +55,21 @@ export async function POST(req: Request) {
         emailBody = dailyTenderTrialEmailTemplate(data.name, data.tenders, data.trialEndDate);
         break;
 
-      case 'dailyTenderPaid':
+      // case 'dailyTenderPaid':
+      //   // Add a check for the expected data for this template
+      //   if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
+      //     return NextResponse.json({ message: 'Missing or invalid data for dailyTenderPaid template' }, { status: 400 });
+      //   }
+      
+        // emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
+        // break;
+
+        case 'dailyTenderPaid':
         // Add a check for the expected data for this template
-        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
+        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders)) {
           return NextResponse.json({ message: 'Missing or invalid data for dailyTenderPaid template' }, { status: 400 });
         }
-      
+        
         emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
         break;
 
