@@ -134,7 +134,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     const isWhatsappValid = data.whatsapp.trim() !== "";
     const isCategoryValid = data.category.length > 0;
     const isSpseValid = data.targetSpse.length > 0;
-    const isKeywordsValid = data.keywords.some(keyword => keyword.trim() !== "");
+    const isKeywordsValid = data.keywords.some(
+      (keyword) => keyword.trim() !== ""
+    );
 
     return {
       name: isNameValid,
@@ -145,20 +147,22 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       keywords: isKeywordsValid,
     };
   };
-  
+
   const handleBlur = (field: keyof typeof touchedState) => {
-    setTouchedState(prev => ({ ...prev, [field]: true }));
+    setTouchedState((prev) => ({ ...prev, [field]: true }));
     setValidationState(validateForm(formData));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData((prev) => ({ ...prev, targetSpse: selectedValues }));
-    handleBlur('targetSpse');
+    handleBlur("targetSpse");
   };
 
   const handleKeywordChange = (index: number, value: string) => {
@@ -172,13 +176,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       ...prev,
       keywords: prev.keywords.filter((_, i) => i !== indexToRemove),
     }));
-    handleBlur('keywords');
+    handleBlur("keywords");
   };
 
   const handleAddKeyword = () => {
     if (formData.keywords.length < keywordLimit) {
       setFormData((prev) => ({ ...prev, keywords: [...prev.keywords, ""] }));
-      handleBlur('keywords');
+      handleBlur("keywords");
     }
   };
 
@@ -196,9 +200,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       }
     }
     setFormData((prev) => ({ ...prev, category: newCategories }));
-    handleBlur('category');
+    handleBlur("category");
   };
-  
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedPackage) return;
@@ -214,13 +218,13 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
     const formValidationResult = validateForm(formData);
     setValidationState(formValidationResult);
-    
+
     const isFormValid = Object.values(formValidationResult).every(Boolean);
     if (!isFormValid) {
       console.log("Form is not valid. Please correct the errors.");
       return;
     }
-    
+
     setIsLoading(true);
     setShowProgressBar(true);
 
@@ -334,7 +338,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("id-ID").format(price);
   };
-  
+
   // ✅ Ditambahkan: Hitung harga total dengan PPN 11% untuk ditampilkan
   const totalPrice = selectedPackage.price * 1.11;
 
@@ -352,11 +356,11 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const getValidationClass = (field: keyof typeof validationState) => {
     const state = validationState[field];
     const isTouched = touchedState[field];
-    
+
     if (isTouched && state !== null) {
-      return state === true ? 'valid' : 'invalid';
+      return state === true ? "valid" : "invalid";
     }
-    return '';
+    return "";
   };
 
   return (
@@ -390,11 +394,14 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-price">
               IDR {formatPrice(selectedPackage.price)}
             </p>
+            <sub>
+              <i>*Harga belum termasuk 11% PPN</i>
+            </sub>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="package-trial-form">
-          <div className={`package-input-group ${getValidationClass('name')}`}>
+          <div className={`package-input-group ${getValidationClass("name")}`}>
             <label>Nama</label>
             <input
               type="text"
@@ -402,14 +409,16 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
               name="name"
               value={formData.name}
               onChange={handleChange}
-              onBlur={() => handleBlur('name')}
+              onBlur={() => handleBlur("name")}
               required
               className="package-text-input"
             />
           </div>
 
           <div className="package-inline-inputs">
-            <div className={`package-field-inline ${getValidationClass('email')}`}>
+            <div
+              className={`package-field-inline ${getValidationClass("email")}`}
+            >
               <label>Email</label>
               <input
                 type="email"
@@ -417,12 +426,16 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={() => handleBlur('email')}
+                onBlur={() => handleBlur("email")}
                 required
                 className="package-text-input"
               />
             </div>
-            <div className={`package-field-inline ${getValidationClass('whatsapp')}`}>
+            <div
+              className={`package-field-inline ${getValidationClass(
+                "whatsapp"
+              )}`}
+            >
               <label>Nomor Whatsapp</label>
               <input
                 type="tel"
@@ -430,22 +443,29 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleChange}
-                onBlur={() => handleBlur('whatsapp')}
+                onBlur={() => handleBlur("whatsapp")}
                 required
                 className="package-text-input"
               />
             </div>
           </div>
 
-          <div className={`radio-group ${getValidationClass('category')}`}>
+          <div className={`radio-group ${getValidationClass("category")}`}>
             <label>Kategori (maks {categoryLimit})</label>
-            <div className="radio-options-grid" onBlur={() => handleBlur('category')}>
+            <div
+              className="radio-options-grid"
+              onBlur={() => handleBlur("category")}
+            >
               {allCategories.map((cat, index) => (
                 <label key={index} className="radio-option">
                   <input
-                    type={categoryLimit === 1 ? 'radio' : 'checkbox'}
+                    type={categoryLimit === 1 ? "radio" : "checkbox"}
                     name="category"
-                    checked={categoryLimit === 1 ? formData.category[0] === cat : formData.category.includes(cat)}
+                    checked={
+                      categoryLimit === 1
+                        ? formData.category[0] === cat
+                        : formData.category.includes(cat)
+                    }
                     onChange={() => handleCategoryChange(cat)}
                     disabled={
                       categoryLimit > 1 &&
@@ -459,24 +479,33 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          <div className={`package-input-group ${getValidationClass('targetSpse')}`}>
+          <div
+            className={`package-input-group ${getValidationClass(
+              "targetSpse"
+            )}`}
+          >
             <div className="package-field-input">
               <label>Target SPSE (maks {spseLimit})</label>
               <CustomMultiSelect
                 options={multiSelectLpseOptions}
                 defaultValue={formData.targetSpse}
                 onChange={handleLpseChange}
-                onBlur={() => handleBlur('targetSpse')}
+                onBlur={() => handleBlur("targetSpse")}
                 placeholder="Pilih SPSE"
                 limit={spseLimit}
               />
             </div>
           </div>
 
-          <div className={`package-input-group ${getValidationClass('keywords')}`}>
+          <div
+            className={`package-input-group ${getValidationClass("keywords")}`}
+          >
             <div className="package-field-input">
               <label>Target Kata Kunci (maks {keywordLimit})</label>
-              <div className="package-keywords-input-area" onBlur={() => handleBlur('keywords')}>
+              <div
+                className="package-keywords-input-area"
+                onBlur={() => handleBlur("keywords")}
+              >
                 {formData.keywords.map((keyword, index) => (
                   <div key={index} className="package-keyword-tag">
                     <input
@@ -516,11 +545,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             value={JSON.stringify(selectedPackage)}
           />
           {/* ✅ Diperbarui: Menggunakan totalPrice yang sudah termasuk PPN */}
-          <input
-            type="hidden"
-            name="amount"
-            value={Math.round(totalPrice)}
-          />
+          <input type="hidden" name="amount" value={Math.round(totalPrice)} />
           <input
             type="hidden"
             name="duration_months"

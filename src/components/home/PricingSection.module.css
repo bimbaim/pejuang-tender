@@ -30,6 +30,7 @@
   font-weight: 500;
   line-height: 1.5;
   color: var(--color-black);
+  margin: 0;
 }
 
 .mainTitle {
@@ -59,24 +60,27 @@
   background-color: var(--color-light-gray);
   border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.15);
+  font-family: Quicksand, Quicksand Fallback;
 }
 
 .tabButton {
   border-radius: 8px;
   padding: 10px 24px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 300;
   line-height: 1.5;
   cursor: pointer;
   background-color: transparent;
   border: 1px solid transparent;
   color: var(--color-black);
   transition: all 0.2s ease-in-out;
+  font-family: Quicksand, Quicksand Fallback;
 }
 
 .tabButton.active {
   background-color: var(--color-white);
   border-color: rgba(0, 0, 0, 0.15);
+  font-weight: 400;
 }
 
 .pricingCards {
@@ -309,13 +313,13 @@
 /* No need for a separate rule here, the color will be inherited from .highlightedCard */
 .taxNoteContainer {
   text-align: center;
-    min-width: 99%;
-    margin-top: -85px;
+  min-width: 99%;
+  margin-top: -85px;
 }
 
 .taxNote {
-    color: var(--color-black);
-    font-size: 17px;
-    text-align: left;
-    font-weight: 500;
+  color: var(--color-black);
+  font-size: 17px;
+  text-align: left;
+  font-weight: 500;
 }

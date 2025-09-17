@@ -270,15 +270,27 @@
   font-size: 12px;
 }
 .package-remove-keyword-btn {
-  background: none;
+  background: #4cb3e7;
   border: none;
   cursor: pointer;
-  color: var(--color-text-dark);
+  color: #fff;
   font-size: 18px;
   line-height: 1;
   padding: 0 5px;
   transition: color 0.2s ease;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.package-keyword-input::placeholder {
+  color: #4cb3e7;
+  opacity: 1;
+}
+
 .package-remove-keyword-btn:hover {
   color: var(--color-primary-blue);
 }
@@ -290,7 +302,7 @@
   background-color: #e5f4fb;
   border: 1px solid #cce9f8;
   border-radius: 30px;
-  padding: 3px 10px;
+  padding: 4px 10px;
   transition: background-color 0.2s;
 }
 .package-add-keyword-btn:hover {
@@ -343,7 +355,6 @@
 .package-payment-icons img {
   /* height: 25px; */
   border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Wrapper: flex container for button + partners */
@@ -597,8 +608,6 @@
 @media all and (max-width: 900px) {
 }
 
-
-
 /* 🔹 Style untuk progress bar di bagian atas halaman */
 .loading-bar {
   position: fixed;
@@ -671,16 +680,14 @@
   opacity: 0.7;
 }
 
-
 /* Styling for form validation feedback */
 
 /* Warna untuk input yang valid (Hijau) */
 .package-input-group.valid input,
 .package-input-group.valid textarea,
 .package-input-inline.valid input {
-  border-color: #4CAF50 !important; /* Hijau */
+  border-color: #4caf50 !important; /* Hijau */
 }
-
 
 /* Warna untuk input yang tidak valid (Merah) */
 .package-input-group.invalid input,
@@ -688,4 +695,3 @@
 .package-input-inline.invalid input {
   border-color: #f44336 !important; /* Merah */
 }
-

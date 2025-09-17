@@ -27,6 +27,10 @@
   gap: 15px;
 }
 
+.categoryLinks button {
+  background-color: transparent;
+}
+
 .link,
 .activeLink {
   font-size: 18px;

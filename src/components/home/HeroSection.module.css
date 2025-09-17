@@ -79,6 +79,12 @@
   .contentContainer {
     flex-wrap: wrap;
   }
+
+  .imageColumn .heroImage {
+    width: 100%;
+    object-fit: contain;
+    object-position: left;
+  }
 }
 
 @media all and (min-width: 901px) {

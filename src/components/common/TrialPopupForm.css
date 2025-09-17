@@ -370,12 +370,6 @@
   }
 }
 
-@media all and (max-width: 1600px) and (min-width: 1200px) {
-  .popup-content {
-    margin-top: 160px;
-  }
-}
-
 @media all and (min-width: 1200px) {
   .popup-content {
     padding: 48px 80px;
@@ -421,7 +415,6 @@
     margin: 80px 20px;
   }
 }
-
 
 /* ...existing CSS for TrialPopupForm... */
 

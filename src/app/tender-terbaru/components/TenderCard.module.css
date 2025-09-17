@@ -13,7 +13,7 @@
 
 .imageWrapper {
   flex-shrink: 0;
-    position: relative;
+  position: relative;
   width: 163px;
   height: 163px;
 }
@@ -55,6 +55,10 @@
   line-height: 110%;
   color: var(--color-black);
   margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
 }
 
 .details {
