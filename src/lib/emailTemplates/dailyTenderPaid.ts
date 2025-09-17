@@ -72,7 +72,7 @@ export const dailyTenderPaidEmailTemplate = (
 <body style="margin: 0; padding: 0; background-color: #f4f4f4; text-align: center; font-family: Saira, Quicksand, sans-serif;">
 
   <div style="background-color: #f4f4f4; padding: 20px;">
-    <table border="0" cellpadding="0" cellspacing="0" width="850" style="max-width: 850px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
+    <table border="0" cellpadding="0" cellspacing="0" width="1028" style="max-width:1028px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
       <tr>
         <td style="padding: 30px;">
           <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -168,13 +168,13 @@ export const dailyTenderPaidEmailTemplate = (
             </tr>
             <!-- Footer -->
 <tr>
-  <td align="center" style="background-color: #000000; padding: 10px 20px 20px; position: relative;">
+  <td align="center" style="background-color: #000000; padding: 50px 20px 20px; position: relative;">
     <!-- Logo -->
     <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
          alt="Pejuang Tender Logo" 
          width="60" 
          height="60" 
-         style="display: block; margin: -40px auto 20px auto;">
+         style="position: absolute;bottom: 180px;">
     
     <!-- Two Columns -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
