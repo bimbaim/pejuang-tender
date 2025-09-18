@@ -76,9 +76,9 @@ export async function POST(req: NextRequest) {
       }
       
       if (spse && spse.length > 0) {
-          const spseFilters = spse.map(site => `source_url.like.%//spse.inaproc.id/${site}/%`).join(',');
-          filterConditions.push(spseFilters);
-      }
+        const spseFilters = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
+        filterConditions.push(spseFilters);
+    }
 
       if (keyword && keyword.length > 0) {
           const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
