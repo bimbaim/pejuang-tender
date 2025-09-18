@@ -309,6 +309,16 @@
   background-color: #d0d0d0;
 }
 
+.package-field-inline.invalid input,
+.package-field-inline.invalid textarea {
+  border-color: #f44336;
+}
+
+.package-field-inline.valid input,
+.package-field-inline.valid textarea {
+  border-color: #4caf50;
+}
+
 /* --- Submit --- */
 .package-submit-button {
   width: 100%;
