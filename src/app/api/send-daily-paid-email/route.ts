@@ -24,11 +24,20 @@ interface SubscriptionWithDetails {
   };
 }
 
+// ✅ Diperbarui: 'end_date' dihapus dari interface.
+// interface Tender {
+//     id: string;
+//     title: string;
+//     agency: string;
+//     budget: number;
+//     source_url: string;
+// }
 
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
     const sentEmails: string[] = [];
+    // ✅ Add a new array to collect all spse URLs
     const allSpseUrls: string[] = [];
     
     const { data: subscriptions, error: subsError } = await supabase
@@ -60,30 +69,27 @@ export async function POST(req: NextRequest) {
           .order("created_at", { ascending: false })
           .limit(5);
       
-      // ✅ Solusi: Bangun satu array filter untuk semua kriteria pencarian
-      const allSearchFilters: string[] = [];
+      // ✅ Menggabungkan kondisi filter menggunakan method chaining (logika AND)
 
+      // Menambahkan filter keyword
       if (keyword && keyword.length > 0) {
           const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
-          allSearchFilters.push(keywordFilters);
+          tenderQuery = tenderQuery.or(keywordFilters);
       }
       
+      // Menambahkan filter kategori
       if (category && category.length > 0) {
           const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
-          allSearchFilters.push(categoryFilters);
+          tenderQuery = tenderQuery.or(categoryFilters);
       }
       
+      // Menambahkan filter SPSE
       if (spse && spse.length > 0) {
           const spseFilters = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
-          allSearchFilters.push(spseFilters);
+          tenderQuery = tenderQuery.or(spseFilters);
       }
 
-      // Gabungkan semua filter pencarian dengan logika OR
-      if (allSearchFilters.length > 0) {
-          tenderQuery = tenderQuery.or(allSearchFilters.join(','));
-      }
-
-      // ✅ Terapkan filter status secara terpisah dengan logika AND (implisit)
+      // Menambahkan filter status
       const statusFilters = 'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%';
       tenderQuery = tenderQuery.or(statusFilters);
 
@@ -95,6 +101,7 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      // ✅ Collect all source_url values into the new array
       if (tenders && tenders.length > 0) {
         tenders.forEach(tender => {
           allSpseUrls.push(tender.source_url);
@@ -123,6 +130,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ✅ Update the return statement to include the new array
     return NextResponse.json({ 
       message: "Daily emails sent successfully.",
       emails_sent_to: sentEmails,
