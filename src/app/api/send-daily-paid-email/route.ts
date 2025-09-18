@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
      if (spse && spse.length > 0) {
         const spseFilters = spse
           .map(site => `source_url.ilike.%${site.trim()}%`)
-          .join(';'); // ✅ use ; instead of ,
+          .join(','); // ✅ must use comma here
         filterConditions.push(spseFilters);
       }
 
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
       );
       
-      if (filterConditions.length > 0) {
+     if (filterConditions.length > 0) {
         tenderQuery = tenderQuery.or(filterConditions.join(','));
       }
 
