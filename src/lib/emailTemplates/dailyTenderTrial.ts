@@ -127,11 +127,14 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
               <tr>
                 <td style="padding: 25px 0 10px;">
-                  <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
-                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0 0 10px; font-weight: bold;">TIPS:</p>
-                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0; line-height: 150%;">Cek detail tender sesegera mungkin sebelum batas waktu berakhir. Simpan tender yang relevan untuk persiapan dokumen penawaran.</p>
-                  </div>
-                </td>
+                <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
+                  <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0 0 10px; font-weight: bold;">TIPS:</p>
+                  <ul style="padding: 0; margin: 0;">
+                    <li style="font-size: 16px; font-family: Quicksand, sans-serif; line-height: 150%;">Cek detail tender sesegera mungkin sebelum batas waktu berakhir.</li>
+                    <li style="font-size: 16px; font-family: Quicksand, sans-serif; line-height: 150%;">Simpan tender yang relevan untuk persiapan dokumen penawaran.</li>
+                  </ul>
+                </div>
+              </td>
               </tr>
               <tr>
                 <td style="padding: 10px 0 20px;">
@@ -143,39 +146,56 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
               </tr>
               <tr>
                 <td align="center" style="padding-bottom: 25px;">
-                  <a href="[Link untuk upgrade]" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
+                  <a href=""https://pejuang-tender.vercel.app/#paket" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
                     UPGRADE SEKARANG
                   </a>
                 </td>
               </tr>
             </table>
 
-            <div style="background-color: #191919; padding: 30px; color: #ffffff; text-align: left; font-size: 12px; border-radius: 0 0 10px 10px;">
-              <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                <tr>
-                  <td width="70%" style="padding-right: 20px;">
-                    <p style="margin: 0 0 15px; line-height: 150%;">Selamat berjuang & semoga sukses memenangkan tender! Salam, Tim pejuangtender.id<br/>“Tender Tepat, Lebih Cepat”</p>
-                  </td>
-                  <td width="30%" align="right">
-                    <img src="https://your-domain.com/images/logo-white.png" alt="Logo" width="60" height="60" style="display: block; margin-left: auto;">
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="2" style="padding-top: 20px;">
-                    <div style="border-top: 1px solid #444444; margin-top: 20px;"></div>
-                    <p style="margin: 10px 0 0; font-weight: bold; text-align: right;">BUTUH BANTUAN?</p>
-                    <p style="margin: 5px 0 0; text-align: right; line-height: 150%;">Email: info@pejuangtender.id<br/>WhatsApp: +62822 8478 3855</p>
-                  </td>
-                </tr>
-              </table>
-            </div>
+             <!-- TIPS -->
+          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          
+            <!-- Footer -->
+<tr>
+  <td align="center" style="background-color: #000000; padding: 50px 20px 20px; position: relative;">
+    <!-- Logo -->
+    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+         alt="Pejuang Tender Logo" 
+         width="60" 
+         height="60" 
+         style="position: absolute;bottom: 180px;">
+    
+    <!-- Two Columns -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+      <tr>
+        <!-- Left Column -->
+        <td valign="top" style="color: #ffffff; font-family: Quicksand, sans-serif; font-size: 14px; line-height: 1.6; text-align: left; padding-right: 10px;">
+          <p style="margin: 0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
+          <p style="margin: 0;">Salam,</p>
+          <p style="margin: 0;">Tim pejuangtender.id</p>
+          <p style="margin: 0; font-weight: 700;">“Tender Tepat, Lebih Cepat”</p>
+        </td>
 
-          </td>
-        </tr>
-      </table>
-    </div>
+        <!-- Right Column -->
+        <td valign="top" style="color: #ffffff; font-family: Quicksand, sans-serif; font-size: 14px; line-height: 1.6; text-align: right; padding-left: 10px;">
+          <p style="margin: 0; font-weight: 700;">BUTUH BANTUAN?</p>
+          <p style="margin: 0;">Email: <a href="mailto:info@pejuangtender.id" style="color: #ffffff; text-decoration: none;">info@pejuangtender.id</a></p>
+          <p style="margin: 0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color: #ffffff; text-decoration: none;">+62 822 8478 3555</a></p>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
 
-  </body>
-  </html>
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>
   `;
 };
