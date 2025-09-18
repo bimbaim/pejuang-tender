@@ -62,50 +62,35 @@ export async function POST(req: NextRequest) {
           continue;
       }
       
-   let tenderQuery = supabase
+let tenderQuery = supabase
   .from("lpse_tenders")
-  .select(`id, title, agency, budget, source_url`)
-  .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+  .select("id, title, agency, budget, source_url")
+  .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // created_at >= NOW() - 24h
+  .ilike("category", "%konstruksi%") // AND category ILIKE '%konstruksi%'
+  .ilike("title", "%jalan%") // AND title ILIKE '%jalan%'
   .order("created_at", { ascending: false })
   .limit(5);
 
-// --- Kumpulkan semua filter ---
-const  orConditions: string[] = [];
+// --- SPSE filter (multiple ORs) ---
+tenderQuery = tenderQuery.or(
+  "source_url.ilike.%//spse.inaproc.id/pekanbaru%," +
+  "source_url.ilike.%//spse.inaproc.id/jakarta%"
+);
 
-// Filter keyword
-if (keyword && keyword.length > 0) {
-  const keywordFilters = keyword
-    .map(key => `title.ilike.%${key.trim()}%`)
-    .join(',');
-  orConditions.push(keywordFilters);
-}
+// --- Status filter (multiple ORs) ---
+tenderQuery = tenderQuery.or(
+  "status.eq.Pengumuman Pascakualifikasi," +
+  "status.eq.Download Dokumen Pemilihan," +
+  "status.like.Pengumuman Pascakualifikasi%," +
+  "status.like.Pengumuman Prakualifikasi%," +
+  "status.like.Download Dokumen Pemilihan%," +
+  "status.like.Download Dokumen Kualifikasi%"
+);
 
-// Filter kategori
-if (category && category.length > 0) {
-  const categoryFilters = category
-    .map(cat => `category.ilike.%${cat.trim()}%`)
-    .join(',');
-  orConditions.push(categoryFilters);
-}
 
-// Filter SPSE
-if (spse && spse.length > 0) {
-  const spseFilters = spse
-    .map(site => `source_url.ilike.%${site}%`)
-    .join(',');
-  orConditions.push(spseFilters);
-}
 
-// Filter status (selalu ada)
-const statusFilters = 'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%';
-orConditions.push(statusFilters);
 
-// --- Gabungkan jadi satu .or() ---
-if (orConditions.length > 0) {
-  tenderQuery = tenderQuery.or(orConditions.join(','));
-}
-
-const { data: tenders, error: tendersError } = await tenderQuery;
+    const { data: tenders, error: tendersError } = await tenderQuery;
 
 
 
