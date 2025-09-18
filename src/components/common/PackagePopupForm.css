@@ -693,14 +693,12 @@
 /* Styling for form validation feedback */
 
 /* Warna untuk input yang valid (Hijau) */
-.package-input-group.valid input,
 .package-input-group.valid textarea,
 .package-input-inline.valid input {
   border-color: #4caf50 !important; /* Hijau */
 }
 
 /* Warna untuk input yang tidak valid (Merah) */
-.package-input-group.invalid input,
 .package-input-group.invalid textarea,
 .package-input-inline.invalid input {
   border-color: #f44336 !important; /* Merah */
