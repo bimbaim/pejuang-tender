@@ -63,50 +63,49 @@ export async function POST(req: NextRequest) {
       }
       
       let tenderQuery = supabase
-          // ✅ Diperbarui: Menghapus 'end_date' dari SELECT statement.
-          .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url`)
-          .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-          .order("created_at", { ascending: false })
-          .limit(5);
-      
-        // 1️⃣ Status filter (always apply with AND)
-        const statusFilters = [
-          'status.eq.Pengumuman Pascakualifikasi',
-          'status.eq.Download Dokumen Pemilihan',
-          'status.like.Pengumuman Pascakualifikasi%',
-          'status.like.Pengumuman Prakualifikasi%',
-          'status.like.Download Dokumen Pemilihan%',
-          'status.like.Download Dokumen Kualifikasi%'
-        ].join(',');
+  .from("lpse_tenders")
+  .select(`id, title, agency, budget, source_url`)
+  .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+  .order("created_at", { ascending: false })
+  .limit(5);
 
-      tenderQuery = tenderQuery.or(statusFilters);
-      const filterConditions = [];
+// 1️⃣ Status filter (always apply with AND)
+const statusFilters = [
+  'status.eq.Pengumuman Pascakualifikasi',
+  'status.eq.Download Dokumen Pemilihan',
+  'status.like.Pengumuman Pascakualifikasi%',
+  'status.like.Pengumuman Prakualifikasi%',
+  'status.like.Download Dokumen Pemilihan%',
+  'status.like.Download Dokumen Kualifikasi%'
+].join(',');
 
-      if (category && category.length > 0) {
-          const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
-          filterConditions.push(categoryFilters);
-      }
-      
-     if (spse && spse.length > 0) {
-        const spseFilters = spse
-          .map(site => `source_url.ilike.%${site.trim()}%`)
-          .join(','); // ✅ must use comma here
-        filterConditions.push(spseFilters);
-      }
+tenderQuery = tenderQuery.or(statusFilters);
 
-      if (keyword && keyword.length > 0) {
-          const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
-          filterConditions.push(keywordFilters);
-      }
+// 2️⃣ Build dynamic OR for category/keyword/spse
+const dynamicFilters: string[] = [];
 
-      // filterConditions.push(
-      //   'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%'
-      // );
-      
-     if (filterConditions.length > 0) {
-        tenderQuery = tenderQuery.or(filterConditions.join(','));
-      }
+if (category && category.length > 0) {
+  dynamicFilters.push(
+    category.map(cat => `category.ilike.%${cat.trim()}%`).join(',')
+  );
+}
+
+if (spse && spse.length > 0) {
+  dynamicFilters.push(
+    spse.map(site => `source_url.ilike.%${site.trim()}%`).join(',')
+  );
+}
+
+if (keyword && keyword.length > 0) {
+  dynamicFilters.push(
+    keyword.map(key => `title.ilike.%${key.trim()}%`).join(',')
+  );
+}
+
+// Apply dynamic OR group (if any)
+if (dynamicFilters.length > 0) {
+  tenderQuery = tenderQuery.or(dynamicFilters.join(','), { foreignTable: undefined });
+}
 
       
       
