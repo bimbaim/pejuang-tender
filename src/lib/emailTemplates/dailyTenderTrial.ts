@@ -19,9 +19,7 @@ interface Tender {
 export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], trialEndDate: string): string => {
   const tenderListHtml = tenders.map((tender, index) => {
     // Check if the tender has an end_date before trying to format it
-    const formattedTenderEndDate = tender.end_date 
-      ? new Date(tender.end_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
-      : '-';
+
 
     // const formattedBudget = new Intl.NumberFormat("id-ID", {
     //   style: 'currency',
@@ -89,22 +87,33 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
                 </table>
               </td>
             </tr>
-              <tr>
-                <td style="padding: 20px 0 10px;">
-                  <p style="font-size: 20px; font-family: Saira, sans-serif; margin: 0; text-align: center;">Halo ${name}, 👋</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px 0;">
-                  <p style="font-size: 16px; font-family: Saira, sans-serif; margin: 0; text-align: left;">Daftar Tender Terbaru</p>
-                </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px 0 20px;">
-                  <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0; line-height: 150%; text-align: left;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
-                </td>
-              </tr>
-            </table>
+            <!-- GREETING -->
+            <tr>
+              <td style="padding: 20px 0 10px;">
+                <p style="font-size: 20px; font-weight: 700; margin: 0; text-align: center; font-family: Saira, sans-serif;">
+                  HALO ${name}, 👋
+                </p>
+              </td>
+            </tr>
+
+            <!-- TITLE -->
+            <tr>
+              <td style="padding: 15px 0 5px;">
+                <p style="font-size: 16px; font-weight: 700; margin: 0; text-align: center; font-family: Saira, sans-serif;">
+                  DAFTAR TENDER TERBARU
+                </p>
+              </td>
+            </tr>
+
+            <!-- DESCRIPTION -->
+            <tr>
+              <td style="padding: 5px 0 20px;">
+                <p style="font-size: 15px; margin: 0; line-height: 150%; text-align: center; font-family: Quicksand, sans-serif; color: #333333;">
+                  Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:
+                </p>
+              </td>
+            </tr>
+          </table>
 
             <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #f5f5f5;">
               <thead>
