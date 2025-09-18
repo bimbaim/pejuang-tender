@@ -81,43 +81,49 @@ export async function POST(req: NextRequest) {
       let tenderQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`)
+        // ✅ Created_at filter
         .gte(
           "created_at",
           new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        )
+        );
+
+      // ✅ Category filter
+      if (category && category.length > 0) {
+        tenderQuery = tenderQuery.or(
+          category.map((cat) => `category.ilike.%${cat.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ SPSE filter
+      if (spse && spse.length > 0) {
+        tenderQuery = tenderQuery.or(
+          spse.map((site) => `source_url.ilike.%${site.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ Keyword filter
+      if (keyword && keyword.length > 0) {
+        tenderQuery = tenderQuery.or(
+          keyword.map((key) => `title.ilike.%${key.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ Status filter (selalu ada)
+      tenderQuery = tenderQuery.or(
+        [
+          "status.eq.Pengumuman Pascakualifikasi",
+          "status.eq.Download Dokumen Pemilihan",
+          "status.like.Pengumuman Pascakualifikasi%",
+          "status.like.Pengumuman Prakualifikasi%",
+          "status.like.Download Dokumen Pemilihan%",
+          "status.like.Download Dokumen Kualifikasi%",
+        ].join(",")
+      );
+
+      // ✅ Ordering + Limit
+      tenderQuery = tenderQuery
         .order("created_at", { ascending: false })
         .limit(5);
-
-      // ✅ Menggabungkan kondisi filter menggunakan method chaining (logika AND)
-
-      // Menambahkan filter keyword
-      if (keyword && keyword.length > 0) {
-        const keywordFilters = keyword
-          .map((key) => `title.ilike.%${key.trim()}%`)
-          .join(",");
-        tenderQuery = tenderQuery.or(keywordFilters);
-      }
-
-      // Menambahkan filter kategori
-      if (category && category.length > 0) {
-        const categoryFilters = category
-          .map((cat) => `category.ilike.%${cat.trim()}%`)
-          .join(",");
-        tenderQuery = tenderQuery.or(categoryFilters);
-      }
-
-      // Menambahkan filter SPSE
-      if (spse && spse.length > 0) {
-        const spseFilters = spse
-          .map((site) => `source_url.ilike.%${site}%`)
-          .join(",");
-        tenderQuery = tenderQuery.or(spseFilters);
-      }
-
-      // Menambahkan filter status
-      const statusFilters =
-        "status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%";
-      tenderQuery = tenderQuery.or(statusFilters);
 
       const { data: tenders, error: tendersError } = await tenderQuery;
 
