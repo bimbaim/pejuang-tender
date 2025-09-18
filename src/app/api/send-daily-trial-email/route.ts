@@ -144,7 +144,11 @@ export async function POST(req: NextRequest) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: users.email,
-          subject: "Update Tender Hari Ini",
+          subject: `Update Tender Hari Ini ${today.toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })} pejuangtender.id`,
           // Pass the template name and data instead of the pre-built HTML
           templateName: "dailyTenderTrial",
           data: {
