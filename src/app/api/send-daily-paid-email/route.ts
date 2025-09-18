@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 let tenderQuery = supabase
   .from("lpse_tenders")
   .select("id, title, agency, budget, source_url")
-  .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // created_at >= NOW() - 24h
+  // .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()) // created_at >= NOW() - 24h
   .ilike("category", "%konstruksi%") // AND category ILIKE '%konstruksi%'
   .ilike("title", "%jalan%") // AND title ILIKE '%jalan%'
   .order("created_at", { ascending: false })
