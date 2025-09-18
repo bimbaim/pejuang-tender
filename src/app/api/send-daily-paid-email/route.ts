@@ -55,54 +55,46 @@ export async function POST(req: NextRequest) {
     }
 
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
-  const { user_id, keyword, category, spse, users } = subscription;
-  
-  if (!users || !users.email) {
-      console.warn(`Melewatkan user ID ${user_id} karena email tidak ada.`);
-      continue;
-  }
-  
-  let tenderQuery = supabase
-      .from("lpse_tenders")
-      .select(`id, title, agency, budget, source_url`)
-      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
-      .order("created_at", { ascending: false })
-      .limit(5);
+      const { user_id, keyword, category, spse, users } = subscription;
+      
+      if (!users || !users.email) {
+          console.warn(`Melewatkan user ID ${user_id} karena email tidak ada.`);
+          continue;
+      }
+      
+      let tenderQuery = supabase
+          .from("lpse_tenders")
+          .select(`id, title, agency, budget, source_url`)
+          .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .order("created_at", { ascending: false })
+          .limit(5);
+      
+      // ✅ Menggabungkan kondisi filter menggunakan method chaining (logika AND)
 
-  // ✅ Menggabungkan kondisi filter dengan logika AND yang lebih jelas
-  // Membuat filter untuk setiap kriteria dan menggabungkannya di akhir.
-  
-  const allFilters = [];
+      // Menambahkan filter keyword
+      if (keyword && keyword.length > 0) {
+          const keywordFilters = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
+          tenderQuery = tenderQuery.or(keywordFilters);
+      }
+      
+      // Menambahkan filter kategori
+      if (category && category.length > 0) {
+          const categoryFilters = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
+          tenderQuery = tenderQuery.or(categoryFilters);
+      }
+      
+      // Menambahkan filter SPSE
+      if (spse && spse.length > 0) {
+          const spseFilters = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
+          tenderQuery = tenderQuery.or(spseFilters);
+      }
 
-  // Filter Keyword
-  if (keyword && keyword.length > 0) {
-      const keywordOr = keyword.map(key => `title.ilike.%${key.trim()}%`).join(',');
-      allFilters.push(`(${keywordOr})`); // Menggunakan tanda kurung untuk mengelompokkan
-  }
-  
-  // Filter Kategori
-  if (category && category.length > 0) {
-      const categoryOr = category.map(cat => `category.ilike.%${cat.trim()}%`).join(',');
-      allFilters.push(`(${categoryOr})`);
-  }
-  
-  // Filter SPSE
-  if (spse && spse.length > 0) {
-      const spseOr = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
-      allFilters.push(`(${spseOr})`);
-  }
+      // Menambahkan filter status
+      const statusFilters = 'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%';
+      tenderQuery = tenderQuery.or(statusFilters);
 
-  // Filter Status
-  const statusOr = 'status.eq.Pengumuman Pascakualifikasi,status.eq.Download Dokumen Pemilihan,status.like.Pengumuman Pascakualifikasi%,status.like.Pengumuman Prakualifikasi%,status.like.Download Dokumen Pemilihan%,status.like.Download Dokumen Kualifikasi%';
-  allFilters.push(`(${statusOr})`);
+      const { data: tenders, error: tendersError } = await tenderQuery;
 
-  // Menggabungkan semua filter dengan logika AND
-  if (allFilters.length > 0) {
-      const finalFilterString = allFilters.join(',');
-      tenderQuery = tenderQuery.or(finalFilterString);
-  }
-
-  const { data: tenders, error: tendersError } = await tenderQuery;
 
       if (tendersError) {
         console.error("Error fetching tenders for user", user_id, ":", tendersError.message);
