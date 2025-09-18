@@ -312,11 +312,13 @@
 .package-field-inline.invalid input,
 .package-field-inline.invalid textarea {
   border-color: #f44336;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
 }
 
 .package-field-inline.valid input,
 .package-field-inline.valid textarea {
   border-color: #4caf50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
 }
 
 /* --- Submit --- */
@@ -697,6 +699,7 @@
 .package-input-group.valid textarea,
 .package-input-inline.valid input {
   border-color: #4caf50 !important; /* Hijau */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
 }
 
 /* Warna untuk input yang tidak valid (Merah) */
@@ -704,4 +707,5 @@
 .package-input-group.invalid textarea,
 .package-input-inline.invalid input {
   border-color: #f44336 !important; /* Merah */
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); /* Red shadow */
 }
