@@ -68,7 +68,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({
       // Divide by 1000 to get the value in thousands
       const amountInK = amount / 1000;
       // Format the number with thousands separators and append "K"
-      return `IDR ${amountInK.toLocaleString("id-ID")  }K`;
+      return `IDR ${amountInK.toLocaleString("id-ID")}K`;
     }
     // If the amount is less than 1000, just format it with thousands separators
     return `IDR ${amount.toLocaleString("id-ID")}`;
@@ -176,13 +176,12 @@ const PricingSection: React.FC<PricingSectionProps> = ({
           </div>
         </div>
         <div className={styles.taxNoteContainer}>
-        {/* ✅ Ditambahkan: Catatan Harga */}
+          {/* ✅ Ditambahkan: Catatan Harga */}
           <p className={styles.taxNote}>
-            *Harga belum termasuk PPN 11%
+            <i>*Harga belum termasuk PPN 11%</i>
           </p>
+        </div>
       </div>
-      </div>
-      
     </section>
   );
 };

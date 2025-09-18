@@ -83,7 +83,11 @@
   .imageColumn .heroImage {
     width: 100%;
     object-fit: contain;
-    object-position: left;
+    object-position: center;
+  }
+
+  .imageColumn {
+    width: 100%;
   }
 }
 

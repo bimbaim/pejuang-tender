@@ -293,6 +293,11 @@
     font-size: 40px;
   }
 
+  .taxNote {
+    margin: 0;
+    padding-top: 55px;
+  }
+
   .mainTitle {
     font-size: 36px;
   }
