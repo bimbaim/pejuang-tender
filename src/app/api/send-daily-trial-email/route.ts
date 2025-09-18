@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const today = new Date();
     const todayISOString = today.toISOString().split("T")[0];
     const sentEmails: string[] = []; // Array to store emails of recipients
-
+    const allSpseUrls: string[] = [];
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(
@@ -139,6 +139,13 @@ export async function POST(req: NextRequest) {
 
       // const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
 
+      // ✅ Collect all source_url values into the new array
+      if (tenders && tenders.length > 0) {
+        tenders.forEach((tender) => {
+          allSpseUrls.push(tender.source_url);
+        });
+      }
+
       const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -173,6 +180,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: "Daily emails sent successfully.",
       emails_sent_to: sentEmails,
+      spse_urls: allSpseUrls,
     });
   } catch (error: unknown) {
     const err = error as Error;
