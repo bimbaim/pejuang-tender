@@ -35,7 +35,6 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${index + 1}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.title}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.agency}</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${formattedTenderEndDate}</td>
       <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px;">
         <a href="${tender.source_url}" style="color: #0093dd; text-decoration: underline; font-family: Quicksand, sans-serif;">Link SPSE</a>
       </td>
@@ -68,14 +67,28 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
         <tr>
           <td style="padding: 30px;">
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
-              <tr>
-                <td align="left">
-                  <div style="display: flex; align-items: center; gap: 10px;">
-                    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" alt="PEJUANG Tender Logo" width="44" height="44" style="display: block;">
-                    <p style="font-size: 18px; font-weight: bold; margin: 0;">PEJUANG Tender</p>
-                  </div>
-                </td>
-              </tr>
+               <!-- LOGO & BRAND -->
+            <tr>
+              <td align="center" style="padding: 20px 0;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                  <tr>
+                    <!-- Logo -->
+                    <td style="padding-right: 10px;">
+                      <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                           alt="PEJUANG Tender Logo" 
+                           width="50" 
+                           height="50" 
+                           style="display: block;">
+                    </td>
+                    <!-- Text -->
+                    <td style="text-align: left; vertical-align: middle; font-family: Saira, sans-serif;">
+                      <p style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2;">PEJUANG</p>
+                      <p style="margin: 0; font-size: 16px; font-weight: 400; line-height: 1.2;">TENDER</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
               <tr>
                 <td style="padding: 20px 0 10px;">
                   <p style="font-size: 20px; font-family: Saira, sans-serif; margin: 0; text-align: center;">Halo ${name}, 👋</p>
@@ -99,7 +112,6 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">No</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Nama</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Instansi</th>
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Akhir Pendaftaran</th>
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Link SPSE</th>
                 </tr>
               </thead>
