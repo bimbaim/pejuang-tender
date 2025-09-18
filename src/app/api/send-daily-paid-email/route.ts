@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
   try {
     const today = new Date();
     const sentEmails: string[] = [];
+    // ✅ Add a new array to collect all spse URLs
+    const allSpseUrls: string[] = [];
     
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
@@ -99,6 +101,13 @@ export async function POST(req: NextRequest) {
         console.error("Error fetching tenders for user", user_id, ":", tendersError.message);
         continue;
       }
+
+      // ✅ Collect all source_url values into the new array
+      if (tenders && tenders.length > 0) {
+        tenders.forEach(tender => {
+          allSpseUrls.push(tender.source_url);
+        });
+      }
       
       const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
         method: "POST",
@@ -122,9 +131,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ✅ Update the return statement to include the new array
     return NextResponse.json({ 
       message: "Daily emails sent successfully.",
-      emails_sent_to: sentEmails
+      emails_sent_to: sentEmails,
+      spse_urls: allSpseUrls
     });
 
   } catch (error: unknown) {
