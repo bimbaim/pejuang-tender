@@ -424,7 +424,18 @@
 /* --- Validasi CSS Baru --- */
 
 /* Gaya untuk input yang valid */
+.input-group.valid input:not([class="search-input"]),
+.input-group.valid .multi-select-container {
+  border: 1px solid #4caf50 !important; /* Green border */
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Green shadow */
+}
 
+/* Gaya untuk input yang tidak valid */
+.input-group.invalid input:not([class="search-input"]),
+.input-group.invalid .multi-select-container {
+  border: 1px solid #f44336 !important; /* Red border */
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.5); /* Red shadow */
+}
 
 /* Gaya untuk radio group yang tidak valid */
 
