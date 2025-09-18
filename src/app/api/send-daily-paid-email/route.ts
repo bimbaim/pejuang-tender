@@ -77,9 +77,11 @@ export async function POST(req: NextRequest) {
           filterConditions.push(categoryFilters);
       }
       
-      if (spse && spse.length > 0) {
-          const spseOrConditions = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
-          filterConditions.push(`(${spseOrConditions})`); // Enclose spse conditions in parentheses
+     if (spse && spse.length > 0) {
+        const spseFilters = spse
+          .map(site => `source_url.ilike.%${site.trim()}%`)
+          .join(';'); // ✅ use ; instead of ,
+        filterConditions.push(spseFilters);
       }
 
       if (keyword && keyword.length > 0) {
@@ -94,6 +96,7 @@ export async function POST(req: NextRequest) {
       if (filterConditions.length > 0) {
         tenderQuery = tenderQuery.or(filterConditions.join(','));
       }
+
       
       
       const { data: tenders, error: tendersError } = await tenderQuery;
