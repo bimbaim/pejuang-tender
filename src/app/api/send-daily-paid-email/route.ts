@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
       
       // Menambahkan filter SPSE
       if (spse && spse.length > 0) {
-          const spseFilters = spse.map(site => `source_url.ilike.%//spse.inaproc.id/${site}%`).join(',');
+          const spseFilters = spse.map(site => `source_url.ilike.%${site}%`).join(',');
           tenderQuery = tenderQuery.or(spseFilters);
       }
 
