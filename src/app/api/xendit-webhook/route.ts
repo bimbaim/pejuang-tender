@@ -1,7 +1,7 @@
+// app/api/xendit-webhook/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { NextRequest } from "next/server";
-import { sendEmailFromTemplate } from "../sendgrid/route"; // Impor fungsi baru
+import { NextRequest } from "next/server"; // <-- Perubahan di sini
 
 // --- Type Definitions for Xendit Webhook and Custom Errors ---
 interface XenditInvoiceWebhookEvent {
@@ -27,7 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 /**
  * POST handler for Xendit webhook events.
  */
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) { // <-- Perubahan di sini
   let webhookEvent: XenditInvoiceWebhookEvent | undefined;
 
   try {
@@ -89,12 +89,21 @@ export async function POST(req: NextRequest) {
         const packageName = subscriptionData.packages.alternative_name;
         
         try {
-          await sendEmailFromTemplate(
-            email,
-            `Selamat Bergabung ${packageName} di pejuangtender.id`,
-            'subscriptionWelcome',
-            { name, packageName }
-          );
+          await fetch(`${req.nextUrl.origin}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: email,
+              subject: `Selamat Bergabung ${packageName} di pejuangtender.id`,
+              templateName: 'subscriptionWelcome',
+              data: {
+                name,
+                packageName,
+              },
+            }),
+          });
           console.log(`Email berhasil dikirim ke ${email} untuk paket ${packageName}.`);
         } catch (emailError: unknown) {
           const err = emailError as ExtendedError;
