@@ -8,7 +8,7 @@ interface Tender {
   source_url: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
 
 /**
  * Generates the daily email template with a list of tenders for paid users.
