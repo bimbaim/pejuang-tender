@@ -9,7 +9,7 @@ interface Tender {
     end_date: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
 
 /**
  * Generates the daily email template with a list of tenders for trial users.
@@ -65,7 +65,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
     <div style="background-color: #f4f4f4; padding: 20px;">
       <table border="0" cellpadding="0" cellspacing="0" width="1028" style="max-width: 1028px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
         <tr>
-          <td style="padding: 30px;">
+          <td>
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                <!-- LOGO & BRAND -->
             <tr>
@@ -117,7 +117,8 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
             </tr>
           </table>
 
-            <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #f5f5f5;">
+          table class="user-table" border="0" cellpadding="0" cellspacing="0" width="90%" 
+            style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; font-family: Quicksand, sans-serif; font-size: 14px; margin:auto">
               <thead>
                 <tr style="background-color: #f5f5f5; border: 1px solid #000000;">
                   <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">No</th>
@@ -135,7 +136,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
               </tbody>
             </table>
 
-            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <table border="0" cellpadding="0" cellspacing="0" width="80%" style="margin:auto;">
               <tr>
                 <td style="padding: 25px 0 10px;">
                 <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
