@@ -26,6 +26,22 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
       .inner-container { padding: 20px !important; }
       .button { width: 100% !important; }
     }
+      .button-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            .button-link {
+                padding: 10px 20px !important;
+            }
+        }
   </style>
 </head>
 <body style="margin: 0; padding: 0; font-family: Saira, Quicksand, sans-serif; font-size: 16px; line-height: 1.6; color: #333333; background-color: #f4f4f4;">
@@ -107,9 +123,9 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td align="center" style="padding-bottom: 25px;">
-                    <a href="${BASE_URL}/#paket" class="button" style="display:inline-block;padding:12px 25px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:50px;font-weight:bold;">
-                      Upgrade Paket Anda
-                    </a>
+                      <a href="${BASE_URL}/#paket" class="button-link">
+                          Upgrade Paket Anda
+                      </a>
                   </td>
                 </tr>
               </table>
