@@ -146,7 +146,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Tandai semua field sebagai touched sebelum validasi akhir
     setTouchedState({
       name: true,
       email: true,
@@ -156,7 +155,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       keywords: true,
     });
     
-    // Jalankan validasi terakhir
     const formValidationResult = validateForm(formData);
     setValidationState(formValidationResult);
 
@@ -166,22 +164,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    // Lanjutkan dengan logika submit ke Supabase
     try {
-      const { data: trialPackage, error: packageError } = await supabase
-        .from("packages")
-        .select("id")
-        .eq("name", "Free Trial")
-        .single();
-
-      if (packageError || !trialPackage) {
-        console.error("Error fetching trial package:", packageError?.message || "Trial package not found.");
-        throw new Error("Trial package not found in the database. Please ensure a package named 'Free Trial' exists.");
-      }
-
-      const package_id = trialPackage.id;
-
-      let user_id;
+      // 1. Check if the user already exists in the 'users' table.
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
         .select("id")
@@ -189,6 +173,29 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
       if (userError) throw userError;
 
+      // 2. If a user with this email exists, check for an existing trial subscription.
+      if (existingUsers && existingUsers.length > 0) {
+        const existingUserId = existingUsers[0].id;
+        
+        const { data: existingSubscription, error: subError } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", existingUserId)
+          .eq("payment_status", "free-trial")
+          .maybeSingle();
+
+        if (subError) throw subError;
+
+        // 3. If a trial subscription is found, block the request and show an alert.
+        if (existingSubscription) {
+          alert("❌ Akun Anda sudah memiliki langganan trial gratis. Silakan login atau hubungi dukungan untuk informasi lebih lanjut.");
+          onClose();
+          return;
+        }
+      }
+
+      // 4. If no existing trial is found, proceed with creating the trial.
+      let user_id;
       if (existingUsers && existingUsers.length > 0) {
         user_id = existingUsers[0].id;
       } else {
@@ -207,6 +214,19 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         if (insertUserError) throw insertUserError;
         user_id = newUser.id;
       }
+    
+      const { data: trialPackage, error: packageError } = await supabase
+        .from("packages")
+        .select("id")
+        .eq("name", "Free Trial")
+        .single();
+
+      if (packageError || !trialPackage) {
+        console.error("Error fetching trial package:", packageError?.message || "Trial package not found.");
+        throw new Error("Trial package not found in the database. Please ensure a package named 'Free Trial' exists.");
+      }
+
+      const package_id = trialPackage.id;
 
       const endDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
       const endDateISO = endDate.toISOString().split("T")[0];
@@ -279,7 +299,6 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   }));
   
   const getValidationClass = (field: keyof typeof validationState) => {
-    // Validasi hanya jika field sudah disentuh DAN status validasinya tidak null
     const state = validationState[field];
     const isTouched = touchedState[field];
     
