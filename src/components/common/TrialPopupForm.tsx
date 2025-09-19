@@ -36,7 +36,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     targetSpse: [] as string[],
     keywords: [] as string[],
   });
-
+  
   // State for the notification
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -105,6 +105,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     };
   };
 
+  // Fungsi untuk memicu validasi pada field yang disentuh
   const handleBlur = (field: keyof typeof touchedState) => {
     setTouchedState(prev => ({ ...prev, [field]: true }));
     const newValidationState = validateForm(formData);
@@ -190,13 +191,13 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
         // 3. If a trial subscription is found, block the request and show a notification.
         if (existingSubscription) {
-          setNotification("❌ Akun Anda sudah memiliki langganan trial gratis. Silakan hubungi dukungan untuk informasi lebih lanjut.");
+          setNotification("❌ Akun Anda sudah memiliki langganan trial gratis. Silakan login atau hubungi dukungan untuk informasi lebih lanjut.");
           onClose();
           return;
         }
       }
 
-      // 4. If no existing trial is found, proceed with creating the trial.
+      // 4. Jika tidak ada trial yang ditemukan, lanjutkan dengan proses pendaftaran.
       let user_id;
       if (existingUsers && existingUsers.length > 0) {
         user_id = existingUsers[0].id;
@@ -217,15 +218,20 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         user_id = newUser.id;
       }
     
+      // MENGGANTI .single() dengan .maybeSingle()
       const { data: trialPackage, error: packageError } = await supabase
         .from("packages")
         .select("id")
         .eq("name", "Free Trial")
-        .single();
+        .maybeSingle();
 
-      if (packageError || !trialPackage) {
-        console.error("Error fetching trial package:", packageError?.message || "Trial package not found.");
-        throw new Error("Trial package not found in the database. Please ensure a package named 'Free Trial' exists.");
+      if (packageError) {
+        console.error("Error fetching trial package:", packageError.message);
+        throw new Error("Gagal mengambil informasi paket trial.");
+      }
+      
+      if (!trialPackage) {
+        throw new Error("Trial package 'Free Trial' tidak ditemukan di database.");
       }
 
       const package_id = trialPackage.id;
@@ -288,6 +294,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     } catch (error: unknown) {
       const err = error as ExtendedError;
       console.error("Error creating trial account:", err.message);
+      // GANTI alert() menjadi setNotification()
       setNotification("❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " + err.message);
     }
   };
@@ -330,7 +337,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             ></path>
           </svg>
         </button>
-
+        
+        {/* Notifikasi akan muncul di sini */}
         {notification && (
           <div className="notification">
             <p>{notification}</p>

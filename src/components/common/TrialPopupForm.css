@@ -449,3 +449,36 @@
   border: 1px solid #f44336 !important;
 }
 /* --- Akhir Validasi CSS Baru --- */
+
+
+.notification {
+  background-color: #f8d7da; /* Light red background */
+  color: #721c24; /* Dark red text */
+  padding: 15px;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.notification p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.close-notif-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #721c24;
+  position: absolute;
+  top: 5px;
+  right: 10px;
+}
