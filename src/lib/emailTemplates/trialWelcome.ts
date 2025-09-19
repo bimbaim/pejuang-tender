@@ -108,9 +108,10 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
 
               <p style="margin: 0 0 10px; font-weight: bold;">Tips Memaksimalkan Trial Anda:</p>
               <ul style="margin: 0 0 20px; padding-left: 20px; list-style: disc;">
-                <li style="margin-bottom: 5px;">Cek email update tender setiap pagi.</li>
-                <li style="margin-bottom: 5px;">Simpan atau tandai tender yang menarik.</li>
-                <li>Segera hubungi instansi untuk tender yang sesuai.</li>
+                <li style="margin-bottom: 5px;">Cek email update tender setiap pagi untuk melihat peluang terbaru.</li>
+                <li style="margin-bottom: 5px;">Simpan atau tandai tender yang menarik agar mudah diakses nanti.</li>
+                <li>Segera hubungi instansi atau siapkan dokumen jika menemukan tender yang sesuai.
+</li>
               </ul>
 
               <div style="background-color: #f7f9fc; padding: 15px; border-left: 4px solid #4CAF50; border-radius: 4px; margin-bottom: 25px;">
