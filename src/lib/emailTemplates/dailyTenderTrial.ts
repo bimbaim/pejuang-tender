@@ -117,7 +117,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
             </tr>
           </table>
 
-          table class="user-table" border="0" cellpadding="0" cellspacing="0" width="90%" 
+          <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="90%" 
             style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; font-family: Quicksand, sans-serif; font-size: 14px; margin:auto">
               <thead>
                 <tr style="background-color: #f5f5f5; border: 1px solid #000000;">
