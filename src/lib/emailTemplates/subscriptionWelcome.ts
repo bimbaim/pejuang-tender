@@ -71,14 +71,15 @@ export const subscriptionWelcomeTemplate = (
           <tr>
             <td class="inner-container" style="padding:30px;">
               <p style="margin:0 0 20px; font-size:16px;">
-                Terima kasih telah mempercayakan <strong>pejuangtender.id</strong>. Mulai hari ini Anda akan mendapatkan update tender sesuai paket Anda.
+                Terima kasih telah mempercayakan <strong>pejuangtender.id</strong> untuk membantu perjalanan Anda memenangkan tender.
               </p>
+              <p>Kami senang memberi tahu bahwa paket <strong>${packageName}</strong> Anda sudah aktif mulai hari ini.</p>
 
               <!-- Highlight -->
               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px; border:1px solid #e0e0e0; border-radius:8px; overflow:hidden;">
                 <tr>
                   <td style="padding:15px; background-color:#f9f9f9; font-weight:bold; color:#1a237e;">
-                    Yang Akan Anda Dapatkan
+                    Mulai Sekarang, Anda Akan Mendapatkan:
                   </td>
                 </tr>
                 <tr>
@@ -86,8 +87,9 @@ export const subscriptionWelcomeTemplate = (
                     <ul style="margin:0; padding-left:20px; list-style:disc;">
                       <li style="margin-bottom:10px;">Daftar tender terbaru sesuai kategori & keyword pilihan Anda.</li>
                       <li style="margin-bottom:10px;">Informasi lengkap: nama paket, instansi, nilai proyek, dan batas waktu.</li>
-                      <li style="margin-bottom:10px;">Link langsung ke LPSE resmi.</li>
-                      <li>Akses sesuai paket Anda.</li>
+                      <li style="margin-bottom:10px;">Link langsung ke sumber LPSE resmi untuk detail lebih lanjut.
+</li>
+                      <li>Info terhadap lebih banyak LPSE</li>
                     </ul>
                   </td>
                 </tr>
@@ -97,9 +99,10 @@ export const subscriptionWelcomeTemplate = (
               <p style="margin:0 0 10px; font-weight:bold;">Tips Memaksimalkan Paket Anda:</p>
               <ul style="margin:0 0 20px; padding-left:20px; list-style:disc;">
                 <li style="margin-bottom:5px;">Gunakan lebih banyak keyword untuk peluang tender lebih luas.</li>
-                <li style="margin-bottom:5px;">Cek email update tender setiap pagi.</li>
-                <li style="margin-bottom:5px;">Simpan atau tandai tender yang menarik.</li>
-                <li>Segera hubungi instansi untuk tender sesuai.</li>
+                <li style="margin-bottom:5px;">Cek email update tender setiap pagi untuk melihat peluang terbaru.
+</li>
+                <li style="margin-bottom:5px;">Simpan atau tandai tender yang menarik agar mudah diakses nanti.</li>
+                <li>Segera hubungi instansi atau siapkan dokumen jika menemukan tender yang sesuai.</li>
               </ul>
             </td>
           </tr>
@@ -143,5 +146,6 @@ export const subscriptionWelcomeTemplate = (
 
 </body>
 </html>
+
   `;
 };
