@@ -89,6 +89,8 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         const packageName = subscriptionData.packages.alternative_name;
         
         try {
+          const emailApiUrl = `${req.nextUrl.origin}/api/sendgrid`;
+          console.log("Mencoba mengirim email ke:", email, "via URL:", emailApiUrl);
           await fetch(`${req.nextUrl.origin}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
             method: 'POST',
             headers: {
