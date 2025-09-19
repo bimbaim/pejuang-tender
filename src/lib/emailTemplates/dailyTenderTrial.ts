@@ -9,6 +9,8 @@ interface Tender {
     end_date: string;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 /**
  * Generates the daily email template with a list of tenders for trial users.
  * @param name The user's name.
@@ -72,7 +74,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
                   <tr>
                     <!-- Logo -->
                     <td style="padding-right: 10px;">
-                      <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                      <img src="${BASE_URL}/images/logo-footer.png" 
                            alt="PEJUANG Tender Logo" 
                            width="50" 
                            height="50" 
@@ -155,7 +157,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
               </tr>
               <tr>
                 <td align="center" style="padding-bottom: 25px;">
-                  <a href=""https://pejuang-tender.vercel.app/#paket" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
+                  <a href="${BASE_URL}/#paket" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
                     UPGRADE SEKARANG
                   </a>
                 </td>
@@ -169,7 +171,7 @@ export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], t
 <tr>
   <td align="center" style="background-color: #000000; padding: 50px 20px 20px; position: relative;">
     <!-- Logo -->
-    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+    <img src="${BASE_URL}/images/logo-footer.png" 
          alt="Pejuang Tender Logo" 
          width="60" 
          height="60" 

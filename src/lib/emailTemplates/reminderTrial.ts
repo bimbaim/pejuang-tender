@@ -1,5 +1,7 @@
 // File: src/lib/emailTemplates/reminderTrial.ts
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 /**
  * Generates the email template for a 2-day trial expiration reminder.
  * @param name The user's name.
@@ -42,7 +44,7 @@ export const reminderTrialEmailTemplate = (
                   <tr>
                     <!-- Logo -->
                     <td style="padding-right: 10px;">
-                      <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                      <img src="${BASE_URL}/images/logo-footer.png" 
                            alt="PEJUANG Tender Logo" 
                            width="50" 
                            height="50" 
@@ -120,7 +122,7 @@ export const reminderTrialEmailTemplate = (
             <tr>
               <td align="center" style="background-color: #000000; padding: 10px 20px 20px; position: relative; border-radius: 0 0 10px 10px;">
                 <!-- Logo -->
-                <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                <img src="${BASE_URL}/images/logo-footer.png" 
                      alt="Pejuang Tender Logo" 
                      width="60" 
                      height="60" 

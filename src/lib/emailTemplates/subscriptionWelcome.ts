@@ -1,5 +1,7 @@
 // src/lib/emailTemplates/subscriptionWelcome.ts
 
+const
+
 export const subscriptionWelcomeTemplate = (
   name: string,
   packageName: string
@@ -42,7 +44,7 @@ export const subscriptionWelcomeTemplate = (
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
                 <tr>
                   <td style="padding-right: 10px;">
-                    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" alt="PEJUANG Tender Logo" width="50" height="50" style="display:block;">
+                    <img src="${BASE_URL}/images/logo-footer.png" alt="PEJUANG Tender Logo" width="50" height="50" style="display:block;">
                   </td>
                   <td style="text-align: left; vertical-align: middle; font-family: Saira, sans-serif;">
                     <p style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2;">PEJUANG</p>
@@ -106,7 +108,7 @@ export const subscriptionWelcomeTemplate = (
           <tr>
             <td align="center" style="background-color: #000000; padding: 10px 20px 20px; border-radius: 0 0 8px 8px;">
               <!-- Logo -->
-              <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+              <img src="${BASE_URL}/images/logo-footer.png" 
                    alt="Pejuang Tender Logo" 
                    width="60" 
                    height="60" 

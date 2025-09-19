@@ -8,6 +8,8 @@ interface Tender {
   source_url: string;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 /**
  * Generates the daily email template with a list of tenders for paid users.
  * Menggunakan desain dari template trial namun dengan konten berbayar.
@@ -84,7 +86,7 @@ export const dailyTenderPaidEmailTemplate = (
                   <tr>
                     <!-- Logo -->
                     <td style="padding-right: 10px;">
-                      <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                      <img src="${BASE_URL}/images/logo-footer.png" 
                            alt="PEJUANG Tender Logo" 
                            width="50" 
                            height="50" 
@@ -170,7 +172,7 @@ export const dailyTenderPaidEmailTemplate = (
 <tr>
   <td align="center" style="background-color: #000000; padding: 50px 20px 20px; position: relative;">
     <!-- Logo -->
-    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+    <img src="${BASE_URL}/images/logo-footer.png" 
          alt="Pejuang Tender Logo" 
          width="60" 
          height="60" 

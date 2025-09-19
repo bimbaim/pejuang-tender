@@ -1,5 +1,9 @@
 // File: src/lib/emailTemplates/reminderPaid.ts
 
+
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 /**
  * Generates the email template for a paid subscription renewal reminder.
  * @param name The user's name.
@@ -39,7 +43,7 @@ export const reminderPaidEmailTemplate = (name: string, packageName: string, sub
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
                   <tr>
                     <td style="padding-right:10px;">
-                      <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                      <img src="${BASE_URL}/images/logo-footer.png" 
                            alt="Pejuang Tender Logo" 
                            width="50" 
                            height="50" 
@@ -122,7 +126,7 @@ export const reminderPaidEmailTemplate = (name: string, packageName: string, sub
             <tr>
               <td align="center" style="background-color:#000000; padding:10px 20px 20px; position:relative; border-radius:0 0 10px 10px;">
                 <!-- Logo -->
-                <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                <img src="${BASE_URL}/images/logo-footer.png" 
                      alt="Pejuang Tender Logo" 
                      width="60" 
                      height="60" 

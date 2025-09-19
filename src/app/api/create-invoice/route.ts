@@ -106,8 +106,8 @@ export async function POST(req: Request) {
             email: customer.email,
             mobileNumber: customer.whatsapp || "+628000000000",
         },
-        successRedirectUrl: "http://pejuang-tender.vercel.app/thank-you",
-        failureRedirectUrl: "http://pejuang-tender.vercel.app/payment-failed",
+        successRedirectUrl: xenditCallbackUrl + "/payment-success",
+        failureRedirectUrl: xenditCallbackUrl + "/payment-failure",
         // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
       },
     });

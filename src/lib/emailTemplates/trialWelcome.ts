@@ -1,5 +1,7 @@
 // src/lib/emailTemplates/trialWelcome.ts
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+
 export const trialWelcomeTemplate = (name: string, trialEndDate: string): string => {
   return `
 <!DOCTYPE html>
@@ -40,7 +42,7 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
                 <tr>
                   <!-- Logo -->
                   <td style="padding-right: 10px;">
-                    <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+                    <img src="${BASE_URL}/images/logo-footer.png" 
                          alt="PEJUANG Tender Logo" 
                          width="50" 
                          height="50" 
@@ -105,7 +107,7 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
                   <td align="center" style="padding-bottom: 25px;">
-                    <a href="https://pejuang-tender.vercel.app/#paket" class="button" style="display:inline-block;padding:12px 25px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:50px;font-weight:bold;">
+                    <a href="${BASE_URL}/#paket" class="button" style="display:inline-block;padding:12px 25px;background-color:#4CAF50;color:#ffffff;text-decoration:none;border-radius:50px;font-weight:bold;">
                       Upgrade Paket Anda
                     </a>
                   </td>
@@ -118,7 +120,7 @@ export const trialWelcomeTemplate = (name: string, trialEndDate: string): string
           <tr>
             <td align="center" style="background-color: #000000; padding: 10px 20px 20px; position: relative; border-radius: 0 0 8px 8px;">
               <!-- Logo Footer -->
-              <img src="https://pejuang-tender.vercel.app/images/logo-footer.png" 
+              <img src="${BASE_URL}/images/logo-footer.png" 
                    alt="Pejuang Tender Logo" 
                    width="60" 
                    height="60" 
