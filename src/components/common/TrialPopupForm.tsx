@@ -37,6 +37,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     keywords: [] as string[],
   });
 
+  const [notification, setNotification] = useState<string | null>(null);
+
   // State untuk melacak status validasi setiap field
   const [validationState, setValidationState] = useState({
     name: null as boolean | null,
@@ -190,11 +192,22 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       if (userError) throw userError;
 
       if (existingUsers && existingUsers.length > 0) {
-        // user_id = existingUsers[0].id;
-        alert("❌ Akun Anda sudah memiliki langganan trial gratis. Silakan login atau hubungi dukungan untuk informasi lebih lanjut.");
-        onClose(); // Close the form
-        return; // Stop the function from proceeding
-      } else {
+            // If a user with this email exists, check for an existing trial subscription.
+            const existingUserId = existingUsers[0].id;
+            const { data: existingSubscription, error: subError } = await supabase
+              .from("subscriptions")
+              .select("id")
+              .eq("user_id", existingUserId)
+              .eq("payment_status", "free-trial");
+
+            if (subError) throw subError;
+
+            if (existingSubscription) {
+              setNotification("Email ini sudah terdaftar untuk trial gratis. Silakan pilih paket berbayar atau hubungi customer service.");
+              // onClose(); // Close the form
+              return; // Stop the function from proceeding
+            }
+          } else {
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
           .insert([
@@ -295,6 +308,11 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   return (
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup-content" onClick={(e) => e.stopPropagation()}>
+         {notification && (
+          <div className="notification">
+            <p>{notification}</p>
+          </div>
+        )}
         <button
           className="close-button"
           onClick={onClose}
