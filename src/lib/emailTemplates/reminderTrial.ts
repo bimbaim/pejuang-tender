@@ -1,6 +1,6 @@
 // File: src/lib/emailTemplates/reminderTrial.ts
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app.";
 
 /**
  * Generates the email template for a 2-day trial expiration reminder.
@@ -27,6 +27,22 @@ export const reminderTrialEmailTemplate = (
     @media only screen and (max-width: 640px) {
       .email-container { width: 100% !important; }
     }
+      .button-link {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            .button-link {
+                padding: 10px 20px !important;
+            }
+        }
   </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f4f4; text-align: center; font-family: Saira, Quicksand, sans-serif;">
@@ -108,13 +124,11 @@ export const reminderTrialEmailTemplate = (
             </tr>
 
             <!-- BUTTON -->
-            <tr>
-              <td align="center" style="padding-bottom: 25px;">
-                <a href="https://pejuangtender.id/#paket" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
-                  UPGRADE SEKARANG
+            <td align="center" style="padding-bottom: 25px;">
+                <a href="${BASE_URL}/#paket" class="button-link">
+                    Upgrade Paket Anda
                 </a>
-              </td>
-            </tr>
+            </td>
           </table>
 
           <!-- FOOTER -->
