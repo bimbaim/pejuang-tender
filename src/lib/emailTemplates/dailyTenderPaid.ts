@@ -76,7 +76,7 @@ export const dailyTenderPaidEmailTemplate = (
   <div style="background-color: #f4f4f4; padding: 20px;">
     <table border="0" cellpadding="0" cellspacing="0" width="1028" style="max-width:1028px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
       <tr>
-        <td style="padding: 30px;">
+        <td">
           <table border="0" cellpadding="0" cellspacing="0" width="100%">
             
             <!-- LOGO & BRAND -->
@@ -131,8 +131,8 @@ export const dailyTenderPaidEmailTemplate = (
           </table>
 
           <!-- TABLE -->
-          <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="100%" 
-            style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; font-family: Quicksand, sans-serif; font-size: 14px;">
+          <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="90%" 
+            style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; font-family: Quicksand, sans-serif; font-size: 14px; margin:auto">
             <thead>
               <tr style="background-color: #f5f5f5;">
                 <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-weight: 600; color: #0f1419; border-bottom: 1px solid #e0e0e0;">No</th>
@@ -156,7 +156,7 @@ export const dailyTenderPaidEmailTemplate = (
           </table>
 
           <!-- TIPS -->
-          <table border="0" cellpadding="0" cellspacing="0" width="100%">
+          <table border="0" cellpadding="0" cellspacing="0" width="80%" style="margin:auto;">
             <tr>
               <td style="padding: 25px 0 50px;">
                 <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
