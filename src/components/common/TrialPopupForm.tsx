@@ -190,7 +190,10 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       if (userError) throw userError;
 
       if (existingUsers && existingUsers.length > 0) {
-        user_id = existingUsers[0].id;
+        // user_id = existingUsers[0].id;
+        alert("❌ Akun Anda sudah memiliki langganan trial gratis. Silakan login atau hubungi dukungan untuk informasi lebih lanjut.");
+        onClose(); // Close the form
+        return; // Stop the function from proceeding
       } else {
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
