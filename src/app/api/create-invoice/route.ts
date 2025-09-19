@@ -106,7 +106,8 @@ export async function POST(req: Request) {
             email: customer.email,
             mobileNumber: customer.whatsapp || "+628000000000",
         },
-        successRedirectUrl: xenditCallbackUrl + "/payment-success",
+        // successRedirectUrl: xenditCallbackUrl + "/payment-success",
+        successRedirectUrl: "https://pejuangtender.id/thank-you",
         failureRedirectUrl: xenditCallbackUrl + "/payment-failure",
         // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
       },
