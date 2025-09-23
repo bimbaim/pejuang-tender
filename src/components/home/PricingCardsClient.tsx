@@ -41,9 +41,10 @@ function trackAddToCart(plan: Plan) {
         items: [item]
       }
     };
-
+    console.log("Pushing add_to_cart event to dataLayer:", eventData);
     window.dataLayer.push(eventData);
   }
+  console.log(`trackAddToCart called for plan: ${plan.name}`);
 }
 
 const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
