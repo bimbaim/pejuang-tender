@@ -89,7 +89,10 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         const packageName = subscriptionData.packages.alternative_name;
         
         try {
-          await fetch(`${req.nextUrl.origin}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
+          // Use the environment variable as the primary source
+          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+
+          await fetch(`${baseUrl}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
