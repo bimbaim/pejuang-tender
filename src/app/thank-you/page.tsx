@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import ThankYouBody from './components/ThankYouBody';
 import Navbar from "@/components/common/Navbar";
