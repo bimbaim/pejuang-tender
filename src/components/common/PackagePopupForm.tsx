@@ -1,4 +1,4 @@
-// This file should be saved EXACTLY as: src/components/common/PackagePopupForm.tsx
+// src/components/common/PackagePopupForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./PackagePopupForm.css";
 
+// Definisikan tipe untuk fitur paket
 interface PackageFeatures {
   kategori?: number;
   lpse?: number;
@@ -15,6 +16,7 @@ interface PackageFeatures {
   wa_notifikasi?: boolean;
 }
 
+// Definisikan tipe untuk data paket
 interface SelectedPackage {
   id: string;
   name: string;
@@ -37,6 +39,50 @@ interface LpseLocation {
   id: number;
   value: string;
   name: string;
+}
+
+// Fungsi untuk mengirim event 'view_cart'
+function trackViewCart(selectedPackage: SelectedPackage) {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    const item = {
+      item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
+      item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
+      price: selectedPackage.price,
+      item_category: "Tender Package",
+      item_variant: `${selectedPackage.duration_months} Bulan`,
+    };
+
+    (window as any).dataLayer.push({
+      event: "view_cart",
+      ecommerce: {
+        currency: "IDR",
+        value: selectedPackage.price,
+        items: [item]
+      }
+    });
+  }
+}
+
+// 🔥 Tambahkan fungsi untuk event 'begin_checkout'
+function trackBeginCheckout(selectedPackage: SelectedPackage) {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    const item = {
+      item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
+      item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
+      price: selectedPackage.price,
+      item_category: "Tender Package",
+      item_variant: `${selectedPackage.duration_months} Bulan`,
+    };
+
+    (window as any).dataLayer.push({
+      event: "begin_checkout",
+      ecommerce: {
+        currency: "IDR",
+        value: selectedPackage.price,
+        items: [item]
+      }
+    });
+  }
 }
 
 const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
@@ -91,6 +137,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
     if (isOpen) {
       fetchLpseOptions();
+      if (selectedPackage) {
+        trackViewCart(selectedPackage);
+      }
     } else {
       setFormData({
         name: "",
@@ -119,7 +168,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       setIsLoading(false);
       setShowProgressBar(false);
     }
-  }, [isOpen]);
+  }, [isOpen, selectedPackage]);
 
   if (!isOpen || !selectedPackage) return null;
 
@@ -225,6 +274,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       return;
     }
 
+    // 🔥 Panggil event 'begin_checkout' di sini
+    trackBeginCheckout(selectedPackage);
+
     setIsLoading(true);
     setShowProgressBar(true);
 
@@ -283,7 +335,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (subscriptionError) throw subscriptionError;
 
-      // ✅ Ditambahkan: Hitung total harga dengan PPN 11%
       const basePrice = selectedPackage.price;
       const totalPrice = basePrice * 1.11;
 
@@ -291,8 +342,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          // ✅ Diperbarui: Mengirim totalPrice, bukan basePrice
-          amount: Math.round(totalPrice), // Memastikan nilai adalah integer
+          amount: Math.round(totalPrice),
           currency: "IDR",
           customer: {
             email: formData.email,
@@ -339,7 +389,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     return new Intl.NumberFormat("id-ID").format(price);
   };
 
-  // ✅ Ditambahkan: Hitung harga total dengan PPN 11% untuk ditampilkan
   const totalPrice = selectedPackage.price * 1.11;
 
   const allCategories = [
@@ -362,7 +411,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     }
     return "";
   };
-
   return (
     <div className="package-popup-overlay" onClick={onClose}>
       {showProgressBar && <div className="loading-bar"></div>}
@@ -390,7 +438,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             <p className="package-duration">
               {selectedPackage.duration_months ?? ""} Bulan
             </p>
-            {/* ✅ Diperbarui: Menampilkan harga total dengan PPN */}
             <p className="package-price">
               IDR {formatPrice(selectedPackage.price)}
             </p>
@@ -544,7 +591,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             name="selectedPackage"
             value={JSON.stringify(selectedPackage)}
           />
-          {/* ✅ Diperbarui: Menggunakan totalPrice yang sudah termasuk PPN */}
           <input type="hidden" name="amount" value={Math.round(totalPrice)} />
           <input
             type="hidden"

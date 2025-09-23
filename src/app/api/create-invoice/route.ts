@@ -1,3 +1,4 @@
+// app/api/create-invoice/route.ts
 import { NextResponse } from "next/server";
 import { Xendit } from "xendit-node";
 
@@ -93,12 +94,11 @@ export async function POST(req: Request) {
     console.warn("Xendit Callback URL set to:", xenditCallbackUrl);
 
     // 6. Call Xendit API to create the invoice
-    // CORRECTED: All invoice creation parameters are now correctly nested inside the 'data' property.
     const invoice = await Invoice.createInvoice({
-      data: { // All properties are now correctly inside this 'data' object
-        externalId: String(subscriptionId), // Use the subscription ID as the external ID
+      data: {
+        externalId: String(subscriptionId),
         amount: finalAmount,
-        description: "Subscription Payment", // More specific description
+        description: "Subscription Payment",
         currency: "IDR",
         customer: {
             givenNames: customer.name.split(" ")[0] || customer.name,
@@ -106,10 +106,9 @@ export async function POST(req: Request) {
             email: customer.email,
             mobileNumber: customer.whatsapp || "+628000000000",
         },
-        // successRedirectUrl: xenditCallbackUrl + "/payment-success",
-        successRedirectUrl: "https://pejuangtender.id/thank-you",
-        failureRedirectUrl: xenditCallbackUrl + "/payment-failure",
-        // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
+        // 🔥 Perubahan inti ada di sini: Menambahkan query param `transaction_id`
+        successRedirectUrl: `https://pejuangtender.id/thank-you?transaction_id={invoice_id}`,
+        failureRedirectUrl: `https://pejuangtender.id/thank-you`,
       },
     });
 

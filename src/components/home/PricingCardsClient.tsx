@@ -1,43 +1,59 @@
 // src/components/home/PricingCardsClient.tsx
-"use client"; // This is a Client Component because it uses `onClick`
+"use client";
 
 import React from 'react';
-import CheckIcon from '../common/CheckIcon'; // Assuming this path is correct
-import styles from './PricingSection.module.css'; // Assuming you want to keep CSS Modules
+import CheckIcon from '../common/CheckIcon';
+import styles from './PricingSection.module.css';
 
 interface Plan {
   name: string;
   category: string;
-  price: string; // This will be the formatted string like "IDR 200K"
-  amount: number; // The numerical value for payment processing
+  price: string;
+  amount: number;
   duration_months: number;
   features: string[];
   isHighlighted: boolean;
 }
 
 interface PricingCardsClientProps {
-  plans: Plan[]; // Receive plans data from the Server Component
+  plans: Plan[];
   onOpenPackagePopup: (plan: Plan) => void;
 }
 
-const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
-  // You might want to add state here for the "3 Bulan" / "12 Bulan" tab selection
-  // const [selectedDuration, setSelectedDuration] = useState<number>(3); // Or "3 Bulan" string
+/**
+ * 2. ADD TO CART (trigger when user clicks "Pilih Paket")
+ */
+// This function needs to be defined here or imported.
+function trackAddToCart(plan: Plan) {
+  // Ensure dataLayer is available
+  if (typeof window !== 'undefined' && (window as any).dataLayer) {
+    (window as any).dataLayer.push({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "IDR",
+        value: plan.amount, // Use the numeric 'amount' for the value
+        items: [{
+          item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
+          item_name: `${plan.name} - ${plan.duration_months} Bulan`,
+          price: plan.amount,
+          item_category: plan.category,
+          item_variant: `${plan.duration_months} Bulan`,
+        }]
+      }
+    });
+  }
+}
 
+const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
   return (
     <div className={styles.pricingContent}>
-      {/*
-        You could make these tab buttons interactive here if you fetch plans
-        for different durations. For simplicity, we'll assume only 3-month plans are passed.
-      */}
       <div className={styles.tabButtons}>
         <button className={`${styles.tabButton} ${styles.active}`}>3 Bulan</button>
-        {/* <button className={styles.tabButton} onClick={() => setSelectedDuration(12)}>12 Bulan</button> */}
       </div>
       <div className={styles.pricingCards}>
         {plans.map((plan) => (
           <div
-            key={plan.name} // Using name as key, or better, use plan.id if from DB
+            key={plan.name}
             className={`${styles.pricingCard} ${plan.isHighlighted ? styles.highlightedCard : ''}`}
           >
             <div className={styles.priceHeader}>
@@ -49,7 +65,12 @@ const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPa
               <p className={styles.price}>{plan.price}</p>
               <button
                 className={`${styles.ctaButton} ${plan.isHighlighted ? styles.highlightedButton : ''}`}
-                onClick={() => onOpenPackagePopup(plan)}
+                onClick={() => {
+                  // Trigger the GTM event before opening the popup
+                  trackAddToCart(plan);
+                  // Call the original function to open the popup
+                  onOpenPackagePopup(plan);
+                }}
               >
                 PILIH PAKET
               </button>

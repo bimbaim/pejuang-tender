@@ -1,3 +1,5 @@
+// src/components/home/PricingSection.tsx
+
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,7 +7,7 @@ import CheckIcon from "../common/CheckIcon";
 import styles from "./PricingSection.module.css";
 import { supabase } from "@/lib/supabase";
 
-// Define a specific interface for the features object
+// Definisikan tipe untuk fitur paket
 interface Features {
   kategori?: number;
   lpse?: number;
@@ -14,6 +16,7 @@ interface Features {
   wa_notifikasi?: boolean;
 }
 
+// Definisikan tipe untuk data paket dari Supabase
 interface Plan {
   id: string;
   name: string;
@@ -22,13 +25,35 @@ interface Plan {
   amount: number;
   features: Features;
   isHighlighted: boolean;
-  category: string; // Add this line
-  duration: number; // And this line
+  category: string;
+  duration: number;
 }
 
 interface PricingSectionProps {
   onOpenPackagePopup: (plan: Plan) => void;
 }
+
+// Fungsi untuk mengirim event ke DataLayer
+const pushViewItemListEvent = (plans: Plan[], duration: number) => {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    const items = plans.map(plan => ({
+      item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
+      item_name: `${plan.name} - ${plan.duration_months} Bulan`,
+      price: plan.price,
+      item_category: "Tender Package",
+      item_variant: `${plan.duration_months} Bulan`
+    }));
+
+    (window as any).dataLayer.push({
+      event: "view_item_list",
+      ecommerce: {
+        item_list_id: `subscription_packages_${duration}m`,
+        item_list_name: `Tender Packages - ${duration} Bulan`,
+        items: items
+      }
+    });
+  }
+};
 
 const PricingSection: React.FC<PricingSectionProps> = ({
   onOpenPackagePopup,
@@ -56,6 +81,15 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     fetchPlans();
   }, []);
 
+  // Tambahkan useEffect baru untuk memicu event
+  useEffect(() => {
+    if (plans.length > 0) {
+      // Pemicu saat data pertama kali dimuat atau tab diubah
+      const filtered = plans.filter((p) => p.duration_months === activeTab);
+      pushViewItemListEvent(filtered, activeTab);
+    }
+  }, [plans, activeTab]); // Dependensi: `plans` dan `activeTab`
+
   if (loading) {
     return <p className={styles.loading}>Loading packages...</p>;
   }
@@ -63,18 +97,13 @@ const PricingSection: React.FC<PricingSectionProps> = ({
   const filteredPlans = plans.filter((p) => p.duration_months === activeTab);
 
   const formatPrice = (amount: number) => {
-    // Check if the amount is large enough to be formatted with "K"
     if (amount >= 1000) {
-      // Divide by 1000 to get the value in thousands
       const amountInK = amount / 1000;
-      // Format the number with thousands separators and append "K"
       return `IDR ${amountInK.toLocaleString("id-ID")}K`;
     }
-    // If the amount is less than 1000, just format it with thousands separators
     return `IDR ${amount.toLocaleString("id-ID")}`;
   };
 
-  // Changed the 'features' parameter type from Record<string, any> to Features
   const renderFeatures = (features: Features) => {
     const list: string[] = [];
     if (features.kategori) list.push(`Maks ${features.kategori} Kategori`);
@@ -85,7 +114,6 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     return list;
   };
 
-  // 🔥 Hardcode nama paket dan highlight berdasarkan urutan
   const hardcodedNames = [
     "Prajurit Tender",
     "Komandan Tender",
@@ -176,7 +204,6 @@ const PricingSection: React.FC<PricingSectionProps> = ({
           </div>
         </div>
         <div className={styles.taxNoteContainer}>
-          {/* ✅ Ditambahkan: Catatan Harga */}
           <p className={styles.taxNote}>
             <i>*Harga belum termasuk PPN 11%</i>
           </p>
