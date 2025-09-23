@@ -147,7 +147,9 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+
+      const response = await fetch(`${baseUrl}/api/sendgrid`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

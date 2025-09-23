@@ -61,9 +61,9 @@ export async function POST(req: NextRequest) {
             }
 
             const formattedTrialEndDate = new Date(end_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-            
+             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
             // ✅ Mengirim email menggunakan template reminderTrial
-            const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
+            const response = await fetch(`${baseUrl}/api/sendgrid`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

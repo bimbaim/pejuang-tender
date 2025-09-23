@@ -76,8 +76,9 @@ export async function POST(req: NextRequest) {
             }
 
             const formattedSubscriptionEndDate = new Date(end_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
-            
-            const response = await fetch(`${req.nextUrl.origin}/api/sendgrid`, {
+             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+             
+            const response = await fetch(`${baseUrl}/api/sendgrid`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
