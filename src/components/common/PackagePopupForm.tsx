@@ -43,8 +43,8 @@ interface LpseLocation {
 
 // Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
-  if (typeof window !== "undefined" && (window as any).dataLayer) {
-    const item = {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -52,21 +52,23 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    (window as any).dataLayer.push({
+    const eventData: DataLayerEvent = {
       event: "view_cart",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
         items: [item]
       }
-    });
+    };
+
+    window.dataLayer.push(eventData);
   }
 }
 
-// 🔥 Tambahkan fungsi untuk event 'begin_checkout'
+// Tambahkan fungsi untuk event 'begin_checkout'
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
-  if (typeof window !== "undefined" && (window as any).dataLayer) {
-    const item = {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -74,14 +76,16 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    (window as any).dataLayer.push({
+    const eventData: DataLayerEvent = {
       event: "begin_checkout",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
         items: [item]
       }
-    });
+    };
+
+    window.dataLayer.push(eventData);
   }
 }
 
@@ -274,7 +278,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       return;
     }
 
-    // 🔥 Panggil event 'begin_checkout' di sini
     trackBeginCheckout(selectedPackage);
 
     setIsLoading(true);

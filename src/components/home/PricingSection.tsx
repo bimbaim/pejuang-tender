@@ -1,11 +1,12 @@
 // src/components/home/PricingSection.tsx
-
 "use client";
 
 import React, { useEffect, useState } from "react";
 import CheckIcon from "../common/CheckIcon";
 import styles from "./PricingSection.module.css";
 import { supabase } from "@/lib/supabase";
+
+import {} from '@/types/globals';
 
 // Definisikan tipe untuk fitur paket
 interface Features {
@@ -35,7 +36,7 @@ interface PricingSectionProps {
 
 // Fungsi untuk mengirim event ke DataLayer
 const pushViewItemListEvent = (plans: Plan[], duration: number) => {
-  if (typeof window !== "undefined" && (window as any).dataLayer) {
+  if (typeof window !== "undefined" && window.dataLayer) {
     const items = plans.map(plan => ({
       item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
       item_name: `${plan.name} - ${plan.duration_months} Bulan`,
@@ -44,7 +45,8 @@ const pushViewItemListEvent = (plans: Plan[], duration: number) => {
       item_variant: `${plan.duration_months} Bulan`
     }));
 
-    (window as any).dataLayer.push({
+    // The type now correctly includes item_list_id and item_list_name
+    window.dataLayer.push({
       event: "view_item_list",
       ecommerce: {
         item_list_id: `subscription_packages_${duration}m`,
@@ -81,14 +83,12 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     fetchPlans();
   }, []);
 
-  // Tambahkan useEffect baru untuk memicu event
   useEffect(() => {
     if (plans.length > 0) {
-      // Pemicu saat data pertama kali dimuat atau tab diubah
       const filtered = plans.filter((p) => p.duration_months === activeTab);
       pushViewItemListEvent(filtered, activeTab);
     }
-  }, [plans, activeTab]); // Dependensi: `plans` dan `activeTab`
+  }, [plans, activeTab]);
 
   if (loading) {
     return <p className={styles.loading}>Loading packages...</p>;

@@ -1,9 +1,11 @@
-// src/components/home/PricingCardsClient.tsx
 "use client";
 
 import React from 'react';
 import CheckIcon from '../common/CheckIcon';
 import styles from './PricingSection.module.css';
+
+// Make sure you have this import to use the types from the global declaration file
+import {} from '@/types/globals';
 
 interface Plan {
   name: string;
@@ -23,24 +25,27 @@ interface PricingCardsClientProps {
 /**
  * 2. ADD TO CART (trigger when user clicks "Pilih Paket")
  */
-// This function needs to be defined here or imported.
 function trackAddToCart(plan: Plan) {
   // Ensure dataLayer is available
-  if (typeof window !== 'undefined' && (window as any).dataLayer) {
-    (window as any).dataLayer.push({
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    const item: DataLayerItem = {
+      item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
+      item_name: `${plan.name} - ${plan.duration_months} Bulan`,
+      price: plan.amount,
+      item_category: plan.category,
+      item_variant: `${plan.duration_months} Bulan`,
+    };
+
+    const eventData: DataLayerEvent = {
       event: "add_to_cart",
       ecommerce: {
         currency: "IDR",
-        value: plan.amount, // Use the numeric 'amount' for the value
-        items: [{
-          item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
-          item_name: `${plan.name} - ${plan.duration_months} Bulan`,
-          price: plan.amount,
-          item_category: plan.category,
-          item_variant: `${plan.duration_months} Bulan`,
-        }]
+        value: plan.amount,
+        items: [item]
       }
-    });
+    };
+
+    window.dataLayer.push(eventData);
   }
 }
 
