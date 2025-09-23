@@ -6,7 +6,7 @@ import CheckIcon from "../common/CheckIcon";
 import styles from "./PricingSection.module.css";
 import { supabase } from "@/lib/supabase";
 
-import {} from '@/types/globals';
+// import {} from '@/types/globals';
 
 // Definisikan tipe untuk fitur paket
 interface Features {

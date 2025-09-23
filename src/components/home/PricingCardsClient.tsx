@@ -5,7 +5,7 @@ import CheckIcon from '../common/CheckIcon';
 import styles from './PricingSection.module.css';
 
 // Make sure you have this import to use the types from the global declaration file
-import {} from '@/types/globals';
+// import {} from '@/types/globals';
 
 interface Plan {
   name: string;
