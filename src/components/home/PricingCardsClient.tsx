@@ -77,9 +77,7 @@ const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPa
                   // Trigger the GTM event before opening the popup
                   trackAddToCart(plan);
                   // Call the original function to open the popup
-                  setTimeout(() => {
-                    onOpenPackagePopup(plan);
-                  }, 500); // 500ms delay
+                  onOpenPackagePopup(plan);
                 }}
               >
                 PILIH PAKET
