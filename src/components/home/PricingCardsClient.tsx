@@ -1,9 +1,11 @@
-// src/components/common/PricingCardsClient.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import CheckIcon from '../common/CheckIcon';
 import styles from './PricingSection.module.css';
+
+// Make sure you have this import to use the types from the global declaration file
+// import {} from '@/types/globals';
 
 interface Plan {
   name: string;
@@ -24,12 +26,13 @@ interface PricingCardsClientProps {
  * 2. ADD TO CART (trigger when user clicks "Pilih Paket")
  */
 function trackAddToCart(plan: Plan) {
+  // Ensure dataLayer is available
   if (typeof window !== 'undefined' && window.dataLayer) {
     const item: DataLayerItem = {
       item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
       item_name: `${plan.name} - ${plan.duration_months} Bulan`,
       price: plan.amount,
-      item_category: "Tender Package",
+      item_category: plan.category,
       item_variant: `${plan.duration_months} Bulan`,
     };
 
@@ -45,39 +48,11 @@ function trackAddToCart(plan: Plan) {
     window.dataLayer.push(eventData);
     console.log("DataLayer Event Pushed:", eventData);
   }
-  console.log(`trackAddToCart: ${plan.name} - ${plan.duration_months} Bulan - ${plan.amount}`);
+  console.log("trackAddToCart called with plan:", plan);
 }
 
+
 const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
-  // ✅ State to manage the loading/waiting indicator
-  const [isWaiting, setIsWaiting] = useState<boolean>(false);
-  const [currentPlan, setCurrentPlan] = useState<Plan | null>(null);
-
-  // ✅ useEffect to handle the delayed action
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (isWaiting && currentPlan) {
-      // Start the timer to open the popup after 500ms
-      timeoutId = setTimeout(() => {
-        setIsWaiting(false); // Stop waiting
-        onOpenPackagePopup(currentPlan); // Open the popup
-      }, 500);
-    }
-
-    // Cleanup function to clear the timeout if the component unmounts
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [isWaiting, currentPlan, onOpenPackagePopup]);
-
-  const handlePilihPaketClick = (plan: Plan) => {
-    // 1. Trigger the GTM event immediately
-    trackAddToCart(plan);
-    // 2. Set the state to "waiting" and store the current plan
-    setIsWaiting(true);
-    setCurrentPlan(plan);
-  };
-  
   return (
     <div className={styles.pricingContent}>
       <div className={styles.tabButtons}>
@@ -98,11 +73,16 @@ const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPa
               <p className={styles.price}>{plan.price}</p>
               <button
                 className={`${styles.ctaButton} ${plan.isHighlighted ? styles.highlightedButton : ''}`}
-                // ✅ Use the new click handler
-                onClick={() => handlePilihPaketClick(plan)}
-                disabled={isWaiting} // ✅ Disable the button while waiting
+                onClick={() => {
+                  // Trigger the GTM event before opening the popup
+                  trackAddToCart(plan);
+                  // Call the original function to open the popup
+                  setTimeout(() => {
+                    onOpenPackagePopup(plan);
+                  }, 500); // 500ms delay
+                }}
               >
-                {isWaiting ? "MEMPROSES..." : "PILIH PAKET"}
+                PILIH PAKET
               </button>
             </div>
             <div className={styles.divider} />
