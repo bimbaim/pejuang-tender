@@ -43,7 +43,9 @@ function trackAddToCart(plan: Plan) {
     };
 
     window.dataLayer.push(eventData);
+    console.log("DataLayer Event Pushed:", eventData);
   }
+  console.log(`trackAddToCart: ${plan.name} - ${plan.duration_months} Bulan - ${plan.amount}`);
 }
 
 const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
