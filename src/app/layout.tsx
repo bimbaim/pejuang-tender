@@ -5,8 +5,8 @@ import { Saira } from 'next/font/google';
 import { Quicksand } from 'next/font/google';
 import './globals.css';
 
-// Import komponen GTM
-import { GoogleTagManager } from '@next/third-parties/google';
+// Import kedua komponen
+import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 
 const saira = Saira({ subsets: ['latin'] });
 const quicksand = Quicksand({ subsets: ['latin'] });
@@ -30,8 +30,11 @@ export default function RootLayout({
         {children}
       </body>
       
-      {/* Tambahkan Google Tag Manager di sini */}
+      {/* Tambahkan Google Tag Manager */}
       <GoogleTagManager gtmId="GTM-5VLSLXN3" />
+
+      {/* Tambahkan Google Analytics */}
+      <GoogleAnalytics gaId="G-CRE8KHKB2J" />
     </html>
   );
 }
