@@ -1,13 +1,8 @@
-// src/components/common/ThankYouBody.tsx
-
 "use client";
 
 import React, { useEffect } from 'react';
 import styles from './ThankYouBody.module.css';
 import { useSearchParams } from 'next/navigation';
-
-// Pastikan file deklarasi global Anda sudah benar dan tidak ada import
-// Anda tidak memerlukan import di sini jika tsconfig.json sudah benar
 
 // Mendefinisikan tipe untuk item yang akan dikirim ke dataLayer
 interface PurchaseItem {
@@ -29,7 +24,6 @@ interface PurchaseData {
 }
 
 // Fungsi untuk push event 'purchase' ke dataLayer
-// Sekarang fungsi ini sepenuhnya aman dan memiliki tipe yang jelas
 function trackPurchase({ transaction_id, value, items, tax, shipping }: PurchaseData) {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
@@ -51,55 +45,80 @@ const ThankYouBody = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Ambil data, pastikan untuk menangani kemungkinan null dengan aman
-    const transactionId = searchParams.get('xendit_invoice_id');
+    // 1. Ambil subscription_id dari URL
+    const subscriptionId = searchParams.get('subscription_id');
     const amountStr = searchParams.get('amount');
     const packageName = searchParams.get('package_name');
     const packagePriceStr = searchParams.get('package_price');
     const packageDuration = searchParams.get('package_duration');
     const taxStr = searchParams.get('tax');
 
-    // Pastikan semua data penting ada sebelum melanjutkan
+    // 2. Pastikan data penting yang dibutuhkan dari URL sudah ada
     if (
-      !transactionId ||
+      !subscriptionId ||
       !amountStr ||
       !packageName ||
       !packagePriceStr ||
       !packageDuration
     ) {
       console.error("Missing required URL parameters for purchase tracking.");
-      return; // Hentikan eksekusi jika ada data yang hilang
-    }
-
-    // Ubah string ke number dengan aman
-    const amount = parseFloat(amountStr);
-    const packagePrice = parseFloat(packagePriceStr);
-    const tax = taxStr ? parseFloat(taxStr) : 0;
-
-    // Pastikan nilai-nilai numerik valid
-    if (isNaN(amount) || isNaN(packagePrice)) {
-      console.error("Invalid numeric parameters in URL.");
       return;
     }
 
-    // Buat item untuk pelacakan
-    const items: PurchaseItem[] = [{
-      item_id: `${packageName.toLowerCase().replace(/\s/g, '_')}_${packageDuration}m`,
-      item_name: `${packageName} - ${packageDuration} Bulan`,
-      price: packagePrice,
-      item_category: "Tender Package",
-      item_variant: `${packageDuration} Bulan`,
-      quantity: 1
-    }];
-    
-    // Panggil fungsi pelacakan dengan data yang telah divalidasi dan memiliki tipe
-    trackPurchase({
-      transaction_id: transactionId,
-      value: amount,
-      items,
-      tax,
-      shipping: 0,
-    });
+    const fetchTransactionId = async () => {
+      try {
+        // 3. Panggil API baru untuk mendapatkan transaction_id dari backend
+        const res = await fetch(`/api/get-transaction-data?subscription_id=${subscriptionId}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error("Failed to fetch transaction ID:", data.error);
+          return;
+        }
+
+        const { transactionId } = data;
+
+        if (!transactionId) {
+          console.error("Transaction ID is missing in the API response.");
+          return;
+        }
+
+        // 4. Ubah string ke number dengan aman
+        const amount = parseFloat(amountStr);
+        const packagePrice = parseFloat(packagePriceStr);
+        const tax = taxStr ? parseFloat(taxStr) : 0;
+
+        // Pastikan nilai-nilai numerik valid
+        if (isNaN(amount) || isNaN(packagePrice)) {
+          console.error("Invalid numeric parameters in URL.");
+          return;
+        }
+
+        // 5. Buat item untuk pelacakan menggunakan data yang lengkap
+        const items: PurchaseItem[] = [{
+          item_id: `${packageName.toLowerCase().replace(/\s/g, '_')}_${packageDuration}m`,
+          item_name: `${packageName} - ${packageDuration} Bulan`,
+          price: packagePrice,
+          item_category: "Tender Package",
+          item_variant: `${packageDuration} Bulan`,
+          quantity: 1
+        }];
+        
+        // 6. Panggil fungsi pelacakan dengan data yang sudah divalidasi dan memiliki tipe
+        trackPurchase({
+          transaction_id: transactionId,
+          value: amount,
+          items,
+          tax,
+          shipping: 0,
+        });
+
+      } catch (error) {
+        console.error("Error fetching transaction ID:", error);
+      }
+    };
+
+    fetchTransactionId();
 
   }, [searchParams]);
 

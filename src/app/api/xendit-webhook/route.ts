@@ -1,13 +1,13 @@
 // app/api/xendit-webhook/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { NextRequest } from "next/server"; // <-- Perubahan di sini
+import { NextRequest } from "next/server";
 
 // --- Type Definitions for Xendit Webhook and Custom Errors ---
 interface XenditInvoiceWebhookEvent {
   event: "invoice.paid" | "invoice.expired" | "payment.capture" | string;
   external_id: string;
-  id: string;
+  id: string; // The Xendit Invoice ID
   status: "PAID" | "EXPIRED" | "PENDING" | "SETTLED" | "FAILED" | string;
   amount?: number;
   payer_email?: string;
@@ -27,7 +27,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 /**
  * POST handler for Xendit webhook events.
  */
-export async function POST(req: NextRequest) { // <-- Perubahan di sini
+export async function POST(req: NextRequest) {
   let webhookEvent: XenditInvoiceWebhookEvent | undefined;
 
   try {
@@ -70,9 +70,13 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         return NextResponse.json({ error: "Missing subscription ID in webhook" }, { status: 400 });
       }
 
+      // Add transaction_id to the update payload
       const { data: subscriptionData, error: updateError } = await supabase
           .from("subscriptions")
-          .update({ payment_status: "paid" })
+          .update({ 
+              payment_status: "paid",
+              transaction_id: webhookEvent.id // <--- PERUBAHAN DI SINI
+          })
           .eq("id", subscriptionId)
           .select(`*, users(name, email), packages(alternative_name)`)
           .single();
@@ -82,17 +86,16 @@ export async function POST(req: NextRequest) { // <-- Perubahan di sini
         return NextResponse.json({ error: "Failed to update subscription status" }, { status: 500 });
       }
 
-      console.warn(`Subscription ${subscriptionId} payment status updated to 'paid' in Supabase.`);
+      console.warn(`Subscription ${subscriptionId} payment status updated to 'paid' and transaction ID '${webhookEvent.id}' filled in Supabase.`);
 
       if (subscriptionData && subscriptionData.users && subscriptionData.packages) {
         const { name, email } = subscriptionData.users;
         const packageName = subscriptionData.packages.alternative_name;
         
         try {
-          // Use the environment variable as the primary source
           const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
 
-          await fetch(`${baseUrl}/api/sendgrid`, { // req.nextUrl.origin sudah berfungsi
+          await fetch(`${baseUrl}/api/sendgrid`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

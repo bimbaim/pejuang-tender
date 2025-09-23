@@ -127,7 +127,7 @@ export async function POST(req: Request) {
             mobileNumber,
         },
         // 🔥 Perubahan inti ada di sini: Menambahkan query param `transaction_id`
-        successRedirectUrl: `https://pejuangtender.id/thank-you?transaction_id={id}`,
+        successRedirectUrl: `https://pejuangtender.id/thank-you`,
         failureRedirectUrl: `https://pejuangtender.id/thank-you`,
       },
     });
