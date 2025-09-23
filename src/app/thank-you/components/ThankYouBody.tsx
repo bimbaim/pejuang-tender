@@ -1,145 +1,118 @@
-import { NextResponse } from "next/server";
-import { Xendit } from "xendit-node";
+// src/components/common/ThankYouBody.tsx
 
-// Define interfaces for the expected request body from your frontend
-interface CustomerDetails {
-  email: string;
-  name: string;
-  whatsapp?: string; // whatsapp is optional
+"use client";
+
+import React, { useEffect } from 'react';
+import styles from './ThankYouBody.module.css';
+import { useSearchParams } from 'next/navigation';
+
+// Pastikan file deklarasi global Anda sudah benar dan tidak ada import
+// Anda tidak memerlukan import di sini jika tsconfig.json sudah benar
+
+// Mendefinisikan tipe untuk item yang akan dikirim ke dataLayer
+interface PurchaseItem {
+  item_id: string;
+  item_name: string;
+  price: number;
+  item_category: string;
+  item_variant: string;
+  quantity: number;
 }
 
-interface CreateInvoiceRequestBody {
-  amount: number;
-  customer: CustomerDetails;
-  subscriptionId: string; // Assuming subscriptionId is always a string as it's used as externalId
+// Mendefinisikan tipe untuk data yang akan dikirim ke fungsi trackPurchase
+interface PurchaseData {
+  transaction_id: string;
+  value: number;
+  items: PurchaseItem[];
+  tax: number;
+  shipping: number;
 }
 
-// Define an interface for potential Xendit error structure
-interface XenditError extends Error {
-  code?: string;
-  type?: string;
-  statusCode?: number;
-  field?: string;
-  errors?: {
-    message: string;
-    field: string;
-  }[];
-}
-
-// Initialize Xendit client with your secret key
-const xenditClient = new Xendit({
-  secretKey: process.env.XENDIT_SECRET_KEY!,
-});
-
-// Destructure the Invoice module from the Xendit client
-const { Invoice } = xenditClient;
-
-export async function POST(req: Request) {
-  let requestData: CreateInvoiceRequestBody | undefined; // Use the specific interface, initialized as undefined
-
-  try {
-    // 1. Parse the incoming JSON request body
-    const rawRequestData = await req.json();
-    requestData = rawRequestData; // Assign raw data for logging in catch block
-
-    // Crucial check: Ensure requestData is not undefined before destructuring
-    if (!requestData || typeof requestData.amount === 'undefined' || !requestData.customer || !requestData.subscriptionId) {
-        console.error("Validation Error: Invalid or missing data after JSON parsing.");
-        return NextResponse.json(
-            { error: "Invalid request body structure." },
-            { status: 400 }
-        );
-    }
-
-    // Now TypeScript knows requestData is definitely CreateInvoiceRequestBody
-    const { amount, customer, subscriptionId } = requestData;
-
-    // --- Comprehensive Debugging Logs (for development) ---
-    console.warn("\n--- Incoming Request Data for Invoice Creation ---");
-    console.warn("Raw parsed data:", JSON.stringify(requestData, null, 2));
-    console.warn("Amount received:", amount, "| Type:", typeof amount);
-    console.warn("Customer object received:", customer, "| Type:", typeof customer);
-    console.warn("Subscription ID received:", subscriptionId, "| Type:", typeof subscriptionId);
-    console.warn("--- End Incoming Request Data ---\n");
-
-    // 4. Validate Amount: Ensure it's a valid positive number
-    const finalAmount = Number(amount);
-    if (isNaN(finalAmount) || finalAmount <= 0) {
-      console.error(`Validation Error: Invalid amount '${amount}'. Amount must be a positive number.`);
-      return NextResponse.json(
-        { error: `Invalid amount provided: ${amount}. Amount must be a positive number.` },
-        { status: 400 }
-      );
-    }
-
-    // 5. Validate Customer: Ensure essential customer details are present
-    if (!customer.email || !customer.name) {
-      console.error("Validation Error: Customer object must contain 'email' and 'name'.");
-      return NextResponse.json(
-        { error: "Customer object must contain 'email' and 'name'." },
-        { status: 400 }
-      );
-    }
-
-    // Log the data that will be sent to Xendit
-    console.warn("Attempting to create invoice with:");
-    console.warn(`  External ID: ${subscriptionId}`); // Using subscriptionId as externalId
-    console.warn(`  Amount: ${finalAmount}`);
-    console.warn(`  Customer Email: ${customer.email}`);
-    console.warn(`  Customer Name: ${customer.name}`);
-
-    // Define the webhook callback URL. IMPORTANT: Replace with your deployed domain for production!
-    const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "http://pejuang-tender.vercel.app/api/xendit-webhook";
-    console.warn("Xendit Callback URL set to:", xenditCallbackUrl);
-
-    // 6. Call Xendit API to create the invoice
-    // CORRECTED: All invoice creation parameters are now correctly nested inside the 'data' property.
-    const invoice = await Invoice.createInvoice({
-      data: { // All properties are now correctly inside this 'data' object
-        externalId: String(subscriptionId), // Use the subscription ID as the external ID
-        amount: finalAmount,
-        description: "Subscription Payment", // More specific description
+// Fungsi untuk push event 'purchase' ke dataLayer
+// Sekarang fungsi ini sepenuhnya aman dan memiliki tipe yang jelas
+function trackPurchase({ transaction_id, value, items, tax, shipping }: PurchaseData) {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({
+      event: "purchase",
+      ecommerce: {
+        transaction_id,
+        affiliation: "Tender Subscriptions",
         currency: "IDR",
-        customer: {
-            givenNames: customer.name.split(" ")[0] || customer.name,
-            surname: customer.name.split(" ")[1] || "",
-            email: customer.email,
-            mobileNumber: customer.whatsapp || "+628000000000",
-        },
-        // successRedirectUrl: xenditCallbackUrl + "/payment-success",
-        successRedirectUrl: "https://pejuangtender.id/thank-you",
-        failureRedirectUrl: xenditCallbackUrl + "/payment-failure",
-        // callbackUrl: xenditCallbackUrl, // Also moved back inside 'data'
-      },
+        value,
+        tax,
+        shipping,
+        items
+      }
     });
-
-    console.warn("Invoice created successfully:", invoice.id, "URL:", invoice.invoiceUrl);
-    return NextResponse.json({ invoiceUrl: invoice.invoiceUrl });
-
-  } catch (error: unknown) {
-    console.error("\n--- Xendit API Error Caught in Server ---");
-    
-    // Safely cast to XenditError interface if it matches, otherwise use generic Error properties
-    const xenditError = error as XenditError; 
-
-    console.error("Error message:", xenditError.message);
-    if (requestData) { // Check if requestData was successfully parsed before logging
-      console.error("Original request data that led to error:", JSON.stringify(requestData, null, 2));
-    }
-    
-    // Log Xendit specific error details if they exist on the error object
-    console.error("Xendit Error Details (if provided by Xendit SDK):", {
-      code: xenditError.code,
-      type: xenditError.type,
-      statusCode: xenditError.statusCode,
-      field: xenditError.field,
-      errors: xenditError.errors,
-    });
-    console.error("--- End Xendit API Error ---\n");
-
-    return NextResponse.json(
-      { error: xenditError.message || "Failed to create invoice due to an internal server error." },
-      { status: 500 }
-    );
   }
 }
+
+const ThankYouBody = () => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Ambil data, pastikan untuk menangani kemungkinan null dengan aman
+    const transactionId = searchParams.get('xendit_invoice_id');
+    const amountStr = searchParams.get('amount');
+    const packageName = searchParams.get('package_name');
+    const packagePriceStr = searchParams.get('package_price');
+    const packageDuration = searchParams.get('package_duration');
+    const taxStr = searchParams.get('tax');
+
+    // Pastikan semua data penting ada sebelum melanjutkan
+    if (
+      !transactionId ||
+      !amountStr ||
+      !packageName ||
+      !packagePriceStr ||
+      !packageDuration
+    ) {
+      console.error("Missing required URL parameters for purchase tracking.");
+      return; // Hentikan eksekusi jika ada data yang hilang
+    }
+
+    // Ubah string ke number dengan aman
+    const amount = parseFloat(amountStr);
+    const packagePrice = parseFloat(packagePriceStr);
+    const tax = taxStr ? parseFloat(taxStr) : 0;
+
+    // Pastikan nilai-nilai numerik valid
+    if (isNaN(amount) || isNaN(packagePrice)) {
+      console.error("Invalid numeric parameters in URL.");
+      return;
+    }
+
+    // Buat item untuk pelacakan
+    const items: PurchaseItem[] = [{
+      item_id: `${packageName.toLowerCase().replace(/\s/g, '_')}_${packageDuration}m`,
+      item_name: `${packageName} - ${packageDuration} Bulan`,
+      price: packagePrice,
+      item_category: "Tender Package",
+      item_variant: `${packageDuration} Bulan`,
+      quantity: 1
+    }];
+    
+    // Panggil fungsi pelacakan dengan data yang telah divalidasi dan memiliki tipe
+    trackPurchase({
+      transaction_id: transactionId,
+      value: amount,
+      items,
+      tax,
+      shipping: 0,
+    });
+
+  }, [searchParams]);
+
+  return (
+    <div className={styles.bodyContainer}>
+      <div className={styles.contentWrapper}>
+        <div className={styles.textContainer}>
+          <h1 className={styles.mainTitle}>TERIMA KASIH! PENDAFTARAN ANDA BERHASIL</h1>
+          <p className={styles.description}>Selamat bergabung bersama Pejuang Tender. Akun Anda sudah aktif dan akan mendapatkan notifikasi harian sesuai dengan target LPSE Anda dari seluruh Indonesia.</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ThankYouBody;
