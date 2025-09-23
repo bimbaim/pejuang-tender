@@ -93,6 +93,26 @@ export async function POST(req: Request) {
     const xenditCallbackUrl = process.env.XENDIT_CALLBACK_URL || "http://pejuang-tender.vercel.app/api/xendit-webhook";
     console.warn("Xendit Callback URL set to:", xenditCallbackUrl);
 
+    // ✅ Perbaikan utama ada di sini
+    const nameParts = customer.name.trim().split(" ");
+    const givenNames = nameParts[0] || customer.name;
+    // Surname mengambil semua nama setelah nama pertama, atau "Customer" jika tidak ada
+    const surname = nameParts.slice(1).join(" ") || "Customer";
+    
+    // Pastikan mobile number memiliki format internasional +62
+    const whatsapp = customer.whatsapp?.trim();
+    let mobileNumber = "+628000000000"; // Fallback default
+    if (whatsapp) {
+      // Jika dimulai dengan '0', ganti dengan '+62'
+      if (whatsapp.startsWith('0')) {
+        mobileNumber = `+62${whatsapp.slice(1)}`;
+      } else if (whatsapp.startsWith('+')) {
+        mobileNumber = whatsapp;
+      } else {
+        mobileNumber = `+${whatsapp}`;
+      }
+    }
+    
     // 6. Call Xendit API to create the invoice
     const invoice = await Invoice.createInvoice({
       data: {
@@ -101,10 +121,10 @@ export async function POST(req: Request) {
         description: "Subscription Payment",
         currency: "IDR",
         customer: {
-            givenNames: customer.name.split(" ")[0] || customer.name,
-            surname: customer.name.split(" ")[1] || "",
+            givenNames,
+            surname,
             email: customer.email,
-            mobileNumber: customer.whatsapp || "+628000000000",
+            mobileNumber,
         },
         // 🔥 Perubahan inti ada di sini: Menambahkan query param `transaction_id`
         successRedirectUrl: `https://pejuangtender.id/thank-you?transaction_id={invoice_id}`,
