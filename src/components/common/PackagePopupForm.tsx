@@ -44,6 +44,7 @@ interface LpseLocation {
 // Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
+    // Correct: Create a single item based only on the selected package.
     const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
@@ -56,8 +57,9 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       event: "view_cart",
       ecommerce: {
         currency: "IDR",
+        // Correct: The value should be the price of the single selected item.
         value: selectedPackage.price,
-        items: [item]
+        items: [item] // Correct: The items array contains only one item.
       }
     };
 
@@ -68,6 +70,7 @@ function trackViewCart(selectedPackage: SelectedPackage) {
 // Tambahkan fungsi untuk event 'begin_checkout'
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
+    // Correct: Create a single item based only on the selected package.
     const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
@@ -80,8 +83,9 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       event: "begin_checkout",
       ecommerce: {
         currency: "IDR",
+        // Correct: The value should be the price of the single selected item.
         value: selectedPackage.price,
-        items: [item]
+        items: [item] // Correct: The items array contains only one item.
       }
     };
 
