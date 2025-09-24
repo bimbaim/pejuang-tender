@@ -41,7 +41,7 @@ interface LpseLocation {
   name: string;
 }
 
-// Function for 'add_to_cart' event
+// Fungsi untuk mengirim event 'add_to_cart'
 function trackAddToCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -52,9 +52,8 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    // ✅ Add the type annotation here
-    const eventData: DataLayerEvent = {
-      event: "add_to_cart", // This is now a literal string, not a generic string
+    const eventData = {
+      event: "add_to_cart",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -66,7 +65,7 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
   }
 }
 
-// Function for 'view_cart' event
+// Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -77,9 +76,8 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    // ✅ Add the type annotation here
-    const eventData: DataLayerEvent = {
-      event: "view_cart", // This is now a literal string
+    const eventData = {
+      event: "view_cart",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -91,7 +89,7 @@ function trackViewCart(selectedPackage: SelectedPackage) {
   }
 }
 
-// Function for 'begin_checkout' event
+// Fungsi untuk event 'begin_checkout'
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -102,9 +100,8 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    // ✅ Add the type annotation here
-    const eventData: DataLayerEvent = {
-      event: "begin_checkout", // This is now a literal string
+    const eventData = {
+      event: "begin_checkout",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -151,7 +148,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
-  // Add state to prevent duplicate events
   const [hasTracked, setHasTracked] = useState(false);
 
   useEffect(() => {
@@ -202,7 +198,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       });
       setIsLoading(false);
       setShowProgressBar(false);
-      setHasTracked(false); // Reset state when the popup is closed
+      setHasTracked(false);
     }
   }, [isOpen, selectedPackage, hasTracked]);
 
@@ -310,7 +306,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       return;
     }
 
-    // Call this function once when the user begins the checkout process
     trackBeginCheckout(selectedPackage);
 
     setIsLoading(true);
