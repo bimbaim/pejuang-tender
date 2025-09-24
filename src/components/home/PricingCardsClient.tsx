@@ -43,29 +43,29 @@ interface LpseLocation {
 
 // Fungsi untuk mengirim event 'add_to_cart'
 // Function for 'add_to_cart' event
-function trackAddToCart(selectedPackage: SelectedPackage) {
-  if (typeof window !== "undefined" && window.dataLayer) {
-    const item = {
-      item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
-      item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
-      price: selectedPackage.price,
-      item_category: "Tender Package",
-      item_variant: `${selectedPackage.duration_months} Bulan`,
-    };
+// function trackAddToCart(selectedPackage: SelectedPackage) {
+//   if (typeof window !== "undefined" && window.dataLayer) {
+//     const item = {
+//       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
+//       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
+//       price: selectedPackage.price,
+//       item_category: "Tender Package",
+//       item_variant: `${selectedPackage.duration_months} Bulan`,
+//     };
 
-    // ✅ Add the type annotation here
-    const eventData: DataLayerEvent = {
-      event: "add_to_cart", // This is now a literal string, not a generic string
-      ecommerce: {
-        currency: "IDR",
-        value: selectedPackage.price,
-        items: [item]
-      }
-    };
+//     // ✅ Add the type annotation here
+//     const eventData: DataLayerEvent = {
+//       event: "add_to_cart", // This is now a literal string, not a generic string
+//       ecommerce: {
+//         currency: "IDR",
+//         value: selectedPackage.price,
+//         items: [item]
+//       }
+//     };
 
-    window.dataLayer.push(eventData);
-  }
-}
+//     window.dataLayer.push(eventData);
+//   }
+// }
 
 // Function for 'view_cart' event
 function trackViewCart(selectedPackage: SelectedPackage) {
@@ -172,7 +172,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     if (isOpen) {
       fetchLpseOptions();
       if (selectedPackage && !hasTracked) {
-        trackAddToCart(selectedPackage);
+        // trackAddToCart(selectedPackage);
         trackViewCart(selectedPackage);
         setHasTracked(true);
       }
