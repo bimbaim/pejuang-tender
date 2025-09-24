@@ -1,4 +1,3 @@
-// src/types/globals.d.ts
 export {};
 
 declare global {
@@ -45,8 +44,8 @@ declare global {
 
   // Union type yang menggabungkan semua struktur event
   type DataLayerEvent =
-    | { event: "view_item_list"; ecommerce: ViewItemListEcommerceData }
-    | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData, gtm?: GTMData }; // ✅ Tambahkan 'gtm' di sini
+    | { event: "view_item_list"; ecommerce: ViewItemListEcommerceData, gtm?: GTMData }
+    | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData, gtm?: GTMData };
 
   // Mendeklarasikan window.dataLayer sebagai array dari union type
   interface Window {
