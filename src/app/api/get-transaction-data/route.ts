@@ -9,14 +9,12 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * API handler untuk mengambil semua data transaksi yang diperlukan untuk event 'purchase'.
- * Endpoint ini dipanggil oleh halaman 'Thank You'.
  */
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const subscriptionId = searchParams.get("subscription_id");
 
-    // Validasi parameter subscription_id
     if (!subscriptionId) {
       console.warn("API Warning: Missing subscription_id query parameter.");
       return NextResponse.json(
@@ -31,7 +29,7 @@ export async function GET(req: NextRequest) {
       .select(`
         transaction_id,
         package:packages (
-          alternative_name,
+          name,
           price,
           duration_months
         )
@@ -40,7 +38,6 @@ export async function GET(req: NextRequest) {
       .eq("payment_status", "paid")
       .single();
 
-    // Menangani error dari Supabase
     if (error) {
       console.error("Supabase Query Error:", error.message);
       return NextResponse.json(
@@ -49,16 +46,16 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Menangani kasus data tidak ditemukan atau tidak lengkap
+    // Menggabungkan validasi: periksa apakah data ada dan array `package` tidak kosong.
     if (!subscriptionData || !subscriptionData.transaction_id || !subscriptionData.package || subscriptionData.package.length === 0) {
-      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing data.`);
+      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing package data.`);
       return NextResponse.json(
         { error: "Transaction data not found" },
         { status: 404 }
       );
     }
 
-    // Mengakses objek paket dari array yang dikembalikan Supabase
+    // Akses objek paket dari elemen pertama array
     const packageInfo = subscriptionData.package[0];
 
     // Menghitung value (harga total) dan tax
@@ -74,8 +71,8 @@ export async function GET(req: NextRequest) {
       tax: tax,
       shipping: 0,
       items: [{
-        item_id: `${packageInfo.alternative_name.toLowerCase().replace(/\s/g, '_')}_${packageInfo.duration_months}m`,
-        item_name: `${packageInfo.alternative_name} - ${packageInfo.duration_months} Bulan`,
+        item_id: `${packageInfo.name.toLowerCase().replace(/\s/g, '_')}_${packageInfo.duration_months}m`,
+        item_name: `${packageInfo.name} - ${packageInfo.duration_months} Bulan`,
         price: packageInfo.price,
         item_category: "Tender Package",
         item_variant: `${packageInfo.duration_months} Bulan`,
