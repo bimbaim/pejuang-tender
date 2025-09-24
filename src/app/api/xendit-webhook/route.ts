@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           .from("subscriptions")
           .update({ 
               payment_status: "paid",
-              transaction_id: webhookEvent.id // <--- PERUBAHAN DI SINI
+              transaction_id: webhookEvent.id
           })
           .eq("id", subscriptionId)
           .select(`*, users(name, email), packages(alternative_name)`)
