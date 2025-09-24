@@ -70,11 +70,12 @@ export async function POST(req: NextRequest) {
       let tenderQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`)
-        // ✅ Created_at filter
-        .gte(
-          "created_at",
-          new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        );
+        // The following line filters results to only include those created in the last 24 hours.
+        // .gte(
+        //   "created_at",
+        //   new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+        // )
+        .limit(10); // ✅ Limit changed to 10
 
       // ✅ Category filter
       if (category && category.length > 0) {
