@@ -4,13 +4,16 @@ import { createClient } from "@supabase/supabase-js";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-// const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: false,
   },
 });
+
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 // --- Antarmuka (Interfaces) ---
 interface SubscriptionWithDetails {
@@ -47,8 +50,13 @@ export async function POST(req: NextRequest) {
 
     if (subsError) {
       console.error("Error fetching paid subscriptions:", subsError.message);
+      // ✅ Add this line to log the specific error details from Supabase
+      console.error("Supabase Error Details:", subsError);
       return NextResponse.json(
-        { error: "Failed to fetch subscriptions" },
+        { 
+          error: "Failed to fetch subscriptions", 
+          details: subsError.message // ✅ Include the error message in the response
+        },
         { status: 500 }
       );
     }
