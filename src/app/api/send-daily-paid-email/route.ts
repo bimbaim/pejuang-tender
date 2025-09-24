@@ -50,12 +50,17 @@ export async function POST(req: NextRequest) {
 
     if (subsError) {
       console.error("Error fetching paid subscriptions:", subsError.message);
-      // ✅ Add this line to log the specific error details from Supabase
-      console.error("Supabase Error Details:", subsError);
+      // Log the full error object on your server
+      console.error("Supabase Error Details:", subsError); 
+      
+      // Return the detailed error to the client
       return NextResponse.json(
-        { 
-          error: "Failed to fetch subscriptions", 
-          details: subsError.message // ✅ Include the error message in the response
+        {
+          error: "Failed to fetch subscriptions",
+          details: subsError.message, // This sends the specific error message to Postman
+          // You can also add more fields from the Supabase error object if they exist
+          // code: subsError.code, 
+          // hint: subsError.hint
         },
         { status: 500 }
       );
