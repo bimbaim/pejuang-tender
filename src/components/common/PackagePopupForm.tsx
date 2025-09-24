@@ -44,7 +44,7 @@ interface LpseLocation {
 // Fungsi untuk mengirim event 'add_to_cart'
 function trackAddToCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item = {
+    const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -52,8 +52,8 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
-      event: "add_to_cart", 
+    const eventData: DataLayerEvent = {
+      event: "add_to_cart",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -68,7 +68,7 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
 // Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item = {
+    const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -76,8 +76,8 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
-      event: "view_cart", 
+    const eventData: DataLayerEvent = {
+      event: "view_cart",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -89,10 +89,10 @@ function trackViewCart(selectedPackage: SelectedPackage) {
   }
 }
 
-// Fungsi untuk event 'begin_checkout'
+// Tambahkan fungsi untuk event 'begin_checkout'
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item = {
+    const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -100,8 +100,8 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
-      event: "begin_checkout", 
+    const eventData: DataLayerEvent = {
+      event: "begin_checkout",
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -148,7 +148,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
-  const [hasTracked, setHasTracked] = useState(false);
 
   useEffect(() => {
     const fetchLpseOptions = async () => {
@@ -166,10 +165,11 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
     if (isOpen) {
       fetchLpseOptions();
-      if (selectedPackage && !hasTracked) {
+      if (selectedPackage) {
+        // ✅ Add the trackAddToCart event here
         trackAddToCart(selectedPackage);
+        // ✅ The view_cart event can be triggered here as well
         trackViewCart(selectedPackage);
-        setHasTracked(true);
       }
     } else {
       setFormData({
@@ -198,9 +198,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       });
       setIsLoading(false);
       setShowProgressBar(false);
-      setHasTracked(false);
     }
-  }, [isOpen, selectedPackage, hasTracked]);
+  }, [isOpen, selectedPackage]);
 
   if (!isOpen || !selectedPackage) return null;
 
