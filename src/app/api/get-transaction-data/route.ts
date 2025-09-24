@@ -7,9 +7,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-/**
- * API handler untuk mengambil semua data transaksi yang diperlukan untuk event 'purchase'.
- */
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
@@ -23,7 +20,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Mengambil data dari tabel `subscriptions` dan data relasi dari tabel `packages`
     const { data: subscriptionData, error } = await supabase
       .from("subscriptions")
       .select(`
@@ -46,25 +42,48 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Menggabungkan validasi: periksa apakah data ada dan array `package` tidak kosong.
-    if (!subscriptionData || !subscriptionData.transaction_id || !subscriptionData.package || subscriptionData.package.length === 0) {
-      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing package data.`);
+    // Periksa data utama dan transaction_id
+    if (!subscriptionData || !subscriptionData.transaction_id) {
+      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing transaction ID.`);
       return NextResponse.json(
         { error: "Transaction data not found" },
         { status: 404 }
       );
     }
+    
+    let packageInfo;
+    
+    // Periksa apakah package adalah array atau objek tunggal, lalu ambil datanya
+    if (Array.isArray(subscriptionData.package)) {
+      if (subscriptionData.package.length === 0) {
+        console.warn(`Subscription with ID '${subscriptionId}' has no associated package.`);
+        return NextResponse.json(
+          { error: "Transaction data not found" },
+          { status: 404 }
+        );
+      }
+      packageInfo = subscriptionData.package[0];
+    } else {
+      // Jika bukan array, anggap itu objek tunggal
+      packageInfo = subscriptionData.package;
+    }
 
-    // Akses objek paket dari elemen pertama array
-    const packageInfo = subscriptionData.package[0];
+    // Lakukan validasi terakhir untuk memastikan packageInfo ada
+    if (!packageInfo || !packageInfo.price) {
+        console.warn(`Subscription with ID '${subscriptionId}' has incomplete package data.`);
+        return NextResponse.json(
+          { error: "Transaction data incomplete" },
+          { status: 404 }
+        );
+    }
 
-    // Menghitung value (harga total) dan tax
-    const taxRate = 0.11; // 11% PPN
+    // Hitung harga total dan pajak
+    const taxRate = 0.11;
     const basePrice = packageInfo.price;
     const tax = basePrice * taxRate;
     const value = basePrice + tax;
 
-    // Membuat objek respons dengan semua data yang diperlukan
+    // Buat objek respons
     const responseData = {
       transactionId: subscriptionData.transaction_id,
       value: value,
@@ -81,6 +100,7 @@ export async function GET(req: NextRequest) {
     };
 
     console.log("Successfully fetched transaction data for subscription:", subscriptionId);
+    console.log("Response Data:", responseData);
     return NextResponse.json(responseData, { status: 200 });
 
   } catch (err) {

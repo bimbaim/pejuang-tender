@@ -30,6 +30,7 @@ function trackPurchase({ transaction_id, value, items, tax, shipping }: Purchase
     // Reset objek ecommerce untuk menghindari penggabungan dengan event sebelumnya
     window.dataLayer.push({ ecommerce: null });
 
+    // Langsung push objek dengan literal string yang benar
     window.dataLayer.push({
       event: "purchase",
       ecommerce: {
