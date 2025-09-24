@@ -52,8 +52,8 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "add_to_cart",
+    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
+      event: "add_to_cart", 
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -76,8 +76,8 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "view_cart",
+    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
+      event: "view_cart", 
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -100,8 +100,8 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "begin_checkout",
+    const eventData: DataLayerEvent = { // ✅ Berikan anotasi tipe di sini
+      event: "begin_checkout", 
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,

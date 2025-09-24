@@ -9,22 +9,18 @@ declare global {
     price?: number;
     item_category?: string;
     item_variant?: string;
-    // item_list_name harusnya tidak ada di sini, tapi saya biarkan karena ada di kode Anda
     item_list_name?: string;
   }
 
-  // Antarmuka untuk objek e-commerce yang digunakan oleh
-  // 'view_cart', 'add_to_cart', 'begin_checkout', dan 'purchase'
+  // Antarmuka untuk objek e-commerce standar
   interface StandardEcommerceData {
     currency?: string;
     value?: number;
     items?: DataLayerItem[];
-    // Menambahkan properti spesifik untuk event purchase
     transaction_id?: string;
     affiliation?: string;
     tax?: number;
     shipping?: number;
-    // ✅ Tambahkan properti opsional ini untuk mencocokkan data
     item_list_id?: string;
     item_list_name?: string;
   }
@@ -36,14 +32,23 @@ declare global {
     item_list_name: string;
   }
 
+  // Antarmuka untuk objek GTM
+  interface GTMData {
+    uniqueEventId?: number;
+    start?: number;
+    priorityId?: number;
+    scrollThreshold?: number;
+    scrollUnits?: string;
+    scrollDirection?: string;
+    triggers?: string;
+  }
+
   // Union type yang menggabungkan semua struktur event
-  // ✅ Mengubah event menjadi string literal agar cocok dengan data layer Anda
   type DataLayerEvent =
     | { event: "view_item_list"; ecommerce: ViewItemListEcommerceData }
-    | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData }
-    | { event: string; [key: string]: any; }; // ✅ Menambahkan ini untuk fleksibilitas
+    | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData, gtm?: GTMData }; // ✅ Tambahkan 'gtm' di sini
 
-  // Mendeklarasikan window.dataLayer sebagai array dari union type yang baru
+  // Mendeklarasikan window.dataLayer sebagai array dari union type
   interface Window {
     dataLayer: DataLayerEvent[];
   }
