@@ -41,7 +41,7 @@ interface LpseLocation {
   name: string;
 }
 
-// Fungsi untuk mengirim event 'add_to_cart'
+// Function for 'add_to_cart' event
 function trackAddToCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -52,8 +52,9 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "add_to_cart",
+    // ✅ Add the type annotation here
+    const eventData: DataLayerEvent = {
+      event: "add_to_cart", // This is now a literal string, not a generic string
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -65,7 +66,7 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
   }
 }
 
-// Fungsi untuk mengirim event 'view_cart'
+// Function for 'view_cart' event
 function trackViewCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -76,8 +77,9 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "view_cart",
+    // ✅ Add the type annotation here
+    const eventData: DataLayerEvent = {
+      event: "view_cart", // This is now a literal string
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
@@ -89,7 +91,7 @@ function trackViewCart(selectedPackage: SelectedPackage) {
   }
 }
 
-// Tambahkan fungsi untuk event 'begin_checkout'
+// Function for 'begin_checkout' event
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
     const item = {
@@ -100,8 +102,9 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData = {
-      event: "begin_checkout",
+    // ✅ Add the type annotation here
+    const eventData: DataLayerEvent = {
+      event: "begin_checkout", // This is now a literal string
       ecommerce: {
         currency: "IDR",
         value: selectedPackage.price,
