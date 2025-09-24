@@ -30,7 +30,6 @@ export async function GET(req: NextRequest) {
       .from("subscriptions")
       .select(`
         transaction_id,
-        payment_amount,
         package:packages (
           alternative_name,
           price,
