@@ -5,51 +5,14 @@ import React, { useEffect } from 'react';
 import styles from './ThankYouBody.module.css';
 import { useSearchParams } from 'next/navigation';
 
-// Mendefinisikan tipe untuk item yang akan dikirim ke dataLayer
-interface PurchaseItem {
-  item_id: string;
-  item_name: string;
-  price: number;
-  item_category: string;
-  item_variant: string;
-  quantity: number;
-}
-
-// Mendefinisikan tipe untuk data yang akan dikirim ke fungsi trackPurchase
-interface PurchaseData {
-  transaction_id: string;
-  value: number;
-  items: PurchaseItem[];
-  tax: number;
-  shipping: number;
-}
-
-// Fungsi untuk push event 'purchase' ke dataLayer
-function trackPurchase({ transaction_id, value, items, tax, shipping }: PurchaseData) {
-  if (typeof window !== 'undefined' && window.dataLayer) {
-    // Reset the ecommerce object to avoid merging with previous events
-    window.dataLayer.push({ ecommerce: null });
-
-    window.dataLayer.push({
-      event: "purchase",
-      ecommerce: {
-        transaction_id,
-        affiliation: "Tender Subscriptions",
-        currency: "IDR",
-        value,
-        tax,
-        shipping,
-        items
-      }
-    });
-  }
-}
+// Hapus definisi tipe PurchaseItem dan PurchaseData
+// Hapus juga fungsi trackPurchase
 
 const ThankYouBody = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Gunakan localStorage atau sessionStorage untuk melacak apakah event sudah dikirim
+    // Gunakan sessionStorage untuk melacak apakah event sudah dikirim
     const isPurchaseEventSent = sessionStorage.getItem('purchaseEventSent');
 
     // Jika event sudah pernah dikirim, jangan kirim lagi
@@ -58,14 +21,10 @@ const ThankYouBody = () => {
     }
 
     const subscriptionId = searchParams.get('subscription_id');
-    const amountStr = searchParams.get('amount');
-    const packageName = searchParams.get('package_name');
-    const packagePriceStr = searchParams.get('package_price');
-    const packageDuration = searchParams.get('package_duration');
-    const taxStr = searchParams.get('tax');
 
-    if (!subscriptionId || !amountStr || !packageName || !packagePriceStr || !packageDuration) {
-      console.error("Missing required URL parameters for purchase tracking.");
+    // Fokus hanya pada validasi subscription_id
+    if (!subscriptionId) {
+      console.error("Missing required URL parameter: subscription_id.");
       return;
     }
 
@@ -75,48 +34,32 @@ const ThankYouBody = () => {
         const data = await res.json();
 
         if (!res.ok) {
-          console.error("Failed to fetch transaction ID:", data.error);
+          console.error("Failed to fetch transaction data:", data.error);
           return;
         }
 
-        const { transactionId } = data;
+        const { transactionId, value, items, tax, shipping } = data;
 
-        if (!transactionId) {
-          console.error("Transaction ID is missing in the API response.");
+        if (!transactionId || !value || !items) {
+          console.error("Incomplete transaction data from API.");
           return;
         }
 
-        const amount = parseFloat(amountStr);
-        const packagePrice = parseFloat(packagePriceStr);
-        const tax = taxStr ? parseFloat(taxStr) : 0;
-        
-        if (isNaN(amount) || isNaN(packagePrice)) {
-          console.error("Invalid numeric parameters in URL.");
-          return;
-        }
-
-        const items: PurchaseItem[] = [{
-          item_id: `${packageName.toLowerCase().replace(/\s/g, '_')}_${packageDuration}m`,
-          item_name: `${packageName} - ${packageDuration} Bulan`,
-          price: packagePrice,
-          item_category: "Tender Package",
-          item_variant: `${packageDuration} Bulan`,
-          quantity: 1
-        }];
-        
+        // Panggil fungsi trackPurchase dengan data yang sudah lengkap dari API
+        // Catatan: Fungsi trackPurchase dan tipe-tipenya perlu dipindahkan ke sini atau diimpor
         trackPurchase({
           transaction_id: transactionId,
-          value: amount,
+          value,
           items,
-          tax,
-          shipping: 0,
+          tax: tax || 0,
+          shipping: shipping || 0,
         });
 
         // Tandai bahwa event sudah berhasil dikirim
         sessionStorage.setItem('purchaseEventSent', 'true');
 
       } catch (error) {
-        console.error("Error fetching transaction ID:", error);
+        console.error("Error fetching transaction data:", error);
       }
     };
 
@@ -137,3 +80,39 @@ const ThankYouBody = () => {
 };
 
 export default ThankYouBody;
+
+// Pindahkan atau impor kembali tipe dan fungsi pelacakan di sini jika diperlukan
+interface PurchaseItem {
+  item_id: string;
+  item_name: string;
+  price: number;
+  item_category: string;
+  item_variant: string;
+  quantity: number;
+}
+
+interface PurchaseData {
+  transaction_id: string;
+  value: number;
+  items: PurchaseItem[];
+  tax: number;
+  shipping: number;
+}
+
+function trackPurchase({ transaction_id, value, items, tax, shipping }: PurchaseData) {
+  if (typeof window !== 'undefined' && window.dataLayer) {
+    window.dataLayer.push({ ecommerce: null });
+    window.dataLayer.push({
+      event: "purchase",
+      ecommerce: {
+        transaction_id,
+        affiliation: "Tender Subscriptions",
+        currency: "IDR",
+        value,
+        tax,
+        shipping,
+        items
+      }
+    });
+  }
+}
