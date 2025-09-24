@@ -1,3 +1,4 @@
+// src/app/thank-you/components/ThankYouBody.tsx
 "use client";
 
 import React, { useEffect } from 'react';
@@ -26,6 +27,9 @@ interface PurchaseData {
 // Fungsi untuk push event 'purchase' ke dataLayer
 function trackPurchase({ transaction_id, value, items, tax, shipping }: PurchaseData) {
   if (typeof window !== 'undefined' && window.dataLayer) {
+    // Reset the ecommerce object to avoid merging with previous events
+    window.dataLayer.push({ ecommerce: null });
+
     window.dataLayer.push({
       event: "purchase",
       ecommerce: {
@@ -45,7 +49,14 @@ const ThankYouBody = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // 1. Get all parameters from the URL, including the new 'subscription_id'
+    // Gunakan localStorage atau sessionStorage untuk melacak apakah event sudah dikirim
+    const isPurchaseEventSent = sessionStorage.getItem('purchaseEventSent');
+
+    // Jika event sudah pernah dikirim, jangan kirim lagi
+    if (isPurchaseEventSent) {
+      return;
+    }
+
     const subscriptionId = searchParams.get('subscription_id');
     const amountStr = searchParams.get('amount');
     const packageName = searchParams.get('package_name');
@@ -53,7 +64,6 @@ const ThankYouBody = () => {
     const packageDuration = searchParams.get('package_duration');
     const taxStr = searchParams.get('tax');
 
-    // 2. Check for all the parameters required for a complete purchase event
     if (!subscriptionId || !amountStr || !packageName || !packagePriceStr || !packageDuration) {
       console.error("Missing required URL parameters for purchase tracking.");
       return;
@@ -61,7 +71,6 @@ const ThankYouBody = () => {
 
     const fetchAndTrackPurchase = async () => {
       try {
-        // 3. Call your new API to get the transaction ID
         const res = await fetch(`/api/get-transaction-data?subscription_id=${subscriptionId}`);
         const data = await res.json();
 
@@ -77,7 +86,6 @@ const ThankYouBody = () => {
           return;
         }
 
-        // 4. Parse the other URL parameters
         const amount = parseFloat(amountStr);
         const packagePrice = parseFloat(packagePriceStr);
         const tax = taxStr ? parseFloat(taxStr) : 0;
@@ -87,7 +95,6 @@ const ThankYouBody = () => {
           return;
         }
 
-        // 5. Build the purchase items list
         const items: PurchaseItem[] = [{
           item_id: `${packageName.toLowerCase().replace(/\s/g, '_')}_${packageDuration}m`,
           item_name: `${packageName} - ${packageDuration} Bulan`,
@@ -97,7 +104,6 @@ const ThankYouBody = () => {
           quantity: 1
         }];
         
-        // 6. Call the tracking function with all gathered data
         trackPurchase({
           transaction_id: transactionId,
           value: amount,
@@ -105,6 +111,9 @@ const ThankYouBody = () => {
           tax,
           shipping: 0,
         });
+
+        // Tandai bahwa event sudah berhasil dikirim
+        sessionStorage.setItem('purchaseEventSent', 'true');
 
       } catch (error) {
         console.error("Error fetching transaction ID:", error);
