@@ -71,7 +71,7 @@ const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPa
 
   const handlePilihPaketClick = (plan: Plan) => {
     // 1. Trigger the GTM event immediately
-    trackAddToCart(plan);
+    // trackAddToCart(plan);
     // 2. Set the state to "waiting" and store the current plan
     setIsWaiting(true);
     setCurrentPlan(plan);

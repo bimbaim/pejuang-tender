@@ -44,7 +44,7 @@ interface LpseLocation {
 // Fungsi untuk mengirim event 'add_to_cart'
 function trackAddToCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item: DataLayerItem = {
+    const item = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -52,7 +52,7 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = {
+    const eventData = {
       event: "add_to_cart",
       ecommerce: {
         currency: "IDR",
@@ -68,7 +68,7 @@ function trackAddToCart(selectedPackage: SelectedPackage) {
 // Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item: DataLayerItem = {
+    const item = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -76,7 +76,7 @@ function trackViewCart(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = {
+    const eventData = {
       event: "view_cart",
       ecommerce: {
         currency: "IDR",
@@ -92,7 +92,7 @@ function trackViewCart(selectedPackage: SelectedPackage) {
 // Tambahkan fungsi untuk event 'begin_checkout'
 function trackBeginCheckout(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
-    const item: DataLayerItem = {
+    const item = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
       price: selectedPackage.price,
@@ -100,7 +100,7 @@ function trackBeginCheckout(selectedPackage: SelectedPackage) {
       item_variant: `${selectedPackage.duration_months} Bulan`,
     };
 
-    const eventData: DataLayerEvent = {
+    const eventData = {
       event: "begin_checkout",
       ecommerce: {
         currency: "IDR",
@@ -148,6 +148,8 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [showProgressBar, setShowProgressBar] = useState(false);
   const [lpseOptions, setLpseOptions] = useState<LpseLocation[]>([]);
+  // Add state to prevent duplicate events
+  const [hasTracked, setHasTracked] = useState(false);
 
   useEffect(() => {
     const fetchLpseOptions = async () => {
@@ -165,11 +167,10 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
     if (isOpen) {
       fetchLpseOptions();
-      if (selectedPackage) {
-        // ✅ Add the trackAddToCart event here
+      if (selectedPackage && !hasTracked) {
         trackAddToCart(selectedPackage);
-        // ✅ The view_cart event can be triggered here as well
         trackViewCart(selectedPackage);
+        setHasTracked(true);
       }
     } else {
       setFormData({
@@ -198,8 +199,9 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       });
       setIsLoading(false);
       setShowProgressBar(false);
+      setHasTracked(false); // Reset state when the popup is closed
     }
-  }, [isOpen, selectedPackage]);
+  }, [isOpen, selectedPackage, hasTracked]);
 
   if (!isOpen || !selectedPackage) return null;
 
@@ -305,6 +307,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       return;
     }
 
+    // Call this function once when the user begins the checkout process
     trackBeginCheckout(selectedPackage);
 
     setIsLoading(true);
