@@ -42,28 +42,28 @@ interface LpseLocation {
 }
 
 // Fungsi untuk mengirim event 'add_to_cart'
-// function trackAddToCart(selectedPackage: SelectedPackage) {
-//   if (typeof window !== "undefined" && window.dataLayer) {
-//     const item: DataLayerItem = {
-//       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
-//       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
-//       price: selectedPackage.price,
-//       item_category: "Tender Package",
-//       item_variant: `${selectedPackage.duration_months} Bulan`,
-//     };
+function trackAddToCart(selectedPackage: SelectedPackage) {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    const item: DataLayerItem = {
+      item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
+      item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
+      price: selectedPackage.price,
+      item_category: "Tender Package",
+      item_variant: `${selectedPackage.duration_months} Bulan`,
+    };
 
-//     const eventData: DataLayerEvent = {
-//       event: "add_to_cart",
-//       ecommerce: {
-//         currency: "IDR",
-//         value: selectedPackage.price,
-//         items: [item]
-//       }
-//     };
+    const eventData: DataLayerEvent = {
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "IDR",
+        value: selectedPackage.price,
+        items: [item]
+      }
+    };
 
-//     window.dataLayer.push(eventData);
-//   }
-// }
+    window.dataLayer.push(eventData);
+  }
+}
 
 // Fungsi untuk mengirim event 'view_cart'
 function trackViewCart(selectedPackage: SelectedPackage) {
@@ -167,7 +167,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       fetchLpseOptions();
       if (selectedPackage) {
         // ✅ Add the trackAddToCart event here
-        // trackAddToCart(selectedPackage);
+        trackAddToCart(selectedPackage);
         // ✅ The view_cart event can be triggered here as well
         trackViewCart(selectedPackage);
       }

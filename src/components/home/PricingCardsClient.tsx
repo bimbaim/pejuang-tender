@@ -20,33 +20,6 @@ interface PricingCardsClientProps {
   onOpenPackagePopup: (plan: Plan) => void;
 }
 
-/**
- * 2. ADD TO CART (trigger when user clicks "Pilih Paket")
- */
-function trackAddToCart(plan: Plan) {
-  if (typeof window !== 'undefined' && window.dataLayer) {
-    const item: DataLayerItem = {
-      item_id: `${plan.name.toLowerCase().replace(/\s/g, '_')}_${plan.duration_months}m`,
-      item_name: `${plan.name} - ${plan.duration_months} Bulan`,
-      price: plan.amount,
-      item_category: "Tender Package",
-      item_variant: `${plan.duration_months} Bulan`,
-    };
-
-    const eventData: DataLayerEvent = {
-      event: "add_to_cart",
-      ecommerce: {
-        currency: "IDR",
-        value: plan.amount,
-        items: [item]
-      }
-    };
-    console.log("Pushing add_to_cart event to dataLayer:", eventData);
-    window.dataLayer.push(eventData);
-  }
-  console.log(`trackAddToCart called for plan: ${plan.name}`);
-}
-
 const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPackagePopup }) => {
   // ✅ State to manage the loading/waiting indicator
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
@@ -70,8 +43,6 @@ const PricingCardsClient: React.FC<PricingCardsClientProps> = ({ plans, onOpenPa
   }, [isWaiting, currentPlan, onOpenPackagePopup]);
 
   const handlePilihPaketClick = (plan: Plan) => {
-    // 1. Trigger the GTM event immediately
-    trackAddToCart(plan);
     // 2. Set the state to "waiting" and store the current plan
     setIsWaiting(true);
     setCurrentPlan(plan);
