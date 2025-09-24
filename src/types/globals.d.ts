@@ -44,11 +44,13 @@ declare global {
 
   // Union type yang menggabungkan semua struktur event
   type DataLayerEvent =
-    | { event: "view_item_list"; ecommerce: ViewItemListEcommerceData, gtm?: GTMData }
-    | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData, gtm?: GTMData };
+  | { event: "view_item_list"; ecommerce: ViewItemListEcommerceData, gtm?: GTMData }
+  | { event: "add_to_cart" | "begin_checkout" | "view_cart" | "purchase"; ecommerce: StandardEcommerceData, gtm?: GTMData }
+  | { ecommerce: null }; // Tambahkan tipe ini untuk mengizinkan reset
 
   // Mendeklarasikan window.dataLayer sebagai array dari union type
   interface Window {
     dataLayer: DataLayerEvent[];
   }
+
 }

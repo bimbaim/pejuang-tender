@@ -44,6 +44,7 @@ interface LpseLocation {
 // Fungsi untuk mengirim event 'add_to_cart'
 function trackAddToCart(selectedPackage: SelectedPackage) {
   if (typeof window !== "undefined" && window.dataLayer) {
+    window.dataLayer.push({ ecommerce: null });
     const item: DataLayerItem = {
       item_id: `${selectedPackage.name.toLowerCase().replace(/\s/g, '_')}_${selectedPackage.duration_months}m`,
       item_name: `${selectedPackage.name} - ${selectedPackage.duration_months} Bulan`,
