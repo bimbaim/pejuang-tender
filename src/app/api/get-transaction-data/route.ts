@@ -1,21 +1,22 @@
+// src/app/api/get-transaction-data/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Initialize Supabase client
+// Inisialisasi klien Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
- * API handler to fetch only the transaction ID based on a subscription ID.
- * This endpoint is called by the 'Thank You' page.
+ * API handler untuk mengambil semua data transaksi yang diperlukan untuk event 'purchase'.
+ * Endpoint ini dipanggil oleh halaman 'Thank You'.
  */
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const subscriptionId = searchParams.get("subscription_id");
 
-    // 1. Validate the incoming subscription ID
+    // Validasi parameter subscription_id
     if (!subscriptionId) {
       console.warn("API Warning: Missing subscription_id query parameter.");
       return NextResponse.json(
@@ -24,38 +25,66 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // 2. Query Supabase for only the transaction_id
+    // Mengambil data dari tabel `subscriptions` dan data relasi dari tabel `packages`
     const { data: subscriptionData, error } = await supabase
       .from("subscriptions")
-      .select(`transaction_id`) // <-- Only selecting this column now
+      .select(`
+        transaction_id,
+        payment_amount,
+        package:packages (
+          alternative_name,
+          price,
+          duration_months
+        )
+      `)
       .eq("id", subscriptionId)
       .eq("payment_status", "paid")
       .single();
 
-    // 3. Handle potential errors from the Supabase query
+    // Menangani error dari Supabase
     if (error) {
       console.error("Supabase Query Error:", error.message);
       return NextResponse.json(
-        { error: "Failed to fetch transaction ID" },
+        { error: "Failed to fetch transaction data" },
         { status: 500 }
       );
     }
 
-    // 4. Handle case where the subscription is not found, not paid, or has no transaction ID
-    if (!subscriptionData || !subscriptionData.transaction_id) {
-      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing transaction ID.`);
+    // Menangani kasus data tidak ditemukan atau tidak lengkap
+    if (!subscriptionData || !subscriptionData.transaction_id || !subscriptionData.package || subscriptionData.package.length === 0) {
+      console.warn(`Subscription with ID '${subscriptionId}' not found, not paid, or missing data.`);
       return NextResponse.json(
-        { error: "Transaction ID not found" },
+        { error: "Transaction data not found" },
         { status: 404 }
       );
     }
-    
-    // 5. Return the transaction ID
+
+    // Mengakses objek paket dari array yang dikembalikan Supabase
+    const packageInfo = subscriptionData.package[0];
+
+    // Menghitung value (harga total) dan tax
+    const taxRate = 0.11; // 11% PPN
+    const basePrice = packageInfo.price;
+    const tax = basePrice * taxRate;
+    const value = basePrice + tax;
+
+    // Membuat objek respons dengan semua data yang diperlukan
     const responseData = {
       transactionId: subscriptionData.transaction_id,
+      value: value,
+      tax: tax,
+      shipping: 0,
+      items: [{
+        item_id: `${packageInfo.alternative_name.toLowerCase().replace(/\s/g, '_')}_${packageInfo.duration_months}m`,
+        item_name: `${packageInfo.alternative_name} - ${packageInfo.duration_months} Bulan`,
+        price: packageInfo.price,
+        item_category: "Tender Package",
+        item_variant: `${packageInfo.duration_months} Bulan`,
+        quantity: 1
+      }]
     };
 
-    console.log("Successfully fetched transaction ID for subscription:", subscriptionId);
+    console.log("Successfully fetched transaction data for subscription:", subscriptionId);
     return NextResponse.json(responseData, { status: 200 });
 
   } catch (err) {
