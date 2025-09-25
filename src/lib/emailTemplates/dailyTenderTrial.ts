@@ -18,196 +18,180 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.verc
  * @param trialEndDate The end date of the user's trial period.
  * @returns The complete HTML string for the email.
  */
-export const dailyTenderTrialEmailTemplate = (name: string, tenders: Tender[], trialEndDate: string): string => {
-  const tenderListHtml = tenders.map((tender, index) => {
-    // Check if the tender has an end_date before trying to format it
+export const dailyTenderTrialEmailTemplate = (
+  name: string,
+  tenders: Tender[],
+  trialEndDate: string
+): string => {
+  // Format tanggal hari ini (misalnya: 25 September 2025)
+  const today = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-
-    // const formattedBudget = new Intl.NumberFormat("id-ID", {
-    //   style: 'currency',
-    //   currency: 'IDR',
-    //   minimumFractionDigits: 0,
-    //   maximumFractionDigits: 0,
-    // }).format(tender.budget);
-
-    return `
-    <tr style="background-color: #ffffff; border: 1px solid #f5f5f5;">
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${index + 1}</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.title}</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #333333;">${tender.agency}</td>
-      <td style="padding: 8px 15px; border-bottom: 1px solid #e0e0e0; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px;">
-        <a href="${tender.source_url}" style="color: #0093dd; text-decoration: underline; font-family: Quicksand, sans-serif;">Link SPSE</a>
+  const tenderListHtml = tenders
+    .map(
+      (tender, index) => `
+    <tr>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
+        index + 1
+      }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
+        tender.title
+      }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
+        tender.agency
+      }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
+        <a href="${tender.source_url}" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
-    </tr>
-  `;
-  }).join('');
+    </tr>`
+    )
+    .join("");
 
   return `
   <!DOCTYPE html>
-  <html>
+  <html lang="id">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Update Tender Harian</title>
     <style>
-      body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-      table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-      img { -ms-interpolation-mode: bicubic; }
-      a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; font-size: inherit !important; font-family: inherit !important; font-weight: inherit !important; line-height: inherit !important; }
-      @media only screen and (max-width: 640px) {
-        .email-container { width: 100% !important; }
-        .user-table { width: 100% !important; }
+      @media only screen and (max-width:600px) {
+        .container { width:100% !important; padding:10px !important; }
+        .content { padding:15px !important; }
+        .btn { display:block !important; width:100% !important; text-align:center !important; }
+        table.user-table th, table.user-table td { font-size:12px !important; padding:6px !important; }
       }
     </style>
   </head>
-  <body style="margin: 0; padding: 0; background-color: #f4f4f4; text-align: center;">
-
-    <div style="background-color: #f4f4f4; padding: 20px;">
-      <table border="0" cellpadding="0" cellspacing="0" width="1028" style="max-width: 1028px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; font-family: Saira, Quicksand, sans-serif; color: #000000;">
-        <tr>
-          <td>
-            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-               <!-- LOGO & BRAND -->
+  <body style="margin:0;padding:0;background:#f4f4f4;font-family:Quicksand,Arial,sans-serif;">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      <tr>
+        <td align="center" style="padding:20px;">
+          <table class="container" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:10px;overflow:hidden;">
+            
+            <!-- HEADER -->
             <tr>
-              <td align="center" style="padding: 20px 0;">
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+              <td align="center" style="padding:20px;">
+                <table border="0" cellpadding="0" cellspacing="0" align="center">
                   <tr>
-                    <!-- Logo -->
-                    <td style="padding-right: 10px;">
-                      <img src="${BASE_URL}/images/logo-footer.png" 
-                           alt="PEJUANG Tender Logo" 
-                           width="50" 
-                           height="50" 
-                           style="display: block;">
+                    <td style="padding-right:10px;">
+                      <img src="${BASE_URL}/images/logo-footer.png" alt="Logo" width="50" height="50" style="display:block;">
                     </td>
-                    <!-- Text -->
-                    <td style="text-align: left; vertical-align: middle; font-family: Saira, sans-serif;">
-                      <p style="margin: 0; font-size: 18px; font-weight: 700; line-height: 1.2;">PEJUANG</p>
-                      <p style="margin: 0; font-size: 16px; font-weight: 400; line-height: 1.2;">TENDER</p>
+                    <td style="text-align:left;vertical-align:middle;">
+                      <p style="margin:0;font-size:18px;font-weight:700;">PEJUANG</p>
+                      <p style="margin:0;font-size:16px;">TENDER</p>
                     </td>
                   </tr>
                 </table>
               </td>
             </tr>
+            
+            <!-- TITLE DATE -->
+            <tr>
+              <td align="center" style="padding:0 20px 10px;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender Hari Ini ${today}</p>
+              </td>
+            </tr>
+
             <!-- GREETING -->
             <tr>
-              <td style="padding: 20px 0 10px;">
-                <p style="font-size: 20px; font-weight: 700; margin: 0; text-align: center; font-family: Saira, sans-serif;">
-                  HALO ${name}, 👋
-                </p>
+              <td align="center" style="padding:10px 20px;">
+                <p style="margin:0;font-size:20px;font-weight:700;">HALO ${name}, 👋</p>
               </td>
             </tr>
 
             <!-- TITLE -->
             <tr>
-              <td style="padding: 15px 0 5px;">
-                <p style="font-size: 16px; font-weight: 700; margin: 0; text-align: center; font-family: Saira, sans-serif;">
-                  DAFTAR TENDER TERBARU
-                </p>
+              <td align="center" style="padding:10px 20px;">
+                <p style="margin:0;font-size:16px;font-weight:700;">DAFTAR TENDER TERBARU</p>
               </td>
             </tr>
 
             <!-- DESCRIPTION -->
             <tr>
-              <td style="padding: 5px 0 20px;">
-                <p style="font-size: 15px; margin: 0; line-height: 150%; text-align: center; font-family: Quicksand, sans-serif; color: #333333;">
-                  Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:
-                </p>
+              <td align="center" style="padding:0 20px 20px;">
+                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
+              </td>
+            </tr>
+
+            <!-- TABLE -->
+            <tr>
+              <td style="padding:0 20px 20px;">
+                <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
+                  <thead>
+                    <tr style="background:#f5f5f5;">
+                      <th style="padding:10px;font-size:13px;text-align:left;">No</th>
+                      <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
+                      <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+                      <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${
+                      tenders.length > 0
+                        ? tenderListHtml
+                        : `<tr><td colspan="4" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+                    }
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+
+            <!-- TIPS -->
+            <tr>
+              <td style="padding:0 20px 20px;">
+                <div style="background:#e5f4fb;border-radius:8px;padding:15px;text-align:left;">
+                  <p style="margin:0 0 8px;font-weight:bold;">TIPS:</p>
+                  <ul style="margin:0;padding-left:20px;">
+                    <li style="margin-bottom:5px;">Cek detail tender sesegera mungkin sebelum batas waktu berakhir.</li>
+                    <li>Simpan tender yang relevan untuk persiapan dokumen penawaran.</li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+
+            <!-- TRIAL INFO -->
+            <tr>
+              <td style="padding:0 20px 20px;">
+                <div style="background:#fff3f3;border-radius:8px;padding:15px;text-align:left;">
+                  <p style="margin:0 0 8px;font-weight:bold;">Catatan Penting:</p>
+                  <p style="margin:0;">Trial Anda akan berakhir pada <strong>${trialEndDate}</strong>. Untuk terus mendapatkan update tender harian, upgrade paket Anda sebelum masa trial berakhir.</p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td align="center" style="padding:10px 20px 30px;">
+                <a href="${BASE_URL}/#paket" class="btn" style="display:inline-block;padding:12px 25px;background:#0093dd;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">UPGRADE SEKARANG</a>
+              </td>
+            </tr>
+
+          </table>
+
+          <!-- FOOTER -->
+          <table width="600" class="container" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000;border-radius:10px;margin-top:20px;color:#fff;">
+            <tr>
+              <td style="padding:20px;text-align:left;font-size:14px;">
+                <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
+                <p style="margin:0;">Salam,</p>
+                <p style="margin:0;">Tim pejuangtender.id</p>
+                <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
+              </td>
+              <td style="padding:20px;text-align:right;font-size:14px;">
+                <p style="margin:0;font-weight:bold;">BUTUH BANTUAN?</p>
+                <p style="margin:0;">Email: <a href="mailto:info@pejuangtender.id" style="color:#fff;text-decoration:none;">info@pejuangtender.id</a></p>
+                <p style="margin:0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color:#fff;text-decoration:none;">+62 822 8478 3555</a></p>
               </td>
             </tr>
           </table>
 
-          <table class="user-table" border="0" cellpadding="0" cellspacing="0" width="90%" 
-            style="border-collapse: collapse; border-radius: 10px; overflow: hidden; border: 1px solid #e0e0e0; font-family: Quicksand, sans-serif; font-size: 14px; margin:auto">
-              <thead>
-                <tr style="background-color: #f5f5f5; border: 1px solid #000000;">
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">No</th>
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Nama</th>
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Instansi</th>
-                  <th style="padding: 10px 15px; text-align: left; font-size: 13px; font-family: Quicksand, sans-serif; line-height: 19px; color: #0f1419;">Link SPSE</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tenders.length > 0 ? tenderListHtml : `
-                  <tr style="background-color: #ffffff;">
-                    <td colspan="6" style="padding: 20px; text-align: center; color: #666; font-family: Quicksand, sans-serif;">Tidak ada tender baru yang ditemukan hari ini.</td>
-                  </tr>
-                `}
-              </tbody>
-            </table>
-
-            <table border="0" cellpadding="0" cellspacing="0" width="80%" style="margin:auto;">
-              <tr>
-                <td style="padding: 25px 0 10px;">
-                <div style="background-color: #e5f4fb; border-radius: 10px; padding: 20px; text-align: left;">
-                  <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0 0 10px; font-weight: bold;">TIPS:</p>
-                  <ul style="padding: 0; margin: 0;">
-                    <li style="font-size: 16px; font-family: Quicksand, sans-serif; line-height: 150%;">Cek detail tender sesegera mungkin sebelum batas waktu berakhir.</li>
-                    <li style="font-size: 16px; font-family: Quicksand, sans-serif; line-height: 150%;">Simpan tender yang relevan untuk persiapan dokumen penawaran.</li>
-                  </ul>
-                </div>
-              </td>
-              </tr>
-              <tr>
-                <td style="padding: 10px 0 20px;">
-                  <div style="background-color: #fff3f3; border-radius: 10px; padding: 20px; text-align: left;">
-                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0 0 10px; font-weight: bold;">Catatan Penting:</p>
-                    <p style="font-size: 16px; font-family: Quicksand, sans-serif; margin: 0; line-height: 150%;">Trial Anda akan berakhir pada <strong>${trialEndDate}</strong>. Untuk terus mendapatkan update tender harian, upgrade paket Anda sebelum masa trial berakhir.</p>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding-bottom: 25px;">
-                  <a href="${BASE_URL}/#paket" style="display:inline-block;padding:12px 25px;background-color:#0093dd;color:#ffffff;text-decoration:none;border-radius:12px;font-size: 16px; font-weight: bold;">
-                    UPGRADE SEKARANG
-                  </a>
-                </td>
-              </tr>
-            </table>
-
-             <!-- TIPS -->
-          <table border="0" cellpadding="0" cellspacing="0" width="100%">
-          
-            <!-- Footer -->
-<tr>
-  <td align="center" style="background-color: #000000; padding: 50px 20px 20px; position: relative;">
-    <!-- Logo -->
-    <img src="${BASE_URL}/images/logo-footer.png" 
-         alt="Pejuang Tender Logo" 
-         width="60" 
-         height="60" 
-         style="position: absolute;bottom: 180px;">
-    
-    <!-- Two Columns -->
-    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-      <tr>
-        <!-- Left Column -->
-        <td valign="top" style="color: #ffffff; font-family: Quicksand, sans-serif; font-size: 14px; line-height: 1.6; text-align: left; padding-right: 10px;">
-          <p style="margin: 0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
-          <p style="margin: 0;">Salam,</p>
-          <p style="margin: 0;">Tim pejuangtender.id</p>
-          <p style="margin: 0; font-weight: 700;">“Tender Tepat, Lebih Cepat”</p>
-        </td>
-
-        <!-- Right Column -->
-        <td valign="top" style="color: #ffffff; font-family: Quicksand, sans-serif; font-size: 14px; line-height: 1.6; text-align: right; padding-left: 10px;">
-          <p style="margin: 0; font-weight: 700;">BUTUH BANTUAN?</p>
-          <p style="margin: 0;">Email: <a href="mailto:info@pejuangtender.id" style="color: #ffffff; text-decoration: none;">info@pejuangtender.id</a></p>
-          <p style="margin: 0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color: #ffffff; text-decoration: none;">+62 822 8478 3555</a></p>
         </td>
       </tr>
     </table>
-  </td>
-</tr>
-
-          </table>
-
-        </td>
-      </tr>
-    </table>
-  </div>
-
-</body>
-</html>
-  `;
+  </body>
+  </html>`;
 };
