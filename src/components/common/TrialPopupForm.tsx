@@ -6,6 +6,10 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./TrialPopupForm.css";
 
+// ✅ [BARU] Import definisi tipe dari file global.d.ts Anda
+// Secara teknis, ini tidak perlu karena 'declare global' membuatnya tersedia,
+// tetapi ini adalah cara yang baik untuk menunjukkan dependensi.
+
 interface PopupFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,6 +23,61 @@ interface LpseLocation {
   id: number;
   value: string;
   name: string;
+}
+
+// ✅ [BARU] Hardcode informasi item trial yang sesuai dengan DataLayerItem
+const freeTrialItem: DataLayerItem = {
+  item_id: 'free_trial_7d',
+  item_name: 'Free Trial - 7 Hari',
+  price: 0,
+  item_category: 'Trial Package',
+  item_variant: '7 Hari',
+};
+
+// ✅ [BARU] Fungsi untuk mengirim event 'add_to_cart'
+function trackAddToCartTrial() {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    window.dataLayer.push({ ecommerce: null }); // Reset ecommerce object
+    const eventData: DataLayerEvent = { // ✅ Gunakan tipe yang benar dari definisi global
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "IDR",
+        value: 0,
+        items: [freeTrialItem]
+      }
+    };
+    window.dataLayer.push(eventData);
+  }
+}
+
+// ✅ [BARU] Fungsi untuk mengirim event 'view_cart'
+function trackViewCartTrial() {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    const eventData: DataLayerEvent = { // ✅ Gunakan tipe yang benar dari definisi global
+      event: "view_cart",
+      ecommerce: {
+        currency: "IDR",
+        value: 0,
+        items: [freeTrialItem]
+      }
+    };
+    window.dataLayer.push(eventData);
+  }
+}
+
+// ✅ [BARU] Fungsi untuk mengirim event 'begin_checkout'
+function trackBeginCheckoutTrial() {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    const eventData: DataLayerEvent = { // ✅ Gunakan tipe yang benar dari definisi global
+      event: "begin_checkout",
+      ecommerce: {
+        currency: "IDR",
+        value: 0,
+        items: [freeTrialItem]
+      }
+    };
+    window.dataLayer.push(eventData);
+  }
 }
 
 const spseLimit = 10;
@@ -64,6 +123,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) return;
+
+    trackAddToCartTrial();
+    trackViewCartTrial();
 
     const fetchLpseOptions = async () => {
       const { data, error } = await supabase
@@ -168,6 +230,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       return;
     }
 
+    trackBeginCheckoutTrial();
+
     // Lanjutkan dengan logika submit ke Supabase
     try {
       const { data: trialPackage, error: packageError } = await supabase
@@ -207,6 +271,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
               // onClose(); // Close the form
               return; // Stop the function from proceeding
             }
+            user_id = existingUserId; // Use existing user_id if they don't have a trial yet
           } else {
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
