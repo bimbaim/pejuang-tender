@@ -19,9 +19,11 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.verc
  * @returns The complete HTML string for the email.
  */
 export const dailyTenderTrialEmailTemplate = (
+  name: string,
   tenders: Tender[],
   trialEndDate: string
 ): string => {
+  // Format tanggal hari ini (misalnya: 25 September 2025)
   const today = new Date().toLocaleDateString("id-ID", {
     day: "numeric",
     month: "long",
@@ -63,12 +65,12 @@ export const dailyTenderTrialEmailTemplate = (
         table.user-table th, table.user-table td { font-size:12px !important; padding:6px !important; }
       }
         @media only screen and (max-width:600px) {
-        .btn {
-          display:block !important;
-          width:100% !important;
-          box-sizing:border-box !important;
+          .btn {
+            display:block !important;
+            width:100% !important;
+            box-sizing:border-box !important;
+          }
         }
-      }
 
     </style>
   </head>
@@ -97,8 +99,22 @@ export const dailyTenderTrialEmailTemplate = (
             
             <!-- TITLE DATE -->
             <tr>
-              <td align="center" style="padding:0 20px 20px;">
+              <td align="center" style="padding:0 20px 10px;">
                 <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender Hari Ini ${today}</p>
+              </td>
+            </tr>
+
+            <!-- TITLE -->
+            <tr>
+              <td align="center" style="padding:10px 20px;">
+                <p style="margin:0;font-size:16px;font-weight:700;">DAFTAR TENDER TERBARU</p>
+              </td>
+            </tr>
+
+            <!-- DESCRIPTION -->
+            <tr>
+              <td align="center" style="padding:0 20px 20px;">
+                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
               </td>
             </tr>
 
@@ -151,7 +167,12 @@ export const dailyTenderTrialEmailTemplate = (
             <!-- CTA -->
             <tr>
               <td align="center" style="padding:10px 20px 30px;">
-               <a href="${BASE_URL}/#paket" class="btn" style="display:inline-block;padding:12px 25px;background:#0093dd;color:#fff; text-decoration:none;border-radius:8px;font-weight:bold;width:auto;max-width:100%;text-align:center;">UPGRADE SEKARANG</a>
+                    <a href="${BASE_URL}/#paket" class="btn" 
+                      style="display:inline-block;padding:12px 25px;background:#0093dd;color:#fff;
+                              text-decoration:none;border-radius:8px;font-weight:bold;
+                              width:auto;max-width:100%;text-align:center;">
+                      UPGRADE SEKARANG
+                    </a>
               </td>
             </tr>
 
@@ -180,4 +201,3 @@ export const dailyTenderTrialEmailTemplate = (
   </body>
   </html>`;
 };
-
