@@ -20,7 +20,7 @@ interface SubscriptionWithDetails {
   keyword: string[] | null;
   category: string[] | null;
   spse: string[] | null;
-  payment_status: 'paid' | 'free-trial' | 'cancelled'; 
+  payment_status: 'paid'; // ✅ PENAMBAHAN: Pastikan status pembayaran adalah 'paid'
   users: {
     name: string;
     email: string;
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, users(name, email), payment_status`) 
-      .eq("subscriptions.payment_status", "paid")
+      .eq("payment_status", "paid")
 
     if (subsError) {
       console.error("Error fetching paid subscriptions:", subsError.message);
