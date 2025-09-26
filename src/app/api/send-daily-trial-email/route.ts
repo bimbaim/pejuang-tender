@@ -1,28 +1,35 @@
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js"; 
 
-// ... (Inisialisasi Klien Supabase) ...
+// --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // Menggunakan Service Role Key
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: false,
   },
 });
 
+console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
 // --- Antarmuka (Interfaces) ---
-// ... (Interface SubscriptionWithDetails tidak berubah) ...
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
   category: string[] | null;
   spse: string[] | null;
-  start_date: string;
-  end_date: string;
   users: {
     name: string;
     email: string;
   };
+}
+
+interface SupabaseError {
+  code: string;
+  details: string;
+  hint: string;
+  message: string;
 }
 
 interface Tender {
@@ -33,68 +40,49 @@ interface Tender {
     source_url: string;
 }
 
-// ✅ PENAMBAHAN: Interface untuk Supabase PostgREST Error
-interface SupabaseError {
-  code: string;
-  details: string;
-  hint: string;
-  message: string;
-}
-
-// Tipe gabungan untuk hasil query Supabase
 type SupabaseQueryResult = {
     data: Tender[] | null;
     error: SupabaseError | null;
 }
 
-// --- POST Handler untuk Mengirim Email Harian ---
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
-    const todayISOString = today.toISOString().split("T")[0];
     const sentEmails: string[] = [];
-    
-    // ... (Kode fetching subscriptions dan loop for tidak berubah) ...
+
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
-      .select(
-        `user_id, keyword, category, spse, start_date, end_date, users(name, email)`
-      )
-      .eq("payment_status", "free-trial")
-      .gte("end_date", todayISOString);
+      .select(`user_id, keyword, category, spse, users(name, email)`)
+      // ✅ FILTER PAID
+      .eq("payment_status", "paid");
 
     if (subsError) {
-      console.error("Error fetching trial subscriptions:", subsError.message);
+      console.error("Error fetching paid subscriptions:", subsError.message);
       return NextResponse.json(
-        { error: "Failed to fetch subscriptions" },
+        { error: "Failed to fetch subscriptions", details: subsError.message },
         { status: 500 }
       );
     }
+
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({
-        message: "No active trial subscriptions found.",
+        message: "No active paid subscriptions found.",
       });
     }
 
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
-      const { user_id, keyword, category, spse, users, end_date } =
-        subscription;
+      const { user_id, keyword, category, spse, users } = subscription;
 
-      // ... (Kode formatting data tidak berubah) ...
-      const formattedTrialEndDate = new Date(end_date).toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-      const formattedCategory = (category?.join(", ") || "Semua").toUpperCase();
-      const formattedSpse = (spse?.join(", ") || "Semua").toUpperCase();
-      const formattedKeyword = (keyword?.join(", ") || "Semua").toUpperCase();
-
+      if (!users || !users.email) {
+        console.warn(`Skipping user ID ${user_id} due to missing email.`);
+        continue;
+      }
+      
       // --- Filter Conditions Helper ---
-      const categoryConditions: string[] = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
-      const spseConditions: string[] = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
-      const keywordConditions: string[] = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
-      const statusConditions: string[] = [
+      const categoryConditions = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
+      const spseConditions = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
+      const keywordConditions = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
+      const statusConditions = [
         "status.eq.Pengumuman Pascakualifikasi",
         "status.eq.Download Dokumen Pemilihan",
         "status.like.Pengumuman Pascakualifikasi%",
@@ -103,29 +91,43 @@ export async function POST(req: NextRequest) {
         "status.like.Download Dokumen Kualifikasi%",
       ];
       
-      // --- Query 1: Main Tenders ---
-      let mainTenderQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
-      const combinedConditions: string[] = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
-      mainTenderQuery = mainTenderQuery.or(combinedConditions.join(",")).order("created_at", { ascending: false }).limit(5);
+      // --- Query 1: Main Tenders (Sequential Flow) ---
+      let mainTenderQuery = supabase
+        .from("lpse_tenders")
+        .select(`id, title, agency, budget, source_url`);
+      const combinedConditions = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
+      if (combinedConditions.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(combinedConditions.join(","));
+      }
+      mainTenderQuery = mainTenderQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      // ✅ SEQUENTIAL AWAIT (Metode Trial)
       const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
+
+      // --- Query 2: Similar Tenders Other SPSE (Sequential Flow) ---
+      let similarTendersOtherSPSEQuery = supabase
+        .from("lpse_tenders")
+        .select(`id, title, agency, budget, source_url`);
+      const otherSPSEConditions = [...categoryConditions, ...keywordConditions, ...statusConditions];
+      if (otherSPSEConditions.length > 0) {
+        similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(","));
+      }
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.order("created_at", { ascending: false }).limit(5);
       
-      // --- Query 2: Similar Tenders Other SPSE ---
-      let similarTendersOtherSPSEQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
-      const otherSPSEConditions: string[] = [...categoryConditions, ...keywordConditions, ...statusConditions];
-      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(",")).order("created_at", { ascending: false }).limit(5);
-      
-      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      // ✅ SEQUENTIAL AWAIT (Metode Trial)
       const { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError } = await similarTendersOtherSPSEQuery as SupabaseQueryResult;
 
-
-      // --- Query 3: Similar Tenders Same SPSE ---
-      let similarTendersSameSPSEQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
-      const sameSPSEConditions: string[] = [...categoryConditions, ...spseConditions, ...statusConditions];
-      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(",")).order("created_at", { ascending: false }).limit(5);
-
-      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      // --- Query 3: Similar Tenders Same SPSE (Sequential Flow) ---
+      let similarTendersSameSPSEQuery = supabase
+        .from("lpse_tenders")
+        .select(`id, title, agency, budget, source_url`);
+      const sameSPSEConditions = [...spseConditions, ...statusConditions];
+      if (sameSPSEConditions.length > 0) {
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(","));
+      }
+      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.order("created_at", { ascending: false }).limit(5);
+      
+      // ✅ SEQUENTIAL AWAIT (Metode Trial)
       const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
 
 
@@ -138,9 +140,12 @@ export async function POST(req: NextRequest) {
         );
         continue;
       }
-
-      // ... (Kode pengiriman email dan response tidak berubah) ...
+      
+      // --- Formatting Data dan Pengiriman Email ---
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+      const formattedCategory = (category?.join(", ") || "Semua").toUpperCase();
+      const formattedSpse = (spse?.join(", ") || "Semua").toUpperCase();
+      const formattedKeyword = (keyword?.join(", ") || "Semua").toUpperCase();
 
       const response = await fetch(`${baseUrl}/api/sendgrid`, {
         method: "POST",
@@ -152,16 +157,15 @@ export async function POST(req: NextRequest) {
             month: "long",
             year: "numeric",
           })} pejuangtender.id`,
-          templateName: "dailyTenderTrial",
+          templateName: "dailyTenderPaid",
           data: {
             name: users.name,
             category: formattedCategory,
             spse: formattedSpse,
             keyword: formattedKeyword,
-            mainTenders: mainTenders || [], 
+            mainTenders: mainTenders || [],
             similarTendersOtherSPSE: similarTendersOtherSPSE || [],
             similarTendersSameSPSE: similarTendersSameSPSE || [],
-            trialEndDate: formattedTrialEndDate,
           },
         }),
       });

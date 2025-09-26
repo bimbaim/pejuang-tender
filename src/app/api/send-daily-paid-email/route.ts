@@ -1,11 +1,9 @@
-// File: src/app/api/cron/dailyTenderPaid/route.ts
 import { NextResponse, NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-// const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
     persistSession: false,
@@ -13,9 +11,10 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // --- Antarmuka (Interfaces) ---
+// ✅ Diperbarui: Interface ini sekarang hanya berisi data yang dibutuhkan untuk template berbayar.
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
@@ -27,21 +26,33 @@ interface SubscriptionWithDetails {
   };
 }
 
-// ✅ Diperbarui: 'end_date' dihapus dari interface.
-// interface Tender {
-//     id: string;
-//     title: string;
-//     agency: string;
-//     budget: number;
-//     source_url: string;
-// }
+// ✅ PENAMBAHAN: Interface untuk PostgREST Error dan Query Result
+interface SupabaseError {
+  code: string;
+  details: string;
+  hint: string;
+  message: string;
+}
+
+// ✅ PENAMBAHAN: Interface Tender dengan tipe number
+interface Tender {
+    id: string;
+    title: string;
+    agency: string;
+    budget: number;
+    source_url: string;
+}
+
+// Tipe gabungan untuk hasil query Supabase
+type SupabaseQueryResult = {
+    data: Tender[] | null;
+    error: SupabaseError | null;
+}
 
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
     const sentEmails: string[] = [];
-    // ✅ Add a new array to collect all spse URLs
-    const allSpseUrls: string[] = [];
 
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
@@ -50,17 +61,10 @@ export async function POST(req: NextRequest) {
 
     if (subsError) {
       console.error("Error fetching paid subscriptions:", subsError.message);
-      // Log the full error object on your server
-      console.error("Supabase Error Details:", subsError); 
-      
-      // Return the detailed error to the client
       return NextResponse.json(
         {
           error: "Failed to fetch subscriptions",
-          details: subsError.message, // This sends the specific error message to Postman
-          // You can also add more fields from the Supabase error object if they exist
-          // code: subsError.code, 
-          // hint: subsError.hint
+          details: subsError.message,
         },
         { status: 500 }
       );
@@ -79,75 +83,75 @@ export async function POST(req: NextRequest) {
         console.warn(`Skipping user ID ${user_id} due to missing email.`);
         continue;
       }
-
-      let tenderQuery = supabase
+      
+      // --- Filter Conditions Helper ---
+      // ✅ Perbaikan: Menggabungkan semua kondisi filter
+      const categoryConditions = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
+      const spseConditions = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
+      const keywordConditions = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
+      const statusConditions = [
+        "status.eq.Pengumuman Pascakualifikasi",
+        "status.eq.Download Dokumen Pemilihan",
+        "status.like.Pengumuman Pascakualifikasi%",
+        "status.like.Pengumuman Prakualifikasi%",
+        "status.like.Download Dokumen Pemilihan%",
+        "status.like.Download Dokumen Kualifikasi%",
+      ];
+      
+      // ✅ Query 1: Main Tenders (semua kriteria)
+      let mainTenderQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`)
-        // The following line filters results to only include those created in the last 24 hours.
-        // .gte(
-        //   "created_at",
-        //   new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        // )
-        .limit(10); // ✅ Limit changed to 10
-
-      // ✅ Category filter
-      if (category && category.length > 0) {
-        tenderQuery = tenderQuery.or(
-          category.map((cat) => `category.ilike.%${cat.trim()}%`).join(",")
-        );
+        .select(`id, title, agency, budget, source_url`);
+      const combinedConditions = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
+      if (combinedConditions.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(combinedConditions.join(","));
       }
+      mainTenderQuery = mainTenderQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ SPSE filter
-      if (spse && spse.length > 0) {
-        tenderQuery = tenderQuery.or(
-          spse.map((site) => `source_url.ilike.%${site.trim()}%`).join(",")
-        );
+      // ✅ Query 2: Similar Tenders Other SPSE (tanpa filter SPSE)
+      let similarTendersOtherSPSEQuery = supabase
+        .from("lpse_tenders")
+        .select(`id, title, agency, budget, source_url`);
+      const otherSPSEConditions = [...categoryConditions, ...keywordConditions, ...statusConditions];
+      if (otherSPSEConditions.length > 0) {
+        similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(","));
       }
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Keyword filter
-      if (keyword && keyword.length > 0) {
-        tenderQuery = tenderQuery.or(
-          keyword.map((key) => `title.ilike.%${key.trim()}%`).join(",")
-        );
+      // ✅ Query 3: Similar Tenders Same SPSE (tanpa filter Keyword & Kategori)
+      let similarTendersSameSPSEQuery = supabase
+        .from("lpse_tenders")
+        .select(`id, title, agency, budget, source_url`);
+      const sameSPSEConditions = [...spseConditions, ...statusConditions];
+      if (sameSPSEConditions.length > 0) {
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(","));
       }
+      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.order("created_at", { ascending: false }).limit(5);
+      
+      const [
+        { data: mainTenders, error: mainTendersError },
+        { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError },
+        { data: similarTendersSameSPSE, error: similarTendersSameSPSEError },
+      ] = await Promise.all([
+        mainTenderQuery.then(result => result as SupabaseQueryResult),
+        similarTendersOtherSPSEQuery.then(result => result as SupabaseQueryResult),
+        similarTendersSameSPSEQuery.then(result => result as SupabaseQueryResult),
+      ]);
 
-      // ✅ Status filter (selalu ada)
-      tenderQuery = tenderQuery.or(
-        [
-          "status.eq.Pengumuman Pascakualifikasi",
-          "status.eq.Download Dokumen Pemilihan",
-          "status.like.Pengumuman Pascakualifikasi%",
-          "status.like.Pengumuman Prakualifikasi%",
-          "status.like.Download Dokumen Pemilihan%",
-          "status.like.Download Dokumen Kualifikasi%",
-        ].join(",")
-      );
-
-      // ✅ Ordering + Limit
-      tenderQuery = tenderQuery
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      const { data: tenders, error: tendersError } = await tenderQuery;
-
-      if (tendersError) {
+      if (mainTendersError || similarTendersOtherSPSEError || similarTendersSameSPSEError) {
         console.error(
-          "Error fetching tenders for user",
+          "Error fetching one or more tender types for user",
           user_id,
           ":",
-          tendersError.message
+          mainTendersError?.message || similarTendersOtherSPSEError?.message || similarTendersSameSPSEError?.message
         );
         continue;
       }
-
-      // ✅ Collect all source_url values into the new array
-      if (tenders && tenders.length > 0) {
-        tenders.forEach((tender) => {
-          allSpseUrls.push(tender.source_url);
-        });
-      }
-
+      
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+      const formattedCategory = (category?.join(", ") || "Semua").toUpperCase();
+      const formattedSpse = (spse?.join(", ") || "Semua").toUpperCase();
+      const formattedKeyword = (keyword?.join(", ") || "Semua").toUpperCase();
 
       const response = await fetch(`${baseUrl}/api/sendgrid`, {
         method: "POST",
@@ -162,7 +166,12 @@ export async function POST(req: NextRequest) {
           templateName: "dailyTenderPaid",
           data: {
             name: users.name,
-            tenders: tenders,
+            category: formattedCategory,
+            spse: formattedSpse,
+            keyword: formattedKeyword,
+            mainTenders: mainTenders || [],
+            similarTendersOtherSPSE: similarTendersOtherSPSE || [],
+            similarTendersSameSPSE: similarTendersSameSPSE || [],
           },
         }),
       });
@@ -177,11 +186,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ✅ Update the return statement to include the new array
     return NextResponse.json({
       message: "Daily emails sent successfully.",
       emails_sent_to: sentEmails,
-      spse_urls: allSpseUrls,
     });
   } catch (error: unknown) {
     const err = error as Error;

@@ -1,6 +1,6 @@
 // src/lib/emailTemplates/dailyTenderPaid.ts
 
-// ✅ Diperbarui: Interface ini sekarang hanya berisi data yang dibutuhkan untuk template berbayar.
+// ✅ Diperbarui: Interface Tender tetap sama
 interface Tender {
   title: string;
   agency: string;
@@ -10,24 +10,12 @@ interface Tender {
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
 
-/**
- * Generates the daily email template with a list of tenders for paid users.
- * Menggunakan desain dari template trial namun dengan konten berbayar.
- * @param name The user's name.
- * @param tenders An array of tender objects to display.
- * @returns The complete HTML string for the email.
- */
-export const dailyTenderPaidEmailTemplate = (
-  name: string,
-  tenders: Tender[]
-): string => {
-  // Format tanggal hari ini (misalnya: 25 September 2025)
-  const today = new Date().toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
+/**
+ * Helper function to generate HTML for a single tender table for PAID users.
+ * Menambahkan kolom HPS.
+ */
+const generateTenderTableHtml = (tenders: Tender[], subHeading: string = ""): string => {
   const tenderListHtml = tenders
     .map(
       (tender, index) => `
@@ -45,14 +33,84 @@ export const dailyTenderPaidEmailTemplate = (
         tender.budget
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
-        <a href="${
-          tender.source_url
-        }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
+        <a href="${tender.source_url}" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
-    </tr>
-  `
+    </tr>`
     )
     .join("");
+
+  return `
+    ${subHeading ? `
+      <tr>
+        <td style="padding:20px 20px 10px;">
+          <p style="margin:0;font-size:14px;font-weight:700;color:#0093dd;">${subHeading}</p>
+        </td>
+      </tr>` : ''
+    }
+
+    <tr>
+      <td style="padding:0 20px 20px;">
+        <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
+          <thead>
+            <tr style="background:#f5f5f5;">
+              <th style="padding:10px;font-size:13px;text-align:left;">No</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">HPS</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              tenders.length > 0
+                ? tenderListHtml
+                : `<tr><td colspan="5" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+            }
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+
+/**
+ * Generates the daily email template with a list of tenders for paid users.
+ * @param name The user's name.
+ * @param category The selected category (formatted string).
+ * @param spse The selected SPSE sites (formatted string).
+ * @param keyword The selected keywords (formatted string).
+ * @param mainTenders Tenders matching all criteria.
+ * @param similarTendersOtherSPSE Tenders matching category/keyword but in other SPSE.
+ * @param similarTendersSameSPSE Tenders matching category/keyword in the selected SPSE.
+ * @returns The complete HTML string for the email.
+ */
+export const dailyTenderPaidEmailTemplate = (
+  name: string,
+  // ✅ PENAMBAHAN PARAMETER BARU UNTUK PAID USER
+  category: string,
+  spse: string,
+  keyword: string,
+  mainTenders: Tender[],
+  similarTendersOtherSPSE: Tender[],
+  similarTendersSameSPSE: Tender[]
+): string => {
+  // Format tanggal hari ini (misalnya: 25 September 2025)
+  const today = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // ✅ GENERASI 3 TABEL
+  const mainTenderTable = generateTenderTableHtml(mainTenders);
+  const otherSpseTable = generateTenderTableHtml(similarTendersOtherSPSE, "Tender Serupa di SPSE Lain");
+  const sameSpseTable = generateTenderTableHtml(similarTendersSameSPSE, "Tender Lain di SPSE Pilihan Anda");
+
+
+  // Hapus kode map awal (tenderListHtml) dari fungsi ini
+  // karena sudah dipindahkan ke generateTenderTableHtml dan akan diganti
+  // dengan variabel mainTenderTable, dll.
 
   return `
   <!DOCTYPE html>
@@ -119,32 +177,24 @@ export const dailyTenderPaidEmailTemplate = (
 
             <tr>
               <td align="center" style="padding:0 20px 20px;">
-                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
+                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori: <strong>${category}</strong>, SPSE: <strong>${spse}</strong> & keyword: <strong>${keyword}</strong> yang Anda pilih:</p>
               </td>
             </tr>
 
+            ${mainTenderTable}
+
             <tr>
-              <td style="padding:0 20px 20px;">
-                <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
-                  <thead>
-                    <tr style="background:#f5f5f5;">
-                      <th style="padding:10px;font-size:13px;text-align:left;">No</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">HPS</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${
-                      tenders.length > 0
-                        ? tenderListHtml
-                        : `<tr><td colspan="5" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
-                    }
-                  </tbody>
-                </table>
-              </td>
+                <td style="padding:0 20px 20px;">
+                    <p style="margin:0;font-size:14px;color:#555;">
+                        “Silakan hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>&nbsp;untuk mengubah keyword atau target SPSE Anda. Namun berikut beberapa tender serupa yang mungkin relevan untuk Anda.“
+                    </p>
+                </td>
             </tr>
+            
+            ${otherSpseTable}
+            
+            ${sameSpseTable}
+
 
             <tr>
               <td style="padding:0 20px 20px;">

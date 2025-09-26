@@ -1,14 +1,14 @@
 // app/api/sendgrid/route.ts
 
-import { NextResponse } from 'next/server';
-import sgMail from '@sendgrid/mail';
-import { trialWelcomeTemplate } from '@/lib/emailTemplates/trialWelcome';
-import { subscriptionWelcomeTemplate } from '@/lib/emailTemplates/subscriptionWelcome';
+import { NextResponse } from "next/server";
+import sgMail from "@sendgrid/mail";
+import { trialWelcomeTemplate } from "@/lib/emailTemplates/trialWelcome";
+import { subscriptionWelcomeTemplate } from "@/lib/emailTemplates/subscriptionWelcome";
 import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
 // import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
-import { reminderTrialEmailTemplate } from '@/lib/emailTemplates/reminderTrial';
-import { reminderPaidEmailTemplate } from '@/lib/emailTemplates/reminderPaid';
-import { dailyTenderPaidEmailTemplate } from '@/lib/emailTemplates/dailyTenderPaid';
+import { reminderTrialEmailTemplate } from "@/lib/emailTemplates/reminderTrial";
+import { reminderPaidEmailTemplate } from "@/lib/emailTemplates/reminderPaid";
+import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 
 interface SendGridError extends Error {
   response?: {
@@ -27,91 +27,152 @@ export async function POST(req: Request) {
     const { to, subject, templateName, data } = await req.json();
 
     if (!to || !subject || !templateName || !data) {
-      return NextResponse.json({ message: 'Missing required fields' }, { status: 400 });
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 }
+      );
     }
 
-    let emailBody = '';
-    
+    let emailBody = "";
+
     switch (templateName) {
-      case 'trialWelcome':
-        if (!data || typeof data.name !== 'string' || typeof data.trialEndDate !== 'string') {
-          return NextResponse.json({ message: 'Missing or invalid data for trialWelcome template' }, { status: 400 });
+      case "trialWelcome":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.trialEndDate !== "string"
+        ) {
+          return NextResponse.json(
+            { message: "Missing or invalid data for trialWelcome template" },
+            { status: 400 }
+          );
         }
         emailBody = trialWelcomeTemplate(data.name, data.trialEndDate);
         break;
 
-      case 'subscriptionWelcome':
-        if (!data || typeof data.name !== 'string' || typeof data.packageName !== 'string') {
-          return NextResponse.json({ message: 'Missing or invalid data for subscriptionWelcome template' }, { status: 400 });
+      case "subscriptionWelcome":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.packageName !== "string"
+        ) {
+          return NextResponse.json(
+            {
+              message:
+                "Missing or invalid data for subscriptionWelcome template",
+            },
+            { status: 400 }
+          );
         }
         emailBody = subscriptionWelcomeTemplate(data.name, data.packageName);
         break;
 
-      case 'dailyTenderTrial':
+      case "dailyTenderTrial":
         // ✅ Periksa semua data yang diperlukan
         if (
-            !data || 
-            typeof data.name !== 'string' || 
-            typeof data.category !== 'string' ||
-            typeof data.spse !== 'string' ||
-            typeof data.keyword !== 'string' ||
-            !Array.isArray(data.mainTenders) ||
-            !Array.isArray(data.similarTendersOtherSPSE) ||
-            !Array.isArray(data.similarTendersSameSPSE) ||
-            typeof data.trialEndDate !== 'string'
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.category !== "string" ||
+          typeof data.spse !== "string" ||
+          typeof data.keyword !== "string" ||
+          !Array.isArray(data.mainTenders) ||
+          !Array.isArray(data.similarTendersOtherSPSE) ||
+          !Array.isArray(data.similarTendersSameSPSE) ||
+          typeof data.trialEndDate !== "string"
         ) {
-          return NextResponse.json({ 
-              message: 'Missing or invalid data for dailyTenderTrial template. Required: name, category, spse, keyword, mainTenders, similarTendersOtherSPSE, similarTendersSameSPSE, trialEndDate' 
-          }, { status: 400 });
+          return NextResponse.json(
+            {
+              message:
+                "Missing or invalid data for dailyTenderTrial template. Required: name, category, spse, keyword, mainTenders, similarTendersOtherSPSE, similarTendersSameSPSE, trialEndDate",
+            },
+            { status: 400 }
+          );
         }
-        
+
         // ✅ Panggil template dengan semua argumen baru
         emailBody = dailyTenderTrialEmailTemplate(
-            data.name, 
-            data.category, 
-            data.spse, 
-            data.keyword, 
-            data.mainTenders, 
-            data.similarTendersOtherSPSE,
-            data.similarTendersSameSPSE,
-            data.trialEndDate
+          data.name,
+          data.category,
+          data.spse,
+          data.keyword,
+          data.mainTenders,
+          data.similarTendersOtherSPSE,
+          data.similarTendersSameSPSE,
+          data.trialEndDate
         );
         break;
 
-      // case 'dailyTenderPaid':
-      //   // Add a check for the expected data for this template
-      //   if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
-      //     return NextResponse.json({ message: 'Missing or invalid data for dailyTenderPaid template' }, { status: 400 });
-      //   }
-      
-        // emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
-        // break;
-
-        case 'dailyTenderPaid':
-        // Add a check for the expected data for this template
-        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders)) {
-          return NextResponse.json({ message: 'Missing or invalid data for dailyTenderPaid template' }, { status: 400 });
+      case "dailyTenderPaid":
+        // ✅ Periksa semua data yang diperlukan (name, 3 kriteria filter, 3 daftar tender)
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.category !== "string" ||
+          typeof data.spse !== "string" ||
+          typeof data.keyword !== "string" ||
+          !Array.isArray(data.mainTenders) ||
+          !Array.isArray(data.similarTendersOtherSPSE) ||
+          !Array.isArray(data.similarTendersSameSPSE)
+        ) {
+          return NextResponse.json(
+            {
+              message:
+                "Missing or invalid data for dailyTenderPaid template. Required: name, category, spse, keyword, mainTenders, similarTendersOtherSPSE, similarTendersSameSPSE",
+            },
+            { status: 400 }
+          );
         }
-        
-        emailBody = dailyTenderPaidEmailTemplate(data.name, data.tenders);
+
+        // ✅ Panggil template dengan semua argumen baru
+        emailBody = dailyTenderPaidEmailTemplate(
+          data.name,
+          data.category,
+          data.spse,
+          data.keyword,
+          data.mainTenders,
+          data.similarTendersOtherSPSE,
+          data.similarTendersSameSPSE
+        );
         break;
 
-      case 'reminderTrial':
-        if (!data || typeof data.name !== 'string' || typeof data.trialEndDate !== 'string') {
-          return NextResponse.json({ message: 'Missing or invalid data for reminderTrial template' }, { status: 400 });
+      case "reminderTrial":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.trialEndDate !== "string"
+        ) {
+          return NextResponse.json(
+            { message: "Missing or invalid data for reminderTrial template" },
+            { status: 400 }
+          );
         }
         emailBody = reminderTrialEmailTemplate(data.name, data.trialEndDate);
         break;
 
-      case 'reminderPaid':
-        if (!data || typeof data.name !== 'string' || typeof data.subscriptionEndDate !== 'string' || typeof data.packageName !== 'string') {
-          return NextResponse.json({ message: 'Missing or invalid data for reminderPaid template' }, { status: 400 });
+      case "reminderPaid":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.subscriptionEndDate !== "string" ||
+          typeof data.packageName !== "string"
+        ) {
+          return NextResponse.json(
+            { message: "Missing or invalid data for reminderPaid template" },
+            { status: 400 }
+          );
         }
-        emailBody = reminderPaidEmailTemplate(data.name, data.packageName, data.subscriptionEndDate);
+        emailBody = reminderPaidEmailTemplate(
+          data.name,
+          data.packageName,
+          data.subscriptionEndDate
+        );
         break;
-      
+
       default:
-        return NextResponse.json({ message: 'Invalid template name' }, { status: 400 });
+        return NextResponse.json(
+          { message: "Invalid template name" },
+          { status: 400 }
+        );
     }
 
     const msg = {
@@ -123,20 +184,30 @@ export async function POST(req: Request) {
 
     await sgMail.send(msg);
 
-    return NextResponse.json({ message: 'Email sent successfully!' });
-
+    return NextResponse.json({ message: "Email sent successfully!" });
   } catch (error: unknown) {
     if (error instanceof Error) {
       const sgError = error as SendGridError;
       let errorMessage = sgError.message;
       if (sgError.response?.body?.errors?.length) {
-        errorMessage = sgError.response.body.errors.map(err => err.message).join(', ');
+        errorMessage = sgError.response.body.errors
+          .map((err) => err.message)
+          .join(", ");
       }
       console.error("Failed to send email:", errorMessage);
-      return NextResponse.json({ message: 'Failed to send email', error: errorMessage }, { status: 500 });
+      return NextResponse.json(
+        { message: "Failed to send email", error: errorMessage },
+        { status: 500 }
+      );
     } else {
       console.error("An unexpected error occurred:", error);
-      return NextResponse.json({ message: 'Failed to send email', error: 'An unexpected error occurred.' }, { status: 500 });
+      return NextResponse.json(
+        {
+          message: "Failed to send email",
+          error: "An unexpected error occurred.",
+        },
+        { status: 500 }
+      );
     }
   }
 }
