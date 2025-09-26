@@ -57,7 +57,6 @@ export async function POST(req: NextRequest) {
 
   const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
-      // ✅ TAMBAHKAN payment_status di SELECT
       .select(`user_id, keyword, category, spse, users(name, email), payment_status`) 
       .eq("payment_status", "paid");
 
@@ -79,11 +78,11 @@ export async function POST(req: NextRequest) {
     }
 
     // ✅ TAMBAHKAN DEBUGGING DI SINI
-    console.log(`Total Paid Subscriptions fetched: ${subscriptions.length}`);
+    console.warn(`Total Paid Subscriptions fetched: ${subscriptions.length}`);
     subscriptions.forEach(sub => {
         // Lakukan assertion di client untuk memastikan filter Supabase berhasil
         if (sub.payment_status !== 'paid') { 
-            console.error(`!!!! Peringatan: Subscription ${sub.user_id} dengan status ${sub.payment_status} bocor ke dalam loop PAID!`);
+            console.warn(`!!!! Peringatan: Subscription ${sub.user_id} dengan status ${sub.payment_status} bocor ke dalam loop PAID!`);
         }
     });
     // ✅ AKHIR DEBUGGING
