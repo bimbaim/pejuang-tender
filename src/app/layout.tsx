@@ -34,7 +34,7 @@ export default function RootLayout({
       <GoogleTagManager gtmId="GTM-5VLSLXN3" />
 
       {/* Tambahkan Google Analytics */}
-      <GoogleAnalytics gaId="G-CRE8KHKB2J" />
+      {/* <GoogleAnalytics gaId="G-CRE8KHKB2J" /> */}
     </html>
   );
 }
