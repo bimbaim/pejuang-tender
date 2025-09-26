@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, users(name, email), payment_status`) 
-      .eq("payment_status", "paid");
+      .eq("subscriptions.payment_status", "paid")
 
     if (subsError) {
       console.error("Error fetching paid subscriptions:", subsError.message);
