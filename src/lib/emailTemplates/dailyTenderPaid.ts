@@ -8,14 +8,17 @@ interface Tender {
   source_url: string;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
-
+const BASE_URL =
+  process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
 
 /**
  * Helper function to generate HTML for a single tender table for PAID users.
  * Menambahkan kolom HPS.
  */
-const generateTenderTableHtml = (tenders: Tender[], subHeading: string = ""): string => {
+const generateTenderTableHtml = (
+  tenders: Tender[],
+  subHeading: string = ""
+): string => {
   const tenderListHtml = tenders
     .map(
       (tender, index) => `
@@ -33,19 +36,24 @@ const generateTenderTableHtml = (tenders: Tender[], subHeading: string = ""): st
         tender.budget
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
-        <a href="${tender.source_url}" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
+        <a href="${
+          tender.source_url
+        }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
     </tr>`
     )
     .join("");
 
   return `
-    ${subHeading ? `
+    ${
+      subHeading
+        ? `
       <tr>
         <td style="padding:20px 20px 10px;">
           <p style="margin:0;font-size:14px;font-weight:700;color:#0093dd;">${subHeading}</p>
         </td>
-      </tr>` : ''
+      </tr>`
+        : ""
     }
 
     <tr>
@@ -71,8 +79,7 @@ const generateTenderTableHtml = (tenders: Tender[], subHeading: string = ""): st
       </td>
     </tr>
   `;
-}
-
+};
 
 /**
  * Generates the daily email template with a list of tenders for paid users.
@@ -104,9 +111,14 @@ export const dailyTenderPaidEmailTemplate = (
 
   // ✅ GENERASI 3 TABEL
   const mainTenderTable = generateTenderTableHtml(mainTenders);
-  const otherSpseTable = generateTenderTableHtml(similarTendersOtherSPSE, "Tender Serupa di SPSE Lain");
-  const sameSpseTable = generateTenderTableHtml(similarTendersSameSPSE, "Tender Lain di SPSE Pilihan Anda");
-
+  const otherSpseTable = generateTenderTableHtml(
+    similarTendersOtherSPSE,
+    "Tender Serupa di SPSE Lain"
+  );
+  const sameSpseTable = generateTenderTableHtml(
+    similarTendersSameSPSE,
+    "Tender Lain di SPSE Pilihan Anda"
+  );
 
   // Hapus kode map awal (tenderListHtml) dari fungsi ini
   // karena sudah dipindahkan ke generateTenderTableHtml dan akan diganti
@@ -132,6 +144,13 @@ export const dailyTenderPaidEmailTemplate = (
             width:100% !important;
             box-sizing:border-box !important;
           }
+            .stack { 
+      display: block !important; 
+      width: 100% !important; 
+      /* Pastikan teks rata kiri saat bertumpuk */
+      text-align: left !important; 
+      padding-bottom: 0px !important; /* Kurangi padding bawah */
+  }
         }
     </style>
   </head>
@@ -211,19 +230,19 @@ export const dailyTenderPaidEmailTemplate = (
             </table>
 
           <table width="600" class="container" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000;border-radius:10px;margin-top:20px;color:#fff;">
-            <tr>
-              <td style="padding:20px;text-align:left;font-size:14px;">
-                <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
-                <p style="margin:0;">Salam,</p>
-                <p style="margin:0;">Tim pejuangtender.id</p>
-                <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
-              </td>
-              <td style="padding:20px;text-align:right;font-size:14px;">
-                <p style="margin:0;font-weight:bold;">BUTUH BANTUAN?</p>
-                <p style="margin:0;">Email: <a href="mailto:info@pejuangtender.id" style="color:#fff;text-decoration:none;">info@pejuangtender.id</a></p>
-                <p style="margin:0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color:#fff;text-decoration:none;">+62 822 8478 3555</a></p>
-              </td>
-            </tr>
+              <tr>
+                  <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
+                      <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
+                      <p style="margin:0;">Salam,</p>
+                      <p style="margin:0;">Tim pejuangtender.id</p>
+                      <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
+                  </td>
+                  <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">
+                      <p style="margin:0;font-weight:bold;">BUTUH BANTUAN?</p>
+                      <p style="margin:0;">Email: <a href="mailto:info@pejuangtender.id" style="color:#fff;text-decoration:none;">info@pejuangtender.id</a></p>
+                      <p style="margin:0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color:#fff;text-decoration:none;">+62 822 8478 3555</a></p>
+                  </td>
+              </tr>
           </table>
 
         </td>
