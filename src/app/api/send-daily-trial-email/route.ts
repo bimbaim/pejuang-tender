@@ -1,10 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-// import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
+import { createClient } from "@supabase/supabase-js"; 
 
-// --- Inisialisasi Klien Supabase ---
+// ... (Inisialisasi Klien Supabase) ...
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-// const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseKey, {
   auth: {
@@ -13,6 +11,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 });
 
 // --- Antarmuka (Interfaces) ---
+// ... (Interface SubscriptionWithDetails tidak berubah) ...
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
@@ -26,21 +25,36 @@ interface SubscriptionWithDetails {
   };
 }
 
-// interface Tender {
-//     id: string;
-//     title: string;
-//     agency: string;
-//     budget: number;
-//     source_url: string;
-// }
+interface Tender {
+    id: string;
+    title: string;
+    agency: string;
+    budget: number;
+    source_url: string;
+}
+
+// ✅ PENAMBAHAN: Interface untuk Supabase PostgREST Error
+interface SupabaseError {
+  code: string;
+  details: string;
+  hint: string;
+  message: string;
+}
+
+// Tipe gabungan untuk hasil query Supabase
+type SupabaseQueryResult = {
+    data: Tender[] | null;
+    error: SupabaseError | null;
+}
 
 // --- POST Handler untuk Mengirim Email Harian ---
 export async function POST(req: NextRequest) {
   try {
     const today = new Date();
     const todayISOString = today.toISOString().split("T")[0];
-    const sentEmails: string[] = []; // Array to store emails of recipients
-    const allSpseUrls: string[] = [];
+    const sentEmails: string[] = [];
+    
+    // ... (Kode fetching subscriptions dan loop for tidak berubah) ...
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(
@@ -56,7 +70,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({
         message: "No active trial subscriptions found.",
@@ -67,87 +80,66 @@ export async function POST(req: NextRequest) {
       const { user_id, keyword, category, spse, users, end_date } =
         subscription;
 
-      if (!users || !users.email) {
-        console.warn(`Skipping user ID ${user_id} due to missing email.`);
-        continue;
-      }
-
-      const trialEndDate = new Date(end_date);
-      const formattedTrialEndDate = trialEndDate.toLocaleDateString("id-ID", {
+      // ... (Kode formatting data tidak berubah) ...
+      const formattedTrialEndDate = new Date(end_date).toLocaleDateString("id-ID", {
         day: "numeric",
         month: "long",
         year: "numeric",
       });
+      const formattedCategory = (category?.join(", ") || "Semua").toUpperCase();
+      const formattedSpse = (spse?.join(", ") || "Semua").toUpperCase();
+      const formattedKeyword = (keyword?.join(", ") || "Semua").toUpperCase();
 
-      let tenderQuery = supabase
-        .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`)
-        // The following line filters results to only include those created in the last 24 hours.
-        // .gte(
-        //   "created_at",
-        //   new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        // )
-        .limit(10); // ✅ Limit changed to 10
+      // --- Filter Conditions Helper ---
+      const categoryConditions: string[] = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
+      const spseConditions: string[] = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
+      const keywordConditions: string[] = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
+      const statusConditions: string[] = [
+        "status.eq.Pengumuman Pascakualifikasi",
+        "status.eq.Download Dokumen Pemilihan",
+        "status.like.Pengumuman Pascakualifikasi%",
+        "status.like.Pengumuman Prakualifikasi%",
+        "status.like.Download Dokumen Pemilihan%",
+        "status.like.Download Dokumen Kualifikasi%",
+      ];
+      
+      // --- Query 1: Main Tenders ---
+      let mainTenderQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
+      const combinedConditions: string[] = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
+      mainTenderQuery = mainTenderQuery.or(combinedConditions.join(",")).order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Category filter
-      if (category && category.length > 0) {
-        tenderQuery = tenderQuery.or(
-          category.map((cat) => `category.ilike.%${cat.trim()}%`).join(",")
-        );
-      }
+      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
+      
+      // --- Query 2: Similar Tenders Other SPSE ---
+      let similarTendersOtherSPSEQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
+      const otherSPSEConditions: string[] = [...categoryConditions, ...keywordConditions, ...statusConditions];
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(",")).order("created_at", { ascending: false }).limit(5);
+      
+      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      const { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError } = await similarTendersOtherSPSEQuery as SupabaseQueryResult;
 
-      // ✅ SPSE filter
-      if (spse && spse.length > 0) {
-        tenderQuery = tenderQuery.or(
-          spse.map((site) => `source_url.ilike.%${site.trim()}%`).join(",")
-        );
-      }
 
-      // ✅ Keyword filter
-      if (keyword && keyword.length > 0) {
-        tenderQuery = tenderQuery.or(
-          keyword.map((key) => `title.ilike.%${key.trim()}%`).join(",")
-        );
-      }
+      // --- Query 3: Similar Tenders Same SPSE ---
+      let similarTendersSameSPSEQuery = supabase.from("lpse_tenders").select(`id, title, agency, budget, source_url`);
+      const sameSPSEConditions: string[] = [...categoryConditions, ...spseConditions, ...statusConditions];
+      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(",")).order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Status filter (selalu ada)
-      tenderQuery = tenderQuery.or(
-        [
-          "status.eq.Pengumuman Pascakualifikasi",
-          "status.eq.Download Dokumen Pemilihan",
-          "status.like.Pengumuman Pascakualifikasi%",
-          "status.like.Pengumuman Prakualifikasi%",
-          "status.like.Download Dokumen Pemilihan%",
-          "status.like.Download Dokumen Kualifikasi%",
-        ].join(",")
-      );
+      // ✅ Menggunakan tipe baru: SupabaseQueryResult
+      const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
 
-      // ✅ Ordering + Limit
-      tenderQuery = tenderQuery
-        .order("created_at", { ascending: false })
-        .limit(5);
 
-      const { data: tenders, error: tendersError } = await tenderQuery;
-
-      if (tendersError) {
+      if (mainTendersError || similarTendersOtherSPSEError || similarTendersSameSPSEError) {
         console.error(
-          "Error fetching tenders for user",
+          "Error fetching one or more tender types for user",
           user_id,
           ":",
-          tendersError.message
+          mainTendersError?.message || similarTendersOtherSPSEError?.message || similarTendersSameSPSEError?.message
         );
         continue;
       }
 
-      // const emailBody = dailyTenderTrialEmailTemplate(users.name, tenders as Tender[], formattedTrialEndDate);
-
-      // ✅ Collect all source_url values into the new array
-      if (tenders && tenders.length > 0) {
-        tenders.forEach((tender) => {
-          allSpseUrls.push(tender.source_url);
-        });
-      }
-
+      // ... (Kode pengiriman email dan response tidak berubah) ...
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
 
       const response = await fetch(`${baseUrl}/api/sendgrid`, {
@@ -160,11 +152,15 @@ export async function POST(req: NextRequest) {
             month: "long",
             year: "numeric",
           })} pejuangtender.id`,
-          // Pass the template name and data instead of the pre-built HTML
           templateName: "dailyTenderTrial",
           data: {
             name: users.name,
-            tenders: tenders,
+            category: formattedCategory,
+            spse: formattedSpse,
+            keyword: formattedKeyword,
+            mainTenders: mainTenders || [], 
+            similarTendersOtherSPSE: similarTendersOtherSPSE || [],
+            similarTendersSameSPSE: similarTendersSameSPSE || [],
             trialEndDate: formattedTrialEndDate,
           },
         }),
@@ -176,15 +172,13 @@ export async function POST(req: NextRequest) {
         );
       } else {
         console.log(`Email harian berhasil dikirim ke ${users.email}.`);
-        sentEmails.push(users.email); // Add email to the list
+        sentEmails.push(users.email);
       }
     }
 
-    // Return the final response with the list of sent emails
     return NextResponse.json({
       message: "Daily emails sent successfully.",
       emails_sent_to: sentEmails,
-      spse_urls: allSpseUrls,
     });
   } catch (error: unknown) {
     const err = error as Error;

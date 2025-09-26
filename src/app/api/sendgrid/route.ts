@@ -48,11 +48,34 @@ export async function POST(req: Request) {
         break;
 
       case 'dailyTenderTrial':
-        // Add a check for the expected data for this template
-        if (!data || typeof data.name !== 'string' || !Array.isArray(data.tenders) || typeof data.trialEndDate !== 'string') {
-          return NextResponse.json({ message: 'Missing or invalid data for dailyTenderTrial template' }, { status: 400 });
+        // ✅ Periksa semua data yang diperlukan
+        if (
+            !data || 
+            typeof data.name !== 'string' || 
+            typeof data.category !== 'string' ||
+            typeof data.spse !== 'string' ||
+            typeof data.keyword !== 'string' ||
+            !Array.isArray(data.mainTenders) ||
+            !Array.isArray(data.similarTendersOtherSPSE) ||
+            !Array.isArray(data.similarTendersSameSPSE) ||
+            typeof data.trialEndDate !== 'string'
+        ) {
+          return NextResponse.json({ 
+              message: 'Missing or invalid data for dailyTenderTrial template. Required: name, category, spse, keyword, mainTenders, similarTendersOtherSPSE, similarTendersSameSPSE, trialEndDate' 
+          }, { status: 400 });
         }
-        emailBody = dailyTenderTrialEmailTemplate(data.name, data.tenders, data.trialEndDate);
+        
+        // ✅ Panggil template dengan semua argumen baru
+        emailBody = dailyTenderTrialEmailTemplate(
+            data.name, 
+            data.category, 
+            data.spse, 
+            data.keyword, 
+            data.mainTenders, 
+            data.similarTendersOtherSPSE,
+            data.similarTendersSameSPSE,
+            data.trialEndDate
+        );
         break;
 
       // case 'dailyTenderPaid':

@@ -12,24 +12,9 @@ interface Tender {
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
 
 /**
- * Generates the daily email template with a list of tenders for trial users.
- * @param name The user's name.
- * @param tenders An array of tender objects to display.
- * @param trialEndDate The end date of the user's trial period.
- * @returns The complete HTML string for the email.
+ * Helper function to generate HTML for a single tender table.
  */
-export const dailyTenderTrialEmailTemplate = (
-  name: string,
-  tenders: Tender[],
-  trialEndDate: string
-): string => {
-  // Format tanggal hari ini (misalnya: 25 September 2025)
-  const today = new Date().toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-
+const generateTenderTableHtml = (tenders: Tender[], subHeading: string = ""): string => {
   const tenderListHtml = tenders
     .map(
       (tender, index) => `
@@ -49,6 +34,74 @@ export const dailyTenderTrialEmailTemplate = (
     </tr>`
     )
     .join("");
+
+  return `
+    ${subHeading ? `
+      <tr>
+        <td style="padding:20px 20px 10px;">
+          <p style="margin:0;font-size:14px;font-weight:700;color:#0093dd;">${subHeading}</p>
+        </td>
+      </tr>` : ''
+    }
+
+    <tr>
+      <td style="padding:0 20px 20px;">
+        <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
+          <thead>
+            <tr style="background:#f5f5f5;">
+              <th style="padding:10px;font-size:13px;text-align:left;">No</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              tenders.length > 0
+                ? tenderListHtml
+                : `<tr><td colspan="4" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+            }
+          </tbody>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+
+/**
+ * Generates the daily email template with a list of tenders for trial users.
+ * @param name The user's name.
+ * @param category The selected category (formatted string).
+ * @param spse The selected SPSE sites (formatted string).
+ * @param keyword The selected keywords (formatted string).
+ * @param mainTenders Tenders matching all criteria.
+ * @param similarTendersOtherSPSE Tenders matching category/keyword but in other SPSE.
+ * @param similarTendersSameSPSE Tenders matching category/keyword in the selected SPSE.
+ * @param trialEndDate The end date of the user's trial period.
+ * @returns The complete HTML string for the email.
+ */
+export const dailyTenderTrialEmailTemplate = (
+  name: string,
+  category: string,
+  spse: string,
+  keyword: string,
+  mainTenders: Tender[],
+  similarTendersOtherSPSE: Tender[],
+  similarTendersSameSPSE: Tender[],
+  trialEndDate: string
+): string => {
+  // Format tanggal hari ini (misalnya: 25 September 2025)
+  const today = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  // ✅ Mengganti tenderListHtml dengan pemanggilan fungsi helper
+  const mainTenderTable = generateTenderTableHtml(mainTenders);
+  const otherSpseTable = generateTenderTableHtml(similarTendersOtherSPSE, "Tender Serupa di SPSE Lain");
+  const sameSpseTable = generateTenderTableHtml(similarTendersSameSPSE, "Tender Lain di SPSE Pilihan Anda");
 
   return `
   <!DOCTYPE html>
@@ -71,7 +124,6 @@ export const dailyTenderTrialEmailTemplate = (
             box-sizing:border-box !important;
           }
         }
-
     </style>
   </head>
   <body style="margin:0;padding:0;background:#f4f4f4;font-family:Quicksand,Arial,sans-serif;">
@@ -80,7 +132,6 @@ export const dailyTenderTrialEmailTemplate = (
         <td align="center" style="padding:20px;">
           <table class="container" width="600" border="0" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:10px;overflow:hidden;">
             
-            <!-- HEADER -->
             <tr>
               <td align="center" style="padding:20px;">
                 <table border="0" cellpadding="0" cellspacing="0" align="center">
@@ -97,51 +148,38 @@ export const dailyTenderTrialEmailTemplate = (
               </td>
             </tr>
             
-            <!-- TITLE DATE -->
             <tr>
               <td align="center" style="padding:0 20px 10px;">
                 <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender Hari Ini ${today}</p>
               </td>
             </tr>
 
-            <!-- TITLE -->
             <tr>
               <td align="center" style="padding:10px 20px;">
                 <p style="margin:0;font-size:16px;font-weight:700;">DAFTAR TENDER TERBARU</p>
               </td>
             </tr>
 
-            <!-- DESCRIPTION -->
             <tr>
               <td align="center" style="padding:0 20px 20px;">
-                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori & keyword yang Anda pilih:</p>
+                <p style="margin:0;font-size:14px;color:#555;">Berikut adalah daftar tender terbaru sesuai kategori: <strong>${category}</strong>, SPSE: <strong>${spse}</strong> & keyword: <strong>${keyword}</strong> yang Anda pilih:</p>
               </td>
             </tr>
 
-            <!-- TABLE -->
+            ${mainTenderTable}
+            
             <tr>
-              <td style="padding:0 20px 20px;">
-                <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
-                  <thead>
-                    <tr style="background:#f5f5f5;">
-                      <th style="padding:10px;font-size:13px;text-align:left;">No</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
-                      <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${
-                      tenders.length > 0
-                        ? tenderListHtml
-                        : `<tr><td colspan="4" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
-                    }
-                  </tbody>
-                </table>
-              </td>
+                <td style="padding:0 20px 20px;">
+                    <p style="margin:0;font-size:14px;color:#555;">
+                        “Silakan hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>&nbsp;untuk mengubah keyword atau target SPSE Anda. Namun berikut beberapa tender serupa yang mungkin relevan untuk Anda.“
+                    </p>
+                </td>
             </tr>
 
-            <!-- TIPS -->
+            ${otherSpseTable}
+
+            ${sameSpseTable}
+
             <tr>
               <td style="padding:0 20px 20px;">
                 <div style="background:#e5f4fb;border-radius:8px;padding:15px;text-align:left;">
@@ -154,7 +192,6 @@ export const dailyTenderTrialEmailTemplate = (
               </td>
             </tr>
 
-            <!-- TRIAL INFO -->
             <tr>
               <td style="padding:0 20px 20px;">
                 <div style="background:#fff3f3;border-radius:8px;padding:15px;text-align:left;">
@@ -164,7 +201,6 @@ export const dailyTenderTrialEmailTemplate = (
               </td>
             </tr>
 
-            <!-- CTA -->
             <tr>
               <td align="center" style="padding:10px 20px 30px;">
                     <a href="${BASE_URL}/#paket" class="btn" 
@@ -178,7 +214,6 @@ export const dailyTenderTrialEmailTemplate = (
 
           </table>
 
-          <!-- FOOTER -->
           <table width="600" class="container" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000;border-radius:10px;margin-top:20px;color:#fff;">
             <tr>
               <td style="padding:20px;text-align:left;font-size:14px;">
