@@ -98,45 +98,88 @@ export async function POST(req: NextRequest) {
         "status.like.Download Dokumen Kualifikasi%",
       ];
       
-      // ✅ Query 1: Main Tenders (semua kriteria)
+// ----------------------------------------------------------------------
+      // --- Query 1: Main Tenders (MENGGUNAKAN LOGIC LAMA/PERMINTAAN USER) ---
+      // ----------------------------------------------------------------------
       let mainTenderQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`);
-      const combinedConditions = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
-      if (combinedConditions.length > 0) {
-        mainTenderQuery = mainTenderQuery.or(combinedConditions.join(","));
-      }
-      mainTenderQuery = mainTenderQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Query 2: Similar Tenders Other SPSE (tanpa filter SPSE)
+      if (category && category.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          category.map((cat) => `category.ilike.%${cat.trim()}%`).join(",")
+        );
+      }
+      if (spse && spse.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          spse.map((site) => `source_url.ilike.%${site.trim()}%`).join(",")
+        );
+      }
+      if (keyword && keyword.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          keyword.map((key) => `title.ilike.%${key.trim()}%`).join(",")
+        );
+      }
+      mainTenderQuery = mainTenderQuery.or(statusConditions.join(","));
+      mainTenderQuery = mainTenderQuery
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
+
+      // -----------------------------------------------------------------------------------
+      // --- Query 2: Similar Tenders Other SPSE (Category AND Keyword AND Status) ---
+      // Logic: Menghilangkan filter SPSE
+      // -----------------------------------------------------------------------------------
       let similarTendersOtherSPSEQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`);
-      const otherSPSEConditions = [...categoryConditions, ...keywordConditions, ...statusConditions];
-      if (otherSPSEConditions.length > 0) {
-        similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(","));
-      }
-      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ Query 3: Similar Tenders Same SPSE (tanpa filter Keyword & Kategori)
-      let similarTendersSameSPSEQuery = supabase
-        .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
-      const sameSPSEConditions = [...spseConditions, ...statusConditions];
-      if (sameSPSEConditions.length > 0) {
-        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(","));
+      // Wajib: Status (sebagai AND pertama)
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(statusConditions.join(","));
+
+      // Wajib: Category (sebagai AND kedua)
+      if (categoryConditions.length > 0) {
+          similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(categoryConditions.join(","));
       }
-      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.order("created_at", { ascending: false }).limit(5);
-      
-      const [
-        { data: mainTenders, error: mainTendersError },
-        { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError },
-        { data: similarTendersSameSPSE, error: similarTendersSameSPSEError },
-      ] = await Promise.all([
-        mainTenderQuery.then(result => result as SupabaseQueryResult),
-        similarTendersOtherSPSEQuery.then(result => result as SupabaseQueryResult),
-        similarTendersSameSPSEQuery.then(result => result as SupabaseQueryResult),
-      ]);
+
+      // Wajib: Keyword (sebagai AND ketiga)
+      if (keywordConditions.length > 0) {
+          similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(keywordConditions.join(","));
+      }
+
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      const { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError } = await similarTendersOtherSPSEQuery as SupabaseQueryResult;
+
+        // ------------------------------------------------------------------------------------------
+        // --- Query 3: Similar Tenders Same SPSE (Category AND SPSE AND Status) ---
+        // Logic: Menghilangkan filter Keyword
+        // ------------------------------------------------------------------------------------------
+        let similarTendersSameSPSEQuery = supabase
+          .from("lpse_tenders")
+          .select(`id, title, agency, budget, source_url`);
+
+        // Wajib: Status (sebagai AND pertama)
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(statusConditions.join(","));
+
+        // Wajib: Category (sebagai AND kedua)
+        if (categoryConditions.length > 0) {
+            similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(categoryConditions.join(","));
+        }
+
+        // Wajib: SPSE (sebagai AND ketiga)
+        if (spseConditions.length > 0) {
+            similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(spseConditions.join(","));
+        }
+
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
 
       if (mainTendersError || similarTendersOtherSPSEError || similarTendersSameSPSEError) {
         console.error(
