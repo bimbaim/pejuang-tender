@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
             month: "long",
             year: "numeric",
           })} pejuangtender.id`,
-          templateName: "dailyTenderPaid",
+          templateName: "dailyTenderTrial",
           data: {
             name: users.name,
             category: formattedCategory,

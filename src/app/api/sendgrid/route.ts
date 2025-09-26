@@ -5,7 +5,6 @@ import sgMail from "@sendgrid/mail";
 import { trialWelcomeTemplate } from "@/lib/emailTemplates/trialWelcome";
 import { subscriptionWelcomeTemplate } from "@/lib/emailTemplates/subscriptionWelcome";
 import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderTrial";
-// import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
 import { reminderTrialEmailTemplate } from "@/lib/emailTemplates/reminderTrial";
 import { reminderPaidEmailTemplate } from "@/lib/emailTemplates/reminderPaid";
 import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
