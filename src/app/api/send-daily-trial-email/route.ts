@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({
-        message: "No active paid subscriptions found.",
+        message: "No free trial subscriptions found.",
       });
     }
 
