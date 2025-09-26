@@ -53,7 +53,6 @@ export async function POST(req: NextRequest) {
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, users(name, email)`)
-      // ✅ FILTER PAID
       .eq("payment_status", "paid");
 
     if (subsError) {
@@ -91,17 +90,43 @@ export async function POST(req: NextRequest) {
         "status.like.Download Dokumen Kualifikasi%",
       ];
       
-      // --- Query 1: Main Tenders (Sequential Flow) ---
+      // --- Query 1: Main Tenders (MENGGUNAKAN LOGIC YANG DIMINTA) ---
       let mainTenderQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`);
-      const combinedConditions = [...categoryConditions, ...spseConditions, ...keywordConditions, ...statusConditions];
-      if (combinedConditions.length > 0) {
-        mainTenderQuery = mainTenderQuery.or(combinedConditions.join(","));
-      }
-      mainTenderQuery = mainTenderQuery.order("created_at", { ascending: false }).limit(5);
 
-      // ✅ SEQUENTIAL AWAIT (Metode Trial)
+      // ✅ Category filter (Menggunakan .or() berulang sesuai permintaan)
+      if (category && category.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          category.map((cat) => `category.ilike.%${cat.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ SPSE filter (Menggunakan .or() berulang sesuai permintaan)
+      if (spse && spse.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          spse.map((site) => `source_url.ilike.%${site.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ Keyword filter (Menggunakan .or() berulang sesuai permintaan)
+      if (keyword && keyword.length > 0) {
+        mainTenderQuery = mainTenderQuery.or(
+          keyword.map((key) => `title.ilike.%${key.trim()}%`).join(",")
+        );
+      }
+
+      // ✅ Status filter (selalu ada, Menggunakan .or() berulang sesuai permintaan)
+      mainTenderQuery = mainTenderQuery.or(
+        statusConditions.join(",")
+      );
+
+      // ✅ Ordering + Limit (Menggunakan Limit 5 untuk konsistensi 3 tabel)
+      mainTenderQuery = mainTenderQuery
+        .order("created_at", { ascending: false })
+        .limit(5);
+
+      // ✅ SEQUENTIAL AWAIT
       const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
 
       // --- Query 2: Similar Tenders Other SPSE (Sequential Flow) ---
@@ -114,7 +139,7 @@ export async function POST(req: NextRequest) {
       }
       similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.order("created_at", { ascending: false }).limit(5);
       
-      // ✅ SEQUENTIAL AWAIT (Metode Trial)
+      // ✅ SEQUENTIAL AWAIT
       const { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError } = await similarTendersOtherSPSEQuery as SupabaseQueryResult;
 
       // --- Query 3: Similar Tenders Same SPSE (Sequential Flow) ---
@@ -127,7 +152,7 @@ export async function POST(req: NextRequest) {
       }
       similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.order("created_at", { ascending: false }).limit(5);
       
-      // ✅ SEQUENTIAL AWAIT (Metode Trial)
+      // ✅ SEQUENTIAL AWAIT
       const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
 
 
