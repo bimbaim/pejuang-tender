@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       .eq("payment_status", "free-trial");
 
     if (subsError) {
-      console.error("Error fetching paid subscriptions:", subsError.message);
+      console.error("Error fetching Trial subscriptions:", subsError.message);
       return NextResponse.json(
         { error: "Failed to fetch subscriptions", details: subsError.message },
         { status: 500 }
