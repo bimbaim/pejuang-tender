@@ -119,47 +119,59 @@ export async function POST(req: NextRequest) {
 
       const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
 
-      // ------------------------------------------------------------------------
-      // --- Query 2: Similar Tenders Other SPSE (TIDAK HARUS SESUAI SPSE) ---
-      // ------------------------------------------------------------------------
-      // Logic: Category + Keyword + Status (menghapus filter SPSE)
+      // -----------------------------------------------------------------------------------
+      // --- Query 2: Similar Tenders Other SPSE (Category AND Keyword AND Status) ---
+      // Logic: Menghilangkan filter SPSE
+      // -----------------------------------------------------------------------------------
       let similarTendersOtherSPSEQuery = supabase
         .from("lpse_tenders")
         .select(`id, title, agency, budget, source_url`);
-        
-      // Gabungkan Category, Keyword, dan Status
-      const otherSPSEConditions = [...categoryConditions, ...keywordConditions, ...statusConditions];
-      
-      if (otherSPSEConditions.length > 0) {
-        similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(otherSPSEConditions.join(","));
+
+      // Wajib: Status (sebagai AND pertama)
+      similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(statusConditions.join(","));
+
+      // Wajib: Category (sebagai AND kedua)
+      if (categoryConditions.length > 0) {
+          similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(categoryConditions.join(","));
+      }
+
+      // Wajib: Keyword (sebagai AND ketiga)
+      if (keywordConditions.length > 0) {
+          similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(keywordConditions.join(","));
       }
 
       similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery
         .order("created_at", { ascending: false })
         .limit(5);
-      
+
       const { data: similarTendersOtherSPSE, error: similarTendersOtherSPSEError } = await similarTendersOtherSPSEQuery as SupabaseQueryResult;
 
-      // ------------------------------------------------------------------------------------------
-      // --- Query 3: Similar Tenders Same SPSE (Category + SPSE, TIDAK HARUS SESUAI KEYWORD) ---
-      // ------------------------------------------------------------------------------------------
-      // Logic: Category + SPSE + Status (menghapus filter Keyword)
-      let similarTendersSameSPSEQuery = supabase
-        .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
-        
-      // Gabungkan Category, SPSE, dan Status
-      const sameSPSEConditions = [...categoryConditions, ...spseConditions, ...statusConditions];
-      
-      if (sameSPSEConditions.length > 0) {
-        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(sameSPSEConditions.join(","));
-      }
+        // ------------------------------------------------------------------------------------------
+        // --- Query 3: Similar Tenders Same SPSE (Category AND SPSE AND Status) ---
+        // Logic: Menghilangkan filter Keyword
+        // ------------------------------------------------------------------------------------------
+        let similarTendersSameSPSEQuery = supabase
+          .from("lpse_tenders")
+          .select(`id, title, agency, budget, source_url`);
 
-      similarTendersSameSPSEQuery = similarTendersSameSPSEQuery
-        .order("created_at", { ascending: false })
-        .limit(5);
-      
-      const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
+        // Wajib: Status (sebagai AND pertama)
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(statusConditions.join(","));
+
+        // Wajib: Category (sebagai AND kedua)
+        if (categoryConditions.length > 0) {
+            similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(categoryConditions.join(","));
+        }
+
+        // Wajib: SPSE (sebagai AND ketiga)
+        if (spseConditions.length > 0) {
+            similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(spseConditions.join(","));
+        }
+
+        similarTendersSameSPSEQuery = similarTendersSameSPSEQuery
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        const { data: similarTendersSameSPSE, error: similarTendersSameSPSEError } = await similarTendersSameSPSEQuery as SupabaseQueryResult;
 
 
       if (mainTendersError || similarTendersOtherSPSEError || similarTendersSameSPSEError) {
