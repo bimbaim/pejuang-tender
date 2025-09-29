@@ -58,7 +58,9 @@ const ThankYouBody = () => {
       return;
     }
 
-    const subscriptionId = searchParams.get('subscription_id');
+  // 💡 FIX: Safely access searchParams before calling .get()
+  const subscriptionId = searchParams ? searchParams.get('subscription_id') : null;
+
 
     // Fokus hanya pada validasi subscription_id dari URL
     if (!subscriptionId) {
