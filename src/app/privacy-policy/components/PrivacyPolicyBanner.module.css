@@ -1,0 +1,40 @@
+/* src/app/privacy-policy/components/PrivacyPolicyBanner.module.css */
+
+/* Renamed from .header-/-6-4-/ */
+.header64 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 112px 64px;
+  gap: 80px;
+  background-color: #e5f4fb;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+}
+
+.component {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  background-color: #ffffff;
+}
+
+/* Renamed from .text-1 */
+.text1 {
+  text-align: center;
+  vertical-align: top;
+  font-size: 48px;
+  font-family: Saira;
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+}
