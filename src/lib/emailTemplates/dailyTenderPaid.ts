@@ -20,18 +20,15 @@ const generateTenderTableHtml = (
   subHeading: string = ""
 ): string => {
   const tenderListHtml = tenders
-    .map(
-      (tender, index) => {
-        // --- START OF MODIFICATION ---
-        // 1. Encode URL SPSE
-        const encodedUrl = encodeURIComponent(tender.source_url);
-        
-        // 2. Buat URL pengalihan (redirect URL)
-        // Menggunakan BASE_URL/redirect?url=...
-        const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
-        // --- END OF MODIFICATION ---
-        
-        return `
+    .map((tender, index) => {
+      // 1. Encode URL SPSE
+      const encodedUrl = encodeURIComponent(tender.source_url);
+
+      // 2. Buat URL pengalihan (redirect URL)
+      // Menggunakan BASE_URL/redirect?url=...
+      const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
+
+      return `
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         index + 1
@@ -51,7 +48,7 @@ const generateTenderTableHtml = (
           redirectUrl
         }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
-    </tr>`
+    </tr>`;
     })
     .join("");
 
@@ -215,9 +212,19 @@ export const dailyTenderPaidEmailTemplate = (
                 </td>
             </tr>
             
-            ${otherSpseTable}
+            ${
+              // CONDITIONALLY HIDE TABLE 2 IF ARRAY IS EMPTY
+              similarTendersOtherSPSE.length > 0
+                ? otherSpseTable
+                : ''
+            }
             
-            ${sameSpseTable}
+            ${
+              // CONDITIONALLY HIDE TABLE 3 IF ARRAY IS EMPTY
+              similarTendersSameSPSE.length > 0
+                ? sameSpseTable
+                : ''
+            }
 
 
             <tr>
