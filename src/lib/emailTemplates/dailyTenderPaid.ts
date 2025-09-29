@@ -7,7 +7,7 @@ interface Tender {
   budget: string;
   source_url: string;
 }
-s
+
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL || "https://pejuang-tender.vercel.app";
 
