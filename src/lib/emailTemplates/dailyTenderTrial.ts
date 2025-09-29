@@ -10,7 +10,7 @@ interface Tender {
 }
 
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://pejuang-tender.vercel.app";
 
 /**
  * Helper function to generate HTML for a single tender table.
@@ -20,8 +20,15 @@ const generateTenderTableHtml = (
   subHeading: string = ""
 ): string => {
   const tenderListHtml = tenders
-    .map(
-      (tender, index) => `
+    .map((tender, index) => {
+      // 1. Encode URL SPSE
+      const encodedUrl = encodeURIComponent(tender.source_url);
+
+      // 2. Buat URL pengalihan (redirect URL)
+      // Menggunakan BASE_URL/redirect?url=...
+      const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
+
+      return `
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         index + 1
@@ -32,13 +39,17 @@ const generateTenderTableHtml = (
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         tender.agency
       }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">Rp. ${
+        tender.budget
+      }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
         <a href="${
-          tender.source_url
+          // Menggunakan redirectUrl yang baru
+          redirectUrl
         }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
-    </tr>`
-    )
+    </tr>`;
+    })
     .join("");
 
   return `
@@ -61,6 +72,7 @@ const generateTenderTableHtml = (
               <th style="padding:10px;font-size:13px;text-align:left;">No</th>
               <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
               <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;">HPS</th>
               <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
             </tr>
           </thead>
@@ -68,7 +80,7 @@ const generateTenderTableHtml = (
             ${
               tenders.length > 0
                 ? tenderListHtml
-                : `<tr><td colspan="4" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+                : `<tr><td colspan="5" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
             }
           </tbody>
         </table>
@@ -192,7 +204,7 @@ export const dailyTenderTrialEmailTemplate = (
             <tr>
                 <td style="padding:0 20px 20px;">
                     <p style="margin:0;font-size:14px;color:#555;">
-                        “Silakan hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>&nbsp;untuk mengubah keyword atau target SPSE Anda. Namun berikut beberapa tender serupa yang mungkin relevan untuk Anda.“
+                        Mau ubah keyword atau target SPSE? Hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>. Sementara itu, cek beberapa tender serupa yang mungkin cocok buat Anda.
                     </p>
                 </td>
             </tr>
@@ -240,7 +252,7 @@ export const dailyTenderTrialEmailTemplate = (
                 <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
                     <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
                     <p style="margin:0;">Salam,</p>
-                    <p style="margin:0;">Tim pejuangtender.id</p>
+                    <p style="margin:0;color:#fff;">Tim pejuangtender.id</p>
                     <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
                 </td>
                 <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">
