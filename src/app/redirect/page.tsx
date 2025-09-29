@@ -1,37 +1,17 @@
 // src/app/redirect/page.tsx
-'use client'; 
+import { Suspense } from 'react';
+import RedirectClient from './RedirectClient';
 
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-
+// This is the parent Server Component
 export default function RedirectPage() {
-  const searchParams = useSearchParams();
-  
-  // 💡 Check if searchParams exists before trying to access its methods
-  const urlParam = searchParams ? searchParams.get('url') : null;
-
-  useEffect(() => {
-    // We already check for null in the urlParam definition above,
-    // but the null check here is still good practice.
-    if (urlParam) {
-      try {
-        // Decode the URL parameter
-        const target = decodeURIComponent(urlParam as string);
-        
-        // Perform the immediate redirect
-        window.location.href = target;
-      } catch (error) {
-        console.error("Failed to decode or redirect:", error);
-        // Add a fallback action here if needed
-      }
-    }
-  }, [urlParam]); // Dependencies array simplified to just urlParam
-
-  // Display a loading message while the effect runs
   return (
-    <div style={{ padding: '50px', textAlign: 'center' }}>
-      <h1>Redirecting...</h1>
-      <p>Please wait while we send you to the SPSE page.</p>
-    </div>
+    // CRITICAL: The Suspense boundary prevents the build from failing
+    // by deferring the rendering of the client hook until the browser.
+    <Suspense fallback={<div>Loading redirect...</div>}>
+      <RedirectClient />
+    </Suspense>
   );
 }
+
+// Optional, but recommended for pages dependent on search params
+export const dynamic = 'force-dynamic';
