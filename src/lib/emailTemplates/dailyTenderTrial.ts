@@ -181,7 +181,7 @@ export const dailyTenderTrialEmailTemplate = (
             
             <tr>
               <td align="center" style="padding:0 20px 10px;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender Hari Ini ${today}</p>
+                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender ${today}</p>
               </td>
             </tr>
 

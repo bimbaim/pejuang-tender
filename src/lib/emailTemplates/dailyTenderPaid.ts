@@ -109,11 +109,11 @@ export const dailyTenderPaidEmailTemplate = (
   similarTendersSameSPSE: Tender[]
 ): string => {
   // Format tanggal hari ini (misalnya: 25 September 2025)
-  // const today = new Date().toLocaleDateString("id-ID", {
-  //   day: "numeric",
-  //   month: "long",
-  //   year: "numeric",
-  // });
+  const today = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
   // ✅ GENERASI 3 TABEL
   const mainTenderTable = generateTenderTableHtml(mainTenders);
@@ -185,6 +185,12 @@ export const dailyTenderPaidEmailTemplate = (
             <tr>
               <td align="center" style="padding:0 20px 10px;">
                 <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">halo ${name}, 👋</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td align="center" style="padding:0 20px 10px;">
+                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender ${today}</p>
               </td>
             </tr>
 
