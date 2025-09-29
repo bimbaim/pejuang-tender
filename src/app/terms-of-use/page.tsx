@@ -3,8 +3,9 @@
 
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-import TermOfUseHero from "./components/TermOfUseHero"; // 1. Import the Hero Banner component
-import TermOfUseBody from "./components/TermOfUseBody";
+import TermsOfUseHero from "./components/TermsOfUseHero"; // 1. Import the Hero Banner component
+import TermsOfUseBody from "./components/TermsOfUseBody"; // 2. Import the Body component
+
 
 // 2. Renamed function from ThankYouPage to TermOfUsePage
 export default function TermOfUsePage() {
@@ -13,10 +14,10 @@ export default function TermOfUsePage() {
       <Navbar />
       
       {/* 3. Added the Hero Banner component */}
-      <TermOfUseHero />
+      <TermsOfUseHero />
       
       {/* TODO: Add the full Terms of Use document content here */}
-      <TermOfUseBody />
+      <TermsOfUseBody />
       
       <Footer />
     </main>

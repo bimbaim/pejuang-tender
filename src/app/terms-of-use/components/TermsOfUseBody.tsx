@@ -1,7 +1,7 @@
 // TermOfUseBody.tsx
 
 import React from 'react';
-import styles from './TermOfUseBody.module.css';
+import styles from './TermsOfUseBody.module.css';
 
 // Fix: Removed the deprecated React.VFC type
 const TermOfUseBody = () => {
