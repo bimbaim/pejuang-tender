@@ -7,9 +7,9 @@ interface Tender {
   budget: string;
   source_url: string;
 }
-
+s
 const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.vercel.app";
+  process.env.NEXT_PUBLIC_BASE_URL || "https://pejuang-tender.vercel.app";
 
 /**
  * Helper function to generate HTML for a single tender table for PAID users.
