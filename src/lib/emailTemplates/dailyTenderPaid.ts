@@ -150,13 +150,13 @@ export const dailyTenderPaidEmailTemplate = (
             width:100% !important;
             box-sizing:border-box !important;
           }
-            .stack { 
-      display: block !important; 
-      width: 100% !important; 
-      /* Pastikan teks rata kiri saat bertumpuk */
-      text-align: left !important; 
-      padding-bottom: 0px !important; /* Kurangi padding bawah */
-  }
+          .stack { 
+              display: block !important; 
+              width: 100% !important; 
+              /* Perubahan di sini */
+              text-align: center !important; 
+              padding-bottom: 0px !important; 
+          }
         }
     </style>
   </head>
@@ -244,7 +244,7 @@ export const dailyTenderPaidEmailTemplate = (
                   <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
                       <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
                       <p style="margin:0;">Salam,</p>
-                      <p style="margin:0;color:#fff;">Tim pejuangtender.id</p>
+                      <p style="margin:0;">Tim <a href="https://pejuangtender.id" style="color:#fff; text-decoration: none;">pejuangtender.id</a></p>
                       <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
                   </td>
                   <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">

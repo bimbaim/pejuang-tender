@@ -30,16 +30,16 @@ const generateTenderTableHtml = (
 
       return `
     <tr>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:30px;">${
         index + 1
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:40%;">${ // 💡 Diperkecil menjadi 40% (dari yang semula otomatis)
         tender.title
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         tender.agency
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">Rp. ${
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:120px;">Rp. ${ // 💡 Diperlebar menjadi 120px
         tender.budget
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
@@ -69,11 +69,9 @@ const generateTenderTableHtml = (
         <table class="user-table" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;border:1px solid #ddd;">
           <thead>
             <tr style="background:#f5f5f5;">
-              <th style="padding:10px;font-size:13px;text-align:left;">No</th>
-              <th style="padding:10px;font-size:13px;text-align:left;">Nama</th>
-              <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
-              <th style="padding:10px;font-size:13px;text-align:left;">HPS</th>
-              <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:30px;">No</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:40%;">Nama</th>  <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:120px;">HPS</th>  <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
             </tr>
           </thead>
           <tbody>
@@ -149,13 +147,13 @@ export const dailyTenderTrialEmailTemplate = (
             width:100% !important;
             box-sizing:border-box !important;
           }
-            .stack { 
-      display: block !important; 
-      width: 100% !important; 
-      /* Pastikan teks rata kiri saat bertumpuk */
-      text-align: left !important; 
-      padding-bottom: 0px !important; /* Kurangi padding bawah */
-  }
+        .stack { 
+              display: block !important; 
+              width: 100% !important; 
+              /* Perubahan di sini */
+              text-align: center !important; 
+              padding-bottom: 0px !important; 
+          }
         }
     </style>
   </head>
@@ -252,7 +250,7 @@ export const dailyTenderTrialEmailTemplate = (
                 <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
                     <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
                     <p style="margin:0;">Salam,</p>
-                    <p style="margin:0;color:#fff;">Tim pejuangtender.id</p>
+                    <p style="margin:0;">Tim <a href="https://pejuangtender.id" style="color:#fff; text-decoration: none;">pejuangtender.id</a></p>
                     <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
                 </td>
                 <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">
