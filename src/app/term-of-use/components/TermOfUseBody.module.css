@@ -1,0 +1,75 @@
+/* TermOfUseBody.module.css */
+
+.bodyWrapper {
+  /* Renamed from .event-/-1-/ */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 112px 64px;
+  gap: 80px;
+  background-color: #ffffff;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 60px; /* Space between the main sections */
+  width: 100%; /* Ensure it fills the container for alignment */
+  max-width: 1200px; /* Example max width for content */
+}
+
+.section {
+  /* Renamed from .section-title and consolidated */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 24px; /* Space between the heading and the paragraph */
+  width: 100%;
+}
+
+/* Style for the main page title (used only once, can be <h1> or <h2>) */
+.headingPrimary {
+  /* Corresponds to .text-1 */
+  text-align: left;
+  font-size: 40px;
+  font-family: Saira, sans-serif;
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+  margin: 0; /* Reset default margin */
+}
+
+/* Style for section subtitles (h3) */
+.headingSecondary {
+  /* Corresponds to .text-3, .text-5, .text-7, etc. */
+  text-align: left;
+  font-size: 32px; /* Slightly smaller than primary for hierarchy */
+  font-family: Saira, sans-serif;
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+  margin: 0; /* Reset default margin */
+}
+
+/* Style for all paragraph content */
+.paragraph {
+  /* Corresponds to .text-2, .text-4, .text-6, etc. */
+  text-align: left;
+  font-size: 18px;
+  /* Assuming 'undefined' font was meant to be Quicksand or a standard sans-serif */
+  font-family: Quicksand, sans-serif; 
+  line-height: 1.6; /* Use unitless line-height for better practice */
+  color: #000000;
+  margin: 0; /* Reset default margin */
+}
+
+.paragraph ul {
+    /* Basic styling for the list inside the Copyright Policy */
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+}

@@ -1,0 +1,43 @@
+/* TermOfUseHero.module.css */
+
+.header {
+  /* Renamed from .header-/-6-4-/ */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 112px 64px;
+  gap: 80px;
+  background-color: #e5f4fb;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+}
+
+.component {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  /* Note: The original component had background-color: #ffffff on .component, 
+     which might be incorrect for a hero banner unless it's a card *within* the banner. 
+     I've kept it as per your original code. */
+  background-color: #ffffff; 
+}
+
+.text {
+  /* Renamed from .text-1 */
+  text-align: center;
+  vertical-align: top;
+  font-size: 48px;
+  font-family: Saira, sans-serif; /* Added sans-serif fallback */
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+}
