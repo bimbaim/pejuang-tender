@@ -246,7 +246,7 @@ export const dailyTenderPaidEmailTemplate = (
                   <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
                       <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
                       <p style="margin:0;">Salam,</p>
-                      <p style="margin:0;">Tim pejuangtender.id</p>
+                      <p style="margin:0;color:#fff;">Tim pejuangtender.id</p>
                       <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
                   </td>
                   <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">
