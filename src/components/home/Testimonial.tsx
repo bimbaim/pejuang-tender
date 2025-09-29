@@ -26,9 +26,9 @@ function renderStars(rating: number) {
   return Array.from({ length: 5 }).map((_, idx) => {
     const starValue = idx + 1;
     if (rating >= starValue) {
-      return <Star key={idx} size={18} fill="#4b5563" stroke="#4b5563" />;
+      return <Star key={idx} size={18} fill="#000000" stroke="#000000" />;
     } else if (rating >= starValue - 0.5) {
-      return <StarHalf key={idx} size={18} fill="#4b5563" stroke="#4b5563" />;
+      return <StarHalf key={idx} size={18} fill="#000000" stroke="#000000" />;
     } else {
       return <StarOff key={idx} size={18} stroke="#d1d5db" fill="none" />;
     }

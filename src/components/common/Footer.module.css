@@ -274,3 +274,28 @@
     gap: 16px;
   }
 }
+
+
+.footerPartner {
+  background: #fff;
+}
+
+.footerLinksData .footerLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.footerLinksData .footerLinks a {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-white);
+  text-decoration: underline;
+}
+
+.partnerText {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-white);
+  margin-bottom: 0px;
+  text-align: right;
+}

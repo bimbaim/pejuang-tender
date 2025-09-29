@@ -39,7 +39,7 @@
 */
 
 .card {
-  background-color: #ffffff; /* Latar belakang putih */
+  background-color: #f2f2f2; /* Latar belakang putih */
   border: 1px solid #e5e7eb; /* Border abu-abu tipis */
   border-radius: 8px; /* Sudut membulat */
   padding: 30px;
@@ -58,11 +58,14 @@
 
 .text {
   font-size: 1rem; /* Ukuran teks sedang/standar */
-  color: #4b5563; /* Abu-abu tua */
+  color: #000000;
   line-height: 1.7;
   font-style: normal;
   margin-bottom: 25px;
   flex-grow: 1;
+  /* 👈 PERBAIKAN: Menetapkan tinggi minimum */
+  /* Coba nilai ini dulu, Anda bisa menyesuaikannya nanti */
+  min-height: 120px; /* Contoh: Ini setara dengan sekitar 5-6 baris teks */ 
 }
 
 .author {

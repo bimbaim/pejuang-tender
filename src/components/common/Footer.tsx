@@ -17,11 +17,27 @@ const Footer = () => {
                 height={44}
               />
               <p className={styles.logoText}>PEJUANG Tender</p>
+              <div className={styles.footerLinksData}>
+                <div className={styles.footerLinks}>
+                  {/* Note: Gunakan tag <a> sesungguhnya di aplikasi Anda */}
+                  <a href="/privacy-policy" className={styles.textLink}>Privacy Policy</a>
+                  <a href="/terms-of-use" className={styles.textLink}>Terms of Service</a>
+                  <a href="/cookies" className={styles.textLink}>Cookies Settings</a>
+                </div>
+                <div className={styles.links}>
+                  <p className={styles.copyright}>
+                    © 2025 Pejuang Tender. All rights reserved.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className={styles.links}>
-              <p className={styles.copyright}>
-                © 2025 Pejuang Tender. All rights reserved.
+              <p className={styles.partnerText}>
+                Partner Pembayaran kami
               </p>
+              <div className={styles.footerPartner}>
+               <Image src="/images/form-payment-partner.png" alt="Partner Logo" width={453} height={47} className={styles.partnerImg} />
+              </div>
             </div>
           </div>
         </div>
