@@ -21,7 +21,17 @@ const generateTenderTableHtml = (
 ): string => {
   const tenderListHtml = tenders
     .map(
-      (tender, index) => `
+      (tender, index) => {
+        // --- START OF MODIFICATION ---
+        // 1. Encode URL SPSE
+        const encodedUrl = encodeURIComponent(tender.source_url);
+        
+        // 2. Buat URL pengalihan (redirect URL)
+        // Menggunakan BASE_URL/redirect?url=...
+        const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
+        // --- END OF MODIFICATION ---
+        
+        return `
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         index + 1
@@ -37,11 +47,12 @@ const generateTenderTableHtml = (
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
         <a href="${
-          tender.source_url
+          // Menggunakan redirectUrl yang baru
+          redirectUrl
         }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
     </tr>`
-    )
+    })
     .join("");
 
   return `
@@ -103,11 +114,11 @@ export const dailyTenderPaidEmailTemplate = (
   similarTendersSameSPSE: Tender[]
 ): string => {
   // Format tanggal hari ini (misalnya: 25 September 2025)
-  const today = new Date().toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  // const today = new Date().toLocaleDateString("id-ID", {
+  //   day: "numeric",
+  //   month: "long",
+  //   year: "numeric",
+  // });
 
   // ✅ GENERASI 3 TABEL
   const mainTenderTable = generateTenderTableHtml(mainTenders);
@@ -178,13 +189,7 @@ export const dailyTenderPaidEmailTemplate = (
             
             <tr>
               <td align="center" style="padding:0 20px 10px;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">HALO ${name}, 👋</p>
-              </td>
-            </tr>
-
-            <tr>
-              <td align="center" style="padding:0 20px 10px;">
-                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">Update Tender Hari Ini ${today}</p>
+                <p style="margin:0;font-size:18px;font-weight:700;color:#0093dd;">halo ${name}, 👋</p>
               </td>
             </tr>
 
@@ -205,7 +210,7 @@ export const dailyTenderPaidEmailTemplate = (
             <tr>
                 <td style="padding:0 20px 20px;">
                     <p style="margin:0;font-size:14px;color:#555;">
-                        “Silakan hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>&nbsp;untuk mengubah keyword atau target SPSE Anda. Namun berikut beberapa tender serupa yang mungkin relevan untuk Anda.“
+                        Mau ubah keyword atau target SPSE? Hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>. Sementara itu, cek beberapa tender serupa yang mungkin cocok buat Anda.
                     </p>
                 </td>
             </tr>
