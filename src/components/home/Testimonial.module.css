@@ -1,14 +1,4 @@
 /*
-  CATATAN PENTING:
-  Desain bintang di gambar menggunakan warna abu-abu gelap untuk bintang terisi,
-  dan warna abu-abu terang untuk bintang kosong.
-  Anda HARUS memperbarui fungsi `renderStars` di komponen React Anda 
-  untuk menggunakan warna berikut agar sesuai:
-  - Bintang Terisi/Setengah: fill="#4b5563" dan stroke="#4b5563" (abu-abu gelap)
-  - Bintang Kosong: fill="none" (atau transparan) dan stroke="#d1d5db" (abu-abu terang)
-*/
-
-/*
   ================================================
   1. CONTAINER DAN JUDUL
   ================================================
@@ -18,18 +8,17 @@
   /* Warna latar belakang sesuai desain (putih/abu-abu sangat terang) */
   background-color: #fff; /* Abu-abu sangat terang, hampir putih */
   padding: 80px 20px;
-  max-width: 1440px; /* Lebar maksimum yang disarankan */
+  max-width: 1440px;
   margin: 0 auto;
 }
 
 .title {
   font-size: 2.25rem;
-  font-weight: 800; /* Extra bold */
+  font-weight: 800;
   text-align: center;
-  color: #1f2937; /* Warna gelap */
+  color: #1f2937;
   margin-bottom: 60px;
   letter-spacing: -0.025em;
-  /* Pastikan font yang digunakan mendukung berat 800 (jika menggunakan custom font) */
 }
 
 /*
@@ -38,14 +27,20 @@
   ================================================
 */
 
+/* 👈 PERBAIKAN TINGGI KARTU: SwiperSlide harus flex agar card: 100% bekerja */
+/* Kita gabungkan dengan selektor lokal agar tidak error syntax */
+.container :global(.swiper-slide) {
+    display: flex;
+    height: auto; 
+}
+
 .card {
-  background-color: #f2f2f2; /* Latar belakang putih */
-  border: 1px solid #e5e7eb; /* Border abu-abu tipis */
-  border-radius: 8px; /* Sudut membulat */
+  background-color: #f2f2f2;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 30px;
-  /* Shadow yang sangat halus sesuai desain */
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  height: 100%;
+  height: 100%; /* Penting: Mengambil 100% tinggi dari swiper-slide */
   display: flex;
   flex-direction: column;
 }
@@ -57,27 +52,26 @@
 }
 
 .text {
-  font-size: 1rem; /* Ukuran teks sedang/standar */
+  font-size: 1rem;
   color: #000000;
   line-height: 1.7;
   font-style: normal;
   margin-bottom: 25px;
   flex-grow: 1;
-  /* 👈 PERBAIKAN: Menetapkan tinggi minimum */
-  /* Coba nilai ini dulu, Anda bisa menyesuaikannya nanti */
-  min-height: 120px; /* Contoh: Ini setara dengan sekitar 5-6 baris teks */ 
+  /* 👈 PERBAIKAN TINGGI: Menetapkan tinggi minimum untuk menampung teks terpanjang */
+  min-height: 120px;
 }
 
 .author {
   font-size: 0.95rem;
-  font-weight: 700; /* Bold */
+  font-weight: 700;
   color: #1f2937;
   margin-bottom: 2px;
 }
 
 .role {
   font-size: 0.85rem;
-  color: #6b7280; /* Abu-abu terang untuk peran */
+  color: #6b7280;
 }
 
 /*
@@ -88,29 +82,26 @@
 
 .navigation {
   display: flex;
-  /* Posisikan di kanan bawah, di atas pagination */
   justify-content: flex-end;
   gap: 15px;
   margin-top: 30px;
   z-index: 10;
-  /* Tambahkan margin kanan jika layout Anda memiliki padding container */
-  /* margin-right: 20px; */
 }
 
 .button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px; /* Ukuran sedikit lebih kecil dari standar */
+  width: 36px;
   height: 36px;
-  border: 1px solid #d1d5db; /* Border abu-abu terang */
-  border-radius: 8px; /* Sudut persegi membulat */
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   background-color: #ffffff;
   cursor: pointer;
   transition:
     background-color 0.2s,
     border-color 0.2s;
-  color: #4b5563; /* Warna ikon panah (abu-abu gelap) */
+  color: #4b5563;
 }
 
 .button:hover {
@@ -122,22 +113,24 @@
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #ffffff;
-  color: #9ca3af; /* Warna ikon lebih pudar saat disabled */
+  color: #9ca3af;
 }
 
 /* Kustomisasi Pagination Swiper (Titik-titik) */
-:global(.swiper-pagination) {
-  /* Posisikan di kiri bawah, sejajar dengan navigation di kanan */
+/* 👈 PERBAIKAN SYNTAX: Gabungkan :global dengan .container */
+.container :global(.swiper-pagination) {
   display: flex;
   justify-content: flex-start;
   position: static !important;
   margin-top: 30px;
-  padding-left: 20px; /* Sesuaikan dengan padding container jika perlu */
-  transform: none !important; /* Hilangkan transform default Swiper */
+  padding-left: 20px;
+  transform: none !important;
 }
 
-:global(.swiper-pagination-bullet) {
-  background: #d1d5db; /* Warna titik non-aktif (abu-abu terang) */
+/* Biarkan selektor bullet di luar jika tidak menyebabkan error,
+   atau gabungkan dengan selektor lokal jika masih bermasalah */
+.container :global(.swiper-pagination-bullet) {
+  background: #d1d5db;
   opacity: 1;
   width: 8px;
   height: 8px;
@@ -145,13 +138,14 @@
   transition: background-color 0.3s;
 }
 
-:global(.swiper-pagination-bullet-active) {
-  background: #3b82f6; /* Warna titik aktif (Biru Muda/Primary) */
+.container :global(.swiper-pagination-bullet-active) {
+  background: #3b82f6;
 }
 
 /* Opsional: Sembunyikan panah default Swiper */
-:global(.swiper-button-next),
-:global(.swiper-button-prev) {
+/* 👈 PERBAIKAN SYNTAX: Gabungkan :global dengan .container */
+.container :global(.swiper-button-next),
+.container :global(.swiper-button-prev) {
   display: none !important;
 }
 
@@ -174,10 +168,11 @@
   }
   .navigation {
     margin-top: 20px;
-    justify-content: center; /* Pindahkan navigasi ke tengah di mobile */
+    justify-content: center;
   }
-  :global(.swiper-pagination) {
-    justify-content: center; /* Pindahkan pagination ke tengah di mobile */
+  /* 👈 PERBAIKAN SYNTAX: Gabungkan :global dengan .container */
+  .container :global(.swiper-pagination) {
+    justify-content: center;
     padding-left: 0;
     margin-top: 20px;
   }
