@@ -12,6 +12,8 @@ import PricingSection from "@/components/home/PricingSection";
 import TrialPopupForm from "@/components/common/TrialPopupForm";
 import PackagePopupForm from "@/components/common/PackagePopupForm";
 
+import Testimonial from "@/components/home/Testimonial";
+
 import type { Plan } from "@/types/plan";
 
 export default function HomePage() {
@@ -51,6 +53,7 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <WhyUsSection />
+      <Testimonial />
       <CallToActionSection onOpenPopup={handleOpenTrialPopup} />
 
       {/* PricingSection now passes selected package */}

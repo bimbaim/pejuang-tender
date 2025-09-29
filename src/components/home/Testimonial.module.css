@@ -1,0 +1,225 @@
+/* src/components/home/Testimonial.module.css */
+
+/* Renamed from .testimonial-/-1-1-/ */
+.testimonial11 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 112px 64px;
+  gap: 80px;
+  background-color: #ffffff;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 80px;
+  width: 100%; /* Add width for better layout control */
+  max-width: 1200px; /* Example max width */
+}
+
+.sectionTitle {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+}
+
+.text1 {
+  text-align: center;
+  vertical-align: top;
+  font-size: 48px;
+  font-family: Saira;
+  letter-spacing: -1%;
+  line-height: 100%;
+  color: #000000;
+}
+
+/* Consolidated the first two duplicate .content definitions into a wrapper */
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center; /* Changed from flex-start to center for better layout */
+  gap: 48px;
+  width: 100%;
+}
+
+/* Consolidated the inner row .content definition */
+.contentColumns {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; /* Use space-between for distribution */
+  align-items: stretch; /* Stretch columns to have equal height */
+  gap: 32px;
+  width: 100%;
+}
+
+.column {
+  flex: 1; /* Allow columns to grow equally */
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* To push avatar to the bottom if content varies */
+  align-items: flex-start;
+  padding: 32px;
+  gap: 24px;
+  background-color: #f2f2f2;
+  border: 1px solid rgba(0, 0, 0, 0.15000000596046448);
+  min-width: 280px; /* Ensures columns don't get too small */
+}
+
+/* Consolidated inner content for the card */
+.contentCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.profileImage {
+  /* Placeholder styles for testimonial image */
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #ccc;
+  /* Original CSS had .img-2 and .img-1-0 which seem to be rating images or empty divs.
+     I've introduced .profileImage for clarity if it's a person's photo. */
+}
+
+.stars {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  background-color: transparent; /* Changed from white background */
+}
+
+.stars img {
+    height: 19px;
+    width: 20px;
+}
+
+.textQuote { /* Renamed from .text-3, .text-7, .text-1-1 */
+  text-align: left;
+  vertical-align: top;
+  font-size: 18px;
+  font-family: Quicksand;
+  line-height: 150%;
+  color: #000000;
+}
+
+.avatar {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+}
+
+.avatarContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* Consolidated .text-4, .text-8, .text-1-2 (Name) */
+.textName {
+  text-align: left;
+  vertical-align: top;
+  font-size: 16px;
+  font-family: Quicksand;
+  line-height: 150%;
+  font-weight: bold; /* Added bold for name */
+  color: #000000;
+}
+
+/* Consolidated .text-5, .text-9, .text-1-3 (Title) */
+.textTitle {
+  text-align: left;
+  vertical-align: top;
+  font-size: 16px;
+  font-family: Quicksand;
+  line-height: 150%;
+  color: #555555; /* Slightly muted color for title */
+}
+
+/* Slider Controls */
+.contentControls { /* Renamed from the last duplicate .content definition */
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1024px; /* Align controls with columns width */
+}
+
+.sliderDots {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+}
+
+.dotActive {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: #000000; /* Active dot is fully visible */
+}
+
+/* Consolidated the inactive dots */
+.dotInactive {
+  opacity: 0.2;
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  background-color: #000000;
+}
+
+.sliderButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sliderArrow {
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
+  gap: 8px;
+  background-color: #f2f2f2;
+  border: 1px solid rgba(0, 0, 0, 0.15000000596046448);
+  cursor: pointer;
+}
+
+.sliderArrow img {
+  height: 24px;
+  width: 24px;
+  /* Remove background-color: #ffffff; from image which was in original CSS */
+}
+
+/* Media Query for Responsiveness */
+@media (max-width: 1024px) {
+    .contentColumns {
+        flex-direction: column;
+        align-items: center;
+    }
+    .column {
+        width: 100%;
+        max-width: 600px; /* Maximize width but keep readable */
+    }
+}
