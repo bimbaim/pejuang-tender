@@ -21,7 +21,7 @@ const Footer = () => {
                 <div className={styles.footerLinks}>
                   {/* Note: Gunakan tag <a> sesungguhnya di aplikasi Anda */}
                   <a href="/privacy-policy" className={styles.textLink}>Privacy Policy</a>
-                  <a href="/terms-of-use" className={styles.textLink}>Terms of Service</a>
+                  <a href="/terms-of-service" className={styles.textLink}>Terms of Service</a>
                   <a href="/cookies" className={styles.textLink}>Cookies Settings</a>
                 </div>
                 <div className={styles.links}>
