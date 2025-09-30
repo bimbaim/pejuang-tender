@@ -10,7 +10,7 @@ const TermOfUseHero = () => {
     <div className={styles.header}>
       <div className={styles.container}>
         <div className={styles.component}>
-          <p className={styles.text}>Website Terms of Use</p>
+          <p className={styles.text}>Syarat dan Ketentuan</p>
         </div>
       </div>
     </div>

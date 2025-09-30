@@ -8,7 +8,7 @@ const PrivacyPolicyBanner = () => {
     <div className={styles.header64}> {/* Using the renamed module class */}
       <div className={styles.container}>
         <div className={styles.component}>
-          <p className={styles.text1}>Privacy Policy for Pejuang Tender</p>
+          <p className={styles.text1}>Kebijakan Privasi</p>
         </div>
       </div>
     </div>

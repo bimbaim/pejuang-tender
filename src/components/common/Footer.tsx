@@ -20,9 +20,8 @@ const Footer = () => {
               <div className={styles.footerLinksData}>
                 <div className={styles.footerLinks}>
                   {/* Note: Gunakan tag <a> sesungguhnya di aplikasi Anda */}
-                  <a href="/privacy-policy" className={styles.textLink}>Privacy Policy</a>
-                  <a href="/terms-of-service" className={styles.textLink}>Terms of Service</a>
-                  <a href="/cookies" className={styles.textLink}>Cookies Settings</a>
+                  <a href="/kebijakan-privasi" className={styles.textLink}>Kebijakan Privasi</a>
+                  <a href="/syarat-dan-ketentuan" className={styles.textLink}>Syarat dan Ketentuan</a>
                 </div>
                 <div className={styles.links}>
                   <p className={styles.copyright}>

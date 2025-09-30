@@ -54,13 +54,13 @@ const Navbar = () => {
             BERANDA
           </Link>
           <Link
-            href="/tender-terbaru"
+            href="/paket-lelang-terbaru"
             className={`${styles.navLink} ${
-              pathname === "/tender-terbaru" ? styles.activeLink : ""
+              pathname === "/paket-lelang-terbaru" ? styles.activeLink : ""
             }`}
             onClick={closeMenu}
           >
-            TENDER TERBARU
+            PAKET LELANG TERBARU
           </Link>
         </div>
 

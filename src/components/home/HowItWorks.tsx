@@ -8,7 +8,7 @@ const HowItWorks: React.FC = () => {
             <div className={styles.container}>
                 <section className={styles.sectionTitle}>
                     <div className={styles.contentTitle}>
-                        <p className={styles.text1}>Cara Kerja PeJuang Tender</p>
+                        <p className={styles.text1}>Cara Kerja Pejuang Tender</p>
                         <p className={styles.text2}>
                             Akses data tender dari ratusan LPSE, notifikasi harian sesuai kebutuhan, 
                             hindari ketinggalan jadwal, dan memaksimalkan kemenangan Anda.
@@ -36,7 +36,7 @@ const HowItWorks: React.FC = () => {
                     {/* Step 2: Image on Right */}
                     <div className={styles.contentRowReversed}> 
                         <div className={styles.contentStepText}>
-                            <p className={styles.text8}>2. Terima Update EMail setiap hari</p>
+                            <p className={styles.text8}>2. Terima Update Email setiap hari</p>
                             <p className={styles.text9}>
                                 Dapatkan ringkasan tender terbaru setiap hari langsung ke email 
                             </p>
