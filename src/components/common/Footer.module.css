@@ -1,88 +1,122 @@
+/* ========================================= */
+/* GAYA DASAR                  */
+/* ========================================= */
+
 .footer {
+  /* Flexbox Container */
+  display: flex;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
-  display: flex;
+
+  /* Justifikasi & Penyelarasan Konten (Rata Tengah) */
+  justify-content: center;
   -webkit-box-pack: center;
   -webkit-justify-content: center;
   -moz-box-pack: center;
   -ms-flex-pack: center;
-  justify-content: center;
+
+  align-items: center;
   -webkit-box-align: center;
   -webkit-align-items: center;
   -moz-box-align: center;
   -ms-flex-align: center;
-  align-items: center;
+
+  /* Gaya */
   background-color: var(--color-dark);
   color: var(--color-white);
 }
 
 .container {
+  /* Flexbox Container */
+  display: flex;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
-  display: flex;
+
+  /* Arah Flexbox (Baris/Horizontal) */
+  flex-direction: row;
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
   -moz-box-orient: horizontal;
   -moz-box-direction: normal;
   -ms-flex-direction: row;
-  flex-direction: row;
+
+  /* Justifikasi Konten (Rata Sisi) */
+  justify-content: space-between; /* Pushes content to opposite sides */
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   -moz-box-pack: justify;
   -ms-flex-pack: justify;
-  justify-content: space-between; /* Pushes content to opposite sides */
+
+  /* Penyelarasan Item (Rata Atas) */
+  align-items: flex-start;
   -webkit-box-align: start;
   -webkit-align-items: flex-start;
   -moz-box-align: start;
   -ms-flex-align: start;
-  align-items: flex-start;
+
+  /* Ukuran & Tata Letak */
   width: 100%;
+  /* PERBAIKAN: Menambahkan margin: 0 auto; agar container rata tengah secara horizontal */
+  margin: 0 auto;
 }
 
 .brandInfo {
+  /* Flexbox Container */
+  display: flex;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
-  display: flex;
+
+  /* Arah Flexbox (Kolom/Vertikal) */
+  flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
   -moz-box-orient: vertical;
   -moz-box-direction: normal;
   -ms-flex-direction: column;
-  flex-direction: column;
+
+  /* Spasi */
   gap: 24px;
 }
 
 .logoGroup {
+  /* Flexbox Container */
+  display: flex;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
-  display: flex;
+
+  /* Penyelarasan Item (Rata Tengah) */
+  align-items: center;
   -webkit-box-align: center;
   -webkit-align-items: center;
   -moz-box-align: center;
   -ms-flex-align: center;
-  align-items: center;
+
+  /* Spasi */
   gap: 8px;
 }
 
 .logoText {
+  /* Tipografi */
   font-size: 18px;
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-white);
+  /* Tata Letak */
   margin: 0;
 }
 
 .link {
+  /* Tipografi */
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-white);
@@ -90,32 +124,41 @@
 }
 
 .copyright {
+  /* Tipografi */
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-white);
+  /* Tata Letak */
   margin-bottom: 0px;
 }
 
 .paymentPartners {
+  /* Flexbox Container */
+  display: flex;
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
   display: -ms-flexbox;
-  display: flex;
+
+  /* Arah Flexbox (Kolom/Vertikal) */
+  flex-direction: column;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -webkit-flex-direction: column;
   -moz-box-orient: vertical;
   -moz-box-direction: normal;
   -ms-flex-direction: column;
-  flex-direction: column;
+
+  /* Spasi */
   gap: 8px;
 }
 
 .paymentTitle {
+  /* Tipografi */
   font-size: 12px;
   line-height: 1.5;
   color: var(--color-white);
+  /* Tata Letak */
   margin: 0;
 }
 
@@ -123,162 +166,21 @@
   display: none;
 }
 
-@media all and (min-width: 1441px) {
-  .container {
-    max-width: 1200px;
-  }
-}
-
-@media all and (min-width: 901px) {
-  .footer {
-    padding: 48px 80px;
-  }
-  .paymentPartners {
-    -webkit-box-align: end;
-    -webkit-align-items: flex-end;
-    -moz-box-align: end;
-    -ms-flex-align: end;
-    align-items: flex-end;
-  }
-
-  .brandInfo {
-    -webkit-box-align: start;
-    -webkit-align-items: flex-start;
-    -moz-box-align: start;
-    -ms-flex-align: start;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .navFooter {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    gap: 24px;
-  }
-
-  .brandInfoWrapper {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    width: 100%;
-    -webkit-box-pack: justify;
-    -webkit-justify-content: space-between;
-    -moz-box-pack: justify;
-    -ms-flex-pack: justify;
-    justify-content: space-between;
-  }
-
-  .logoGroup {
-    margin-right: 20px;
-  }
-  .copyright {
-    margin-top: 5px;
-  }
-}
-
-@media all and (max-width: 900px) {
-  .footer {
-    padding: 48px 20px 80px;
-  }
-
-  .copyright {
-    margin-bottom: 24px;
-    margin-top: 0;
-  }
-
-  .logoGroup {
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -moz-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    margin-bottom: 24px;
-  }
-
-  .footer .container {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-flex-flow: column;
-    -moz-box-orient: vertical;
-    -moz-box-direction: normal;
-    -ms-flex-flow: column;
-    flex-flow: column;
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -moz-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    text-align: center;
-  }
-
-  .navFooter {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: flex;
-    gap: 16px;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-flex-direction: column;
-    -moz-box-orient: vertical;
-    -moz-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
-    margin-bottom: 35px;
-  }
-
-  .brandInfo {
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-  }
-
-  .paymentPartners {
-    text-align: center;
-    margin-top: 10px;
-  }
-}
-
-@media all and (max-width: 600px) {
-  .footer .links {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-flex-flow: column;
-    -moz-box-orient: vertical;
-    -moz-box-direction: normal;
-    -ms-flex-flow: column;
-    flex-flow: column;
-    -webkit-box-align: center;
-    -webkit-align-items: center;
-    -moz-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    gap: 16px;
-  }
-}
-
-
 .footerPartner {
   background: #fff;
+  padding: 10px;
+  border-radius: 8px;
 }
+
+/* --- SOLUSI BLUR DENGAN MENAMBAHKAN ATURAN UNTUK GAMBAR --- */
+.footerPartner img {
+    /* Memastikan gambar selalu mengisi 100% dari wadah .footerPartner, 
+       yang telah dibatasi lebarnya di media query. */
+    width: 100%;
+    height: auto;
+    display: block;
+}
+/* -------------------------------------------------------- */
 
 .footerLinksData .footerLinks {
   display: flex;
@@ -293,9 +195,323 @@
 }
 
 .partnerText {
+  font-weight: 600;
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-white);
   margin-bottom: 0px;
   text-align: right;
+}
+
+/* ========================================= */
+/* MEDIA QUERIES                 */
+/* ========================================= */
+
+/* Desktop Besar (>= 1441px) */
+@media all and (min-width: 1441px) {
+  .container {
+    max-width: 1200px;
+  }
+}
+
+/* Tablet / Desktop Menengah (>= 901px) */
+@media all and (min-width: 901px) {
+  .footer {
+    padding: 48px 80px;
+  }
+
+  .paymentPartners {
+    /* Penyelarasan Item (Rata Kanan/Bawah) */
+    align-items: flex-end;
+    -webkit-box-align: end;
+    -webkit-align-items: flex-end;
+    -moz-box-align: end;
+    -ms-flex-align: end;
+  }
+
+  .brandInfo {
+    /* Penyelarasan Item (Rata Kiri/Atas) */
+    align-items: flex-start;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -moz-box-align: start;
+    -ms-flex-align: start;
+    /* Ukuran */
+    width: 100%;
+  }
+
+  .navFooter {
+    /* Flexbox Container */
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    /* Spasi */
+    gap: 24px;
+  }
+
+  .brandInfoWrapper {
+    /* Flexbox Container */
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+
+    /* Penyelarasan Item (Rata Tengah) */
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+
+    /* Justifikasi Konten (Rata Sisi) */
+    justify-content: space-between;
+    -webkit-box-pack: justify;
+    -webkit-justify-content: space-between;
+    -moz-box-pack: justify;
+    -ms-flex-pack: justify;
+
+    /* Ukuran */
+    width: 100%;
+  }
+
+  .logoGroup {
+    margin-right: 20px;
+  }
+
+  .copyright {
+    margin-top: 5px;
+  }
+}
+
+/* Tablet Kecil / Mobile Landscape (<= 1028px) */
+@media all and (min-width: 901px) {
+  .PaymentPartnerlinks {
+    /* Aturan max-width: 65% hanya berlaku di desktop (>= 901px) */
+    max-width: 65%; 
+  }
+}
+
+/* Mobile (<= 900px) */
+@media all and (max-width: 900px) {
+  .footer {
+    padding: 48px 20px 80px;
+  }
+
+  .copyright {
+    /* Perubahan untuk menggeser copyright ke atas sebelum paymentPartners,
+       dan menambahkan margin atas untuk jarak dari links */
+    /* MENGURANGI JARAK DARI 35px menjadi 20px */
+    margin-bottom: 20px; /* Jarak bawah sebelum Payment Partners (DIPERBAIKI) */
+    margin-top: 24px; /* Jarak atas dari Links/Nav */
+  }
+
+  .logoGroup {
+    /* Justifikasi Konten (Rata Tengah) */
+    justify-content: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+    /* Tata Letak */
+    /* Menghilangkan margin-bottom: 24px; karena logoGroup tidak hanya berisi logo */
+    margin-bottom: 0;
+  }
+
+  /* Container utama footer rata tengah, menumpuk, dan teks rata tengah */
+  .footer .container {
+    /* Arah & Flow Flexbox (Kolom/Vertikal) */
+    flex-flow: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-flow: column;
+
+    /* Justifikasi & Penyelarasan Konten (Rata Tengah) */
+    justify-content: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+
+    /* Teks */
+    text-align: center;
+  }
+
+  /* Menyesuaikan urutan dan tata letak brandInfoWrapper untuk menempatkan logo di atas */
+  .brandInfoWrapper {
+    /* Mengubah brandInfoWrapper menjadi tumpukan vertikal rata tengah */
+
+    /* Arah Flexbox (Kolom/Vertikal) */
+    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-direction: column;
+
+    /* Penyelarasan Item (Rata Tengah) */
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+
+    /* Justifikasi Konten (Rata Tengah) */
+    justify-content: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -moz-box-pack: center;
+    -ms-flex-pack: center;
+
+    /* Ukuran & Spasi */
+    width: 100%;
+    gap: 0; /* Menghapus gap */
+  }
+
+  /* Mengatur tampilan Logo saja agar berada di bagian atas brandInfoWrapper */
+  .logoGroup {
+    /* Arah Flexbox (Kolom/Vertikal) */
+    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-direction: column;
+  }
+
+  /* Nav Footer (Links) kini mengacu pada .footerLinksData .footerLinks dari komponen React */
+  .footerLinksData .footerLinks {
+    /* Flexbox Container */
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+    /* Arah Flexbox (Kolom/Vertikal) */
+    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-direction: column;
+    /* Spasi & Tata Letak */
+    gap: 16px;
+    /* Menghapus margin-bottom jika menggunakan .copyright yang memiliki margin-top */
+    margin-bottom: 0;
+  }
+
+  .brandInfo {
+    /* Penyelarasan Item (Rata Tengah) */
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+    /* Spasi */
+    /* Menghilangkan gap: 24px; pada brandInfo agar urutan logo, links, copyright lebih rapat */
+    gap: 0;
+  }
+
+  /* --- PERBAIKAN BAGIAN COPYRIGHT/LINKS NAVIGASI --- */
+
+  /* Ini mengatasi div className={styles.links} yang membungkus Copyright/Navigasi Policy */
+  .links {
+    /* Tata Letak & Order */
+    /* Di desktop, ini digunakan untuk copyright, tetapi di mobile kita gunakan juga untuk policy links */
+    margin-top: 24px; /* Jarak antara links dan copyright */
+    order: 1; /* Memastikan Copyright/Navigasi berada di atas Partner Pembayaran */
+  }
+
+  /* --- PERBAIKAN BAGIAN PARTNER PEMBAYARAN (MENGGUNAKAN CLASS BARU) --- */
+
+  .PaymentPartnerlinks {
+    /* Targeting div className={styles.PaymentPartnerlinks} */
+    /* Flexbox Container */
+    display: flex;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -moz-box;
+    display: -ms-flexbox;
+
+    /* Arah & Flow Flexbox (Kolom/Vertikal) */
+    flex-flow: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-flow: column;
+
+    /* Penyelarasan Item (Rata Tengah) */
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+
+    /* Ukuran, Spasi & Order */
+    gap: 16px; /* Jarak antara Partner Text dan logo Partner */
+    width: 100%;
+    order: 2; /* Pindahkan ke bagian paling bawah */
+  }
+
+  .partnerText {
+    /* Teks partner yang tadinya rata kanan di desktop harus rata tengah di mobile */
+    text-align: center;
+    margin-bottom: 0px; /* Jarak dikontrol oleh gap di .PaymentPartnerlinks */
+  }
+
+  .paymentPartners {
+    /* Class ini tidak lagi digunakan untuk layout di mobile, tapi tetap ada di sini */
+    text-align: center;
+    margin-top: 0;
+    order: 2;
+  }
+}
+
+/* Mobile Kecil (<= 600px) */
+@media all and (max-width: 600px) {
+  /* Jika menggunakan .footerLinksData .footerLinks, .footer .links mungkin tidak diperlukan */
+  .footer .links {
+    /* Arah & Flow Flexbox (Kolom/Vertikal) */
+    flex-flow: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-flow: column;
+    -moz-box-orient: vertical;
+    -moz-box-direction: normal;
+    -ms-flex-flow: column;
+
+    /* Penyelarasan Item (Rata Tengah) */
+    align-items: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -moz-box-align: center;
+    -ms-flex-align: center;
+
+    /* Spasi */
+    gap: 16px;
+  }
+
+  /* Terapkan max-width pada wadah, bukan pada gambar */
+  .footerPartner {
+    max-width: 300px; /* Batasi lebar wadah agar gambar tidak terlalu besar/blur */
+    width: 90%; /* Pastikan tetap responsif di dalam batas max-width */
+    margin: 0 auto;
+    padding: 10px;
+  }
 }

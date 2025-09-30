@@ -31,7 +31,7 @@ const Footer = () => {
                 </div>
               </div>
             </div>
-            <div className={styles.links}>
+            <div className={styles.PaymentPartnerlinks}>
               <p className={styles.partnerText}>
                 Partner Pembayaran kami
               </p>
