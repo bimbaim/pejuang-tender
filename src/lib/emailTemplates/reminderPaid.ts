@@ -37,7 +37,7 @@ export const reminderPaidEmailTemplate = (name: string, packageName: string, sub
               width: 100% !important; 
               /* Pastikan teks rata kiri saat bertumpuk */
               text-align: left !important; 
-              padding-bottom: 0px !important; /* Kurangi padding bawah */
+              padding:20px 0 !important; /* Kurangi padding bawah */
           }
         }
     </style>
@@ -125,13 +125,13 @@ export const reminderPaidEmailTemplate = (name: string, packageName: string, sub
 
           <table width="600" class="container" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#000;border-radius:10px;margin-top:20px;color:#fff;">
               <tr>
-                  <td class="stack" width="50%" style="padding:20px;text-align:left;font-size:14px;">
+                  <td class="stack" width="50%" style="text-align:left;font-size:14px;">
                       <p style="margin:0;">Selamat berjuang & semoga sukses memenangkan tender!</p>
                       <p style="margin:0;">Salam,</p>
                       <p style="margin:0;">Tim pejuangtender.id</p>
                       <p style="margin:0;font-weight:bold;">“Tender Tepat, Lebih Cepat”</p>
                   </td>
-                  <td class="stack" width="50%" style="padding:20px;text-align:right;font-size:14px;">
+                  <td class="stack" width="50%" style="text-align:right;font-size:14px;">
                       <p style="margin:0;font-weight:bold;">BUTUH BANTUAN?</p>
                       <p style="margin:0;">Email: <a href="mailto:info@pejuangtender.id" style="color:#fff;text-decoration:none;">info@pejuangtender.id</a></p>
                       <p style="margin:0;">WhatsApp: <a href="https://wa.me/6282248783555" style="color:#fff;text-decoration:none;">+62 822 8478 3555</a></p>
