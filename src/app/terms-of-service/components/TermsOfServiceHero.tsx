@@ -1,7 +1,7 @@
-// TermsOfUseHero.tsx
+// TermsOfServiceHero.tsx
 
 import React from 'react';
-import styles from './TermsOfUseHero.module.css'; // 1. Import the CSS module
+import styles from './TermsOfServiceHero.module.css'; // 1. Import the CSS module
 
 // It's a good practice to use PascalCase for component names (e.g., TermOfUseHero)
 const TermOfUseHero = () => { 

@@ -1,7 +1,6 @@
 // TermOfUseBody.tsx
 import React from 'react';
-import styles from './TermsOfUseBody.module.css';
-
+import styles from './TermsOfServiceBody.module.css';
 // Data Utama
 const WEBSITE_URL = "https://pejuangtender.id";
 const COMPANY_NAME = "PejuangTender.id";

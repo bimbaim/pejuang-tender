@@ -1,9 +1,13 @@
 // src/app/privacy-policy/components/PrivacyPolicyBody.tsx
 
 import React from 'react';
-import styles from './PrivacyPolicyBody.module.css'; // Import the CSS module
+import styles from './PrivacyPolicyBody.module.css';
 
-// FIX: Changed React.VFC to the correct type, React.FC
+// Data Utama
+const WEBSITE_URL = "https://pejuangtender.id";
+const COMPANY_NAME = "PejuangTender.id";
+const CONTACT_EMAIL = "info@pejuangtender.id";
+
 const PrivacyPolicyBody: React.FC = () => {
   return (
     <div className={styles.event1}>
@@ -11,76 +15,98 @@ const PrivacyPolicyBody: React.FC = () => {
         
         {/* Section 1: Introduction */}
         <section className={styles.sectionTitle}>
+          <h2 className={styles.headingPrimary}>Kebijakan Privasi</h2>
           <p className={styles.text1}>
-            At datalpse, accessible from https://www.pejuangtender.com, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by datalpse and how we use it.
-
-            If you have additional questions or require more information about our Privacy Policy, do not hesitate to contact us.
+            Di <strong>{COMPANY_NAME}</strong>, yang dapat diakses melalui <a href={WEBSITE_URL}>{WEBSITE_URL}</a>, salah satu prioritas utama kami adalah menjaga privasi pengunjung dan pengguna kami. Kebijakan Privasi ini menjelaskan jenis informasi apa saja yang kami kumpulkan, bagaimana kami menggunakannya, serta hak Anda terkait data tersebut.
+            <br /><br />
+            Jika Anda memiliki pertanyaan tambahan atau memerlukan informasi lebih lanjut tentang Kebijakan Privasi kami, jangan ragu untuk menghubungi kami melalui email di <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
           </p>
         </section>
         
+        {/* --- */}
+
         {/* Section 2: Log Files */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text2}>Log Files</p>
+          <h3 className={styles.headingSecondary}>1. File Log</h3>
           <p className={styles.text3}>
-            pejuang tender follows a standard procedure of using log files. These files log visitors when they visit websites. All hosting companies do this and a part of hosting services&rsquo; analytics. The information collected by log files include internet protocol (IP) addresses, browser type, Internet Service Provider (ISP), date and time stamp, referring/exit pages, and possibly the number of clicks. These are not linked to any information that is personally identifiable. The purpose of the information is for analyzing trends, administering the site, tracking users&rsquo; movement on the website, and gathering demographic information.
+            {COMPANY_NAME} mengikuti prosedur standar penggunaan file log. File-file ini mencatat pengunjung ketika mereka mengunjungi situs web. Informasi yang dikumpulkan oleh file log meliputi:
+            <ul className={styles.list}>
+              <li>Alamat Internet Protocol (IP)</li>
+              <li>Jenis *browser*</li>
+              <li>Penyedia Layanan Internet (ISP)</li>
+              <li>Tanggal dan waktu kunjungan (*timestamp*)</li>
+              <li>Halaman perujuk/keluar (*referring/exit pages*)</li>
+              <li>Jumlah klik</li>
+            </ul>
+            Informasi ini <strong>tidak terkait</strong> dengan informasi apa pun yang dapat diidentifikasi secara pribadi. Tujuan dari informasi ini adalah untuk menganalisis tren, mengelola situs, melacak pergerakan pengguna di situs web, dan mengumpulkan informasi demografis.
           </p>
         </section>
         
+        {/* --- */}
+
         {/* Section 3: Cookies and Web Beacons */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text4}>Cookies and Web Beacons</p>
+          <h3 className={styles.headingSecondary}>2. Cookies dan Pelacakan</h3>
           <p className={styles.text5}>
-            Like any other website, datalpse uses &apos;cookies&apos;. These cookies are used to store information including visitors&rsquo; preferences, and the pages on the website that the visitor accessed or visited. The information is used to optimize the users&rsquo; experience by customizing our web page content based on visitors&rsquo; browser type and/or other information.
-
-            For more general information on cookies, please read the &quot;Cookies&quot; article from the Privacy Policy Generator.
+            Seperti situs web lainnya, kami menggunakan **&apos;cookies&apos;**. *Cookies* ini digunakan untuk menyimpan informasi termasuk preferensi pengunjung, dan halaman-halaman di situs web yang diakses atau dikunjungi pengunjung. Informasi tersebut digunakan untuk:
+            <ul className={styles.list}>
+                <li>Mengingat preferensi pengguna</li>
+                <li>Mengoptimalkan konten halaman</li>
+                <li>Memersonalisasi notifikasi dan layanan</li>
+            </ul>
+            Anda dapat memilih untuk menonaktifkan *cookies* melalui opsi pengaturan *browser* individual Anda. Namun, perlu diperhatikan bahwa beberapa bagian dari situs kami mungkin tidak berfungsi dengan baik atau optimal setelah penonaktifan *cookies*.
           </p>
         </section>
         
-        {/* Section 4: Privacy Policies */}
+        {/* --- */}
+
+        {/* Section 4: Layanan Pihak Ketiga */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text6}>Privacy Policies</p>
+          <h3 className={styles.headingSecondary}>3. Layanan Pihak Ketiga dan Kebijakan Privasi</h3>
           <p className={styles.text7}>
-            You may consult this list to find the Privacy Policy for each of the advertising partners of datalpse.
-
-            Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on datalpse, which are sent directly to users&rsquo; browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
-
-            Note that datalpse has no access to or control over these cookies that are used by third-party advertisers.
+            Kami dapat menampilkan iklan atau menyertakan tautan ke situs pihak ketiga yang menggunakan teknologi seperti *cookies*, JavaScript, atau *Web Beacons*. Server iklan atau jaringan iklan pihak ketiga ini secara otomatis menerima alamat IP Anda ketika hal ini terjadi. Teknologi ini digunakan untuk mengukur efektivitas kampanye iklan mereka dan/atau untuk mempersonalisasi konten iklan yang Anda lihat di situs web yang Anda kunjungi.
+            <br /><br />
+            Perlu diketahui bahwa <strong>{COMPANY_NAME}</strong> tidak memiliki akses ke atau kontrol atas *cookies* ini yang digunakan oleh pengiklan pihak ketiga. Kebijakan Privasi kami tidak berlaku untuk pengiklan atau situs web lain. Oleh karena itu, kami menyarankan Anda untuk meninjau Kebijakan Privasi masing-masing dari server iklan pihak ketiga tersebut untuk informasi yang lebih rinci.
           </p>
         </section>
         
-        {/* Section 5: Third Party Privacy Policies */}
+        {/* --- */}
+
+        {/* Section 5: Data dari Sumber Resmi */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text8}>Third Party Privacy Policies</p>
+          <h3 className={styles.headingSecondary}>4. Data dari Sumber Resmi</h3>
           <p className={styles.text9}>
-            pejuang tender&rsquo;s Privacy Policy does not apply to other advertisers or websites. Thus, we are advising you to consult the respective Privacy Policies of these third-party ad servers for more detailed information. It may include their practices and instructions about how to opt-out of certain options.
-
-            You can choose to disable cookies through your individual browser options. To know more detailed information about cookie management with specific web browsers, it can be found at the browsers&rsquo; respective websites. What Are Cookies?
+            Semua data tender yang kami sediakan berasal langsung dari <strong>platform LPSE/e-procurement resmi</strong>. Kami hanya bertindak sebagai agregator (pengumpul) dan penyedia notifikasi untuk data yang sudah bersifat publik.
           </p>
         </section>
         
-        {/* Section 6: Children's Information */}
+        {/* --- */}
+
+        {/* Section 6: Privasi Anak */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text10}>Children&rsquo;s Information</p>
+          <h3 className={styles.headingSecondary}>5. Privasi Anak</h3>
           <p className={styles.text11}>
-            Another part of our priority is adding protection for children while using the internet. We encourage parents and guardians to observe, participate in, and/or monitor and guide their online activity.
+            Kami memprioritaskan penambahan perlindungan bagi anak-anak saat menggunakan internet. <strong>{COMPANY_NAME}</strong> tidak dengan sengaja mengumpulkan Informasi Identitas Pribadi dari anak-anak di bawah usia 13 tahun. Jika Anda yakin bahwa anak Anda telah memberikan jenis informasi ini di situs web kami, kami sangat menganjurkan Anda untuk segera menghubungi kami dan kami akan melakukan upaya terbaik untuk segera menghapus informasi tersebut dari catatan kami.
+          </p>
+        </section>
+        
+        {/* --- */}
 
-            datalpse does not knowingly collect any Personal Identifiable Information from children under the age of 13. If you think that your child provided this kind of information on our website, we strongly encourage you to contact us immediately and we will do our best efforts to promptly remove such information from our records.
-          </p>
-        </section>
-        
-        {/* Section 7: Online Privacy Policy Only */}
+        {/* Section 7: Kebijakan Online Saja */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text12}>Online Privacy Policy Only</p>
+          <h3 className={styles.headingSecondary}>6. Kebijakan Online Saja</h3>
           <p className={styles.text13}>
-            This Privacy Policy applies only to our online activities and is valid for visitors to our website with regards to the information that they shared and/or collect in datalpse. This policy is not applicable to any information collected offline or via channels other than this website.
+            Kebijakan Privasi ini hanya berlaku untuk aktivitas *online* kami dan berlaku untuk pengunjung situs web kami sehubungan dengan informasi yang mereka bagikan dan/atau kumpulkan di <strong>{COMPANY_NAME}</strong>. Kebijakan ini tidak berlaku untuk informasi apa pun yang dikumpulkan secara *offline* atau melalui saluran selain situs web ini.
           </p>
         </section>
         
+        {/* --- */}
+
         {/* Section 8: Consent */}
         <section className={styles.sectionTitle}>
-          <p className={styles.text14}>Consent</p>
+          <h3 className={styles.headingSecondary}>7. Persetujuan</h3>
           <p className={styles.text15}>
-            By using our website, you hereby consent to our Privacy Policy and agree to its Terms and Conditions.
+            Dengan menggunakan situs web kami, Anda dengan ini menyetujui Kebijakan Privasi kami dan menyetujui Syarat & Ketentuan Penggunaan kami.
           </p>
         </section>
         
