@@ -8,14 +8,16 @@ const HeroSection = () => {
       <div className={styles.contentContainer}>
         <div className={styles.textColumn}>
           <h1 className={styles.mainHeading}>
-            PANITIA MENGUMUMKAN TENDER{" "}
-            <span className={styles.highlightText}>BARU</span>, ANDA LANGSUNG
-            DAPAT <span className={styles.highlightText}>NOTIF</span>.
-          </h1>
+    SELALU JADI 
+    <br />
+    YANG <span className={styles.highlightText}>PERTAMA</span> 
+    <br />
+    TAHU TENDER <span className={styles.highlightText}>BARU</span>.
+</h1>
           <p className={styles.description}>
             Aplikasi kami memantau tender pemerintah terbaru di ratusan laman
-            SPSE setiap hari dan langsung mengirimkan notifikasi sesuai kata
-            kunci Anda. Tidak ada lagi tender terlewat.
+            SPSE setiap hari dan langsung mengirimkan notifikasi sesuai kata kunci
+            Anda. Tidak ada lagi tender terlewat.
           </p>
           <div className={styles.actions}>
             <a href="#paket" className={styles.button}>
