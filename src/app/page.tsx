@@ -54,9 +54,10 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <WhyUsSection />
+      <CallToActionSection onOpenPopup={handleOpenTrialPopup} />
       <Testimonial />
       <HowItWorks />
-      <CallToActionSection onOpenPopup={handleOpenTrialPopup} />
+      
 
       {/* PricingSection now passes selected package */}
       <PricingSection onOpenPackagePopup={handleOpenPackagePopup} />
