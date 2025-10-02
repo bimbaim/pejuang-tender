@@ -93,27 +93,51 @@ export async function POST(req: NextRequest) {
         const packageName = subscriptionData.packages.alternative_name;
         
         try {
-          const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
 
-          await fetch(`${baseUrl}/api/sendgrid`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              to: email,
-              subject: `Selamat Bergabung ${packageName} di pejuangtender.id`,
-              templateName: 'subscriptionWelcome',
-              data: {
-                name,
-                packageName,
-              },
-            }),
-          });
-          console.log(`Email berhasil dikirim ke ${email} untuk paket ${packageName}.`);
+            // --- Langkah 1: Kirim Email Selamat Datang (ke pengguna) ---
+            await fetch(`${baseUrl}/api/sendgrid`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: email,
+                    subject: `Selamat Bergabung ${packageName} di pejuangtender.id`,
+                    templateName: 'subscriptionWelcome',
+                    data: {
+                        name,
+                        packageName,
+                    },
+                }),
+            });
+            console.log(`Email berhasil dikirim ke ${email} untuk paket ${packageName}.`);
+
+            // --- Langkah 2: Kirim Email Notifikasi Tambahan (ke info@pejuangtender.id) ---
+            await fetch(`${baseUrl}/api/sendgrid`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    to: 'info@pejuangtender.id', // Penerima notifikasi internal
+                    // Subjek yang jelas bahwa ini adalah notifikasi internal
+                    subject: `NOTIFIKASI: Langganan Baru Paket ${packageName} oleh ${name}`,
+                    // Asumsi Anda memiliki template terpisah untuk notifikasi internal
+                    templateName: 'internalSubscriptionNotification', 
+                    data: {
+                        name,
+                        email, // Sertakan email pelanggan
+                        packageName,
+                    },
+                }),
+            });
+            console.log(`Email notifikasi berhasil dikirim ke info@pejuangtender.id.`);
+
         } catch (emailError: unknown) {
-          const err = emailError as ExtendedError;
-          console.error("Gagal mengirim email via API:", err.message);
+            const err = emailError as ExtendedError;
+            // Blok catch ini akan menangani error dari salah satu dari dua panggilan fetch di atas
+            console.error("Gagal mengirim salah satu atau kedua email via API:", err.message);
         }
       }
 

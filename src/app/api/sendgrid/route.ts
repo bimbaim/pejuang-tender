@@ -8,6 +8,8 @@ import { dailyTenderTrialEmailTemplate } from "@/lib/emailTemplates/dailyTenderT
 import { reminderTrialEmailTemplate } from "@/lib/emailTemplates/reminderTrial";
 import { reminderPaidEmailTemplate } from "@/lib/emailTemplates/reminderPaid";
 import { dailyTenderPaidEmailTemplate } from "@/lib/emailTemplates/dailyTenderPaid";
+import { internalNotificationTemplate } from "@/lib/emailTemplates/internalNotification";
+import { internalSubscriptionNotificationTemplate } from "@/lib/emailTemplates/internalSubscriptionNotification";
 
 interface SendGridError extends Error {
   response?: {
@@ -164,6 +166,48 @@ export async function POST(req: Request) {
           data.name,
           data.packageName,
           data.subscriptionEndDate
+        );
+        break;
+
+      case "internalNotification":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.email !== "string" ||
+          typeof data.trialEndDate !== "string"
+        ) {
+          return NextResponse.json(
+            {
+              message: "Missing or invalid data for internalNotification template",
+            },
+            { status: 400 }
+          );
+        }
+        emailBody = internalNotificationTemplate(
+          data.name,
+          data.email,
+          data.trialEndDate
+        );
+        break;
+
+      case "internalSubscriptionNotification":
+        if (
+          !data ||
+          typeof data.name !== "string" ||
+          typeof data.email !== "string" ||
+          typeof data.packageName !== "string"
+        ) {
+          return NextResponse.json(
+            {
+              message: "Missing or invalid data for internalSubscriptionNotification template",
+            },
+            { status: 400 }
+          );
+        }
+        emailBody = internalSubscriptionNotificationTemplate(
+          data.name,
+          data.email,
+          data.packageName
         );
         break;
 

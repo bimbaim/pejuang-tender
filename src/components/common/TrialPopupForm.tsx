@@ -315,7 +315,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       if (subscriptionError) throw subscriptionError;
 
       try {
-        const response = await fetch("/api/sendgrid", {
+        // --- Langkah 1: Kirim Email Selamat Datang (ke pengguna) ---
+        const welcomeResponse = await fetch("/api/sendgrid", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -331,16 +332,48 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           }),
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send email via API.");
+        if (!welcomeResponse.ok) {
+          const errorData = await welcomeResponse.json();
+          throw new Error(errorData.message || "Gagal mengirim email selamat datang.");
         }
 
-        console.log("Email berhasil dikirim via API!");
-      } catch (apiError: unknown) {
+        console.log("Email Selamat Datang berhasil dikirim!");
+
+        // --- Langkah 2: Kirim Email Notifikasi Tambahan (ke info@pejuangtender.id) ---
+        // Email ini terpisah dan memiliki tujuan yang berbeda (notifikasi internal)
+        const notificationResponse = await fetch("/api/sendgrid", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            to: "info@pejuangtender.id", // Penerima notifikasi internal
+            // Subjek yang jelas bahwa ini adalah notifikasi internal
+            subject: `NOTIFIKASI: Pendaftaran Trial Baru oleh ${formData.name}`,
+            // Asumsi Anda memiliki template terpisah untuk notifikasi internal
+            templateName: "internalNotification", 
+            data: {
+              name: formData.name,
+              email: formData.email, // Data penting yang mungkin dibutuhkan tim internal
+              trialEndDate: endDateFormatted,
+            },
+          }),
+        });
+        
+        // Periksa status pengiriman email notifikasi
+        if (!notificationResponse.ok) {
+          const errorData = await notificationResponse.json();
+          // Penting: Jika notifikasi gagal, kita tetap log error, tapi email pengguna sudah terkirim.
+          throw new Error(errorData.message || "Gagal mengirim email notifikasi ke info@pejuangtender.id.");
+        }
+
+        console.log("Email notifikasi berhasil dikirim ke info@pejuangtender.id!");
+        
+    } catch (apiError: unknown) {
         const err = apiError as ExtendedError;
-        console.error("Gagal mengirim email via API:", err.message);
-      }
+        // Log error dari salah satu dari dua panggilan API
+        console.error("Gagal mengirim salah satu atau kedua email via API:", err.message);
+    }
 
       onClose();
       router.push("/thank-you");
