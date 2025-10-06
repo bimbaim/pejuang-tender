@@ -203,7 +203,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   };
   
   const handleLpseChange = (selectedValues: string[]) => {
-    setFormData(prev => ({ ...prev.formData, targetSpse: selectedValues }));
+    setFormData(prev => ({ ...prev, targetSpse: selectedValues }));
     handleBlur('targetSpse');
   };
 
