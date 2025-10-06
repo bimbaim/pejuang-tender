@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    to: 'info@pejuangtender.id', // Penerima notifikasi internal
+                    to: ["info@pejuangtender.id", "info@whello.id", "finance@whello.id"], 
                     // Subjek yang jelas bahwa ini adalah notifikasi internal
                     subject: `NOTIFIKASI: Langganan Baru Paket ${packageName} oleh ${name}`,
                     // Asumsi Anda memiliki template terpisah untuk notifikasi internal

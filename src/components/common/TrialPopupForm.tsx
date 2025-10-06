@@ -203,7 +203,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   };
   
   const handleLpseChange = (selectedValues: string[]) => {
-    setFormData(prev => ({ ...prev, targetSpse: selectedValues }));
+    setFormData(prev => ({ ...prev.formData, targetSpse: selectedValues }));
     handleBlur('targetSpse');
   };
 
@@ -266,7 +266,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
             if (subError) throw subError;
 
-            if (existingSubscription) {
+            if (existingSubscription && existingSubscription.length > 0) { // Cek apakah ada langganan trial
               setNotification("Email ini sudah terdaftar untuk trial gratis. Silakan pilih paket berbayar atau hubungi customer service.");
               // onClose(); // Close the form
               return; // Stop the function from proceeding
@@ -296,8 +296,9 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         month: "long",
         year: "numeric",
       });
-
-      const { error: subscriptionError } = await supabase
+      
+      // ✅ [MODIFIKASI] Ambil ID dari langganan yang baru dibuat
+      const { data: newSubscription, error: subscriptionError } = await supabase
         .from("subscriptions")
         .insert([
           {
@@ -310,9 +311,19 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             keyword: formData.keywords,
             spse: formData.targetSpse,
           },
-        ]);
+        ])
+        .select("id") // ✅ PENTING: Minta ID langganan kembali
+        .single(); // Asumsikan hanya satu yang dimasukkan
 
       if (subscriptionError) throw subscriptionError;
+      
+      // ✅ [BARU] Dapatkan ID langganan
+      const subscriptionId = newSubscription?.id;
+      
+      if (!subscriptionId) {
+          throw new Error("Gagal mendapatkan ID langganan baru.");
+      }
+
 
       try {
         // --- Langkah 1: Kirim Email Selamat Datang (ke pengguna) ---
@@ -347,7 +358,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            to: "info@pejuangtender.id", // Penerima notifikasi internal
+            to: ["info@pejuangtender.id", "info@whello.id", "finance@whello.id"], 
             // Subjek yang jelas bahwa ini adalah notifikasi internal
             subject: `NOTIFIKASI: Pendaftaran Trial Baru oleh ${formData.name}`,
             // Asumsi Anda memiliki template terpisah untuk notifikasi internal
@@ -376,7 +387,8 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     }
 
       onClose();
-      router.push("/thank-you");
+      // ✅ [MODIFIKASI] Redirect dengan subscription_id sebagai query parameter
+      router.push(`/thank-you?package=trial&subscription_id=${subscriptionId}`);
     } catch (error: unknown) {
       const err = error as ExtendedError;
       console.error("Error creating trial account:", err.message);
