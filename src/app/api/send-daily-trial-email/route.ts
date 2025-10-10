@@ -23,6 +23,7 @@ interface SubscriptionWithDetails {
     name: string;
     email: string;
   };
+  end_date: string;
 }
 
 interface SupabaseError {
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
-      .select(`user_id, keyword, category, spse, users(name, email)`)
+      .select(`user_id, keyword, category, spse, end_date, users(name, email)`)
       .eq("payment_status", "free-trial");
 
     if (subsError) {
@@ -209,6 +210,7 @@ export async function POST(req: NextRequest) {
             mainTenders: mainTenders || [],
             similarTendersOtherSPSE: similarTendersOtherSPSE || [],
             similarTendersSameSPSE: similarTendersSameSPSE || [],
+            trialEndDate: subscription.end_date, 
           },
         }),
       });
