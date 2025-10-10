@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { createClient } from "@supabase/supabase-js"; 
+import { createClient } from "@supabase/supabase-js";
 
 // --- Inisialisasi Klien Supabase ---
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -214,9 +214,26 @@ export async function POST(req: NextRequest) {
       });
 
       if (!response.ok) {
+        // --- LOGIKA BARU UNTUK MEMBACA DETAIL ERROR ---
+        let errorDetails = "Tidak ada detail error yang tersedia.";
+        try {
+          // Mencoba membaca body sebagai JSON
+          const errorBody = await response.json();
+          errorDetails = JSON.stringify(errorBody, null, 2);
+        } catch {
+          // Jika gagal, coba baca body sebagai teks
+          try {
+            errorDetails = await response.text();
+          } catch (textError) {
+            errorDetails = `Gagal membaca body respons: ${textError}`;
+          }
+        }
+        
         console.error(
-          `Gagal mengirim email ke ${users.email}. Status: ${response.status}`
+          `Gagal mengirim email ke ${users.email}. Status: ${response.status}.`
         );
+        console.error("Detail Error:", errorDetails);
+        // ---------------------------------------------
       } else {
         console.log(`Email harian berhasil dikirim ke ${users.email}.`);
         sentEmails.push(users.email);
