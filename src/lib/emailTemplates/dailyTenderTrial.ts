@@ -1,12 +1,14 @@
 // src/lib/emailTemplates/dailyTenderTrial.ts
 
-interface Tender {
+// --- INTERFACE ---
+// ✅ Pastikan interface diekspor untuk digunakan oleh hooks/validator
+export interface Tender {
   title: string;
   agency: string;
   budget: number;
-  // ✅ PERBAIKAN: Ganti 'url' menjadi 'source_url'
   source_url: string;
   end_date: string;
+  status: string; // ✅ Kolom status sudah ada
 }
 
 const BASE_URL =
@@ -25,26 +27,29 @@ const generateTenderTableHtml = (
       const encodedUrl = encodeURIComponent(tender.source_url);
 
       // 2. Buat URL pengalihan (redirect URL)
-      // Menggunakan BASE_URL/redirect?url=...
       const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
+      
+      // ❌ DIHAPUS: Semua logika statusStyle untuk perubahan warna
 
       return `
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:30px;">${
         index + 1
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:40%;">${ // 💡 Diperkecil menjadi 40% (dari yang semula otomatis)
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:35%;">${
         tender.title
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         tender.agency
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:120px;">Rp. ${ // 💡 Diperlebar menjadi 120px
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:100px;">Rp. ${
         tender.budget
       }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;width:80px;color:#333;font-weight:normal;">
+        ${tender.status}
+      </td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
         <a href="${
-          // Menggunakan redirectUrl yang baru
           redirectUrl
         }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
@@ -70,15 +75,18 @@ const generateTenderTableHtml = (
           <thead>
             <tr style="background:#f5f5f5;">
               <th style="padding:10px;font-size:13px;text-align:left;width:30px;">No</th>
-              <th style="padding:10px;font-size:13px;text-align:left;width:40%;">Nama</th>  <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
-              <th style="padding:10px;font-size:13px;text-align:left;width:120px;">HPS</th>  <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:35%;">Nama</th>  
+              <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:100px;">HPS</th> 
+              <th style="padding:10px;font-size:13px;text-align:left;width:80px;">Status</th> 
+              <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
             </tr>
           </thead>
           <tbody>
             ${
               tenders.length > 0
                 ? tenderListHtml
-                : `<tr><td colspan="5" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+                : `<tr><td colspan="6" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
             }
           </tbody>
         </table>
@@ -89,15 +97,6 @@ const generateTenderTableHtml = (
 
 /**
  * Generates the daily email template with a list of tenders for trial users.
- * @param name The user's name.
- * @param category The selected category (formatted string).
- * @param spse The selected SPSE sites (formatted string).
- * @param keyword The selected keywords (formatted string).
- * @param mainTenders Tenders matching all criteria.
- * @param similarTendersOtherSPSE Tenders matching category/keyword but in other SPSE.
- * @param similarTendersSameSPSE Tenders matching category/keyword in the selected SPSE.
- * @param trialEndDate The end date of the user's trial period.
- * @returns The complete HTML string for the email.
  */
 export const dailyTenderTrialEmailTemplate = (
   name: string,
@@ -108,6 +107,7 @@ export const dailyTenderTrialEmailTemplate = (
   similarTendersOtherSPSE: Tender[],
   similarTendersSameSPSE: Tender[],
   trialEndDate: string
+  // ❌ PERBAIKAN: Parameter 'status: string' yang tidak perlu telah dihapus
 ): string => {
   // Format tanggal hari ini (misalnya: 25 September 2025)
   const today = new Date().toLocaleDateString("id-ID", {
@@ -116,7 +116,6 @@ export const dailyTenderTrialEmailTemplate = (
     year: "numeric",
   });
 
-  // ✅ Mengganti tenderListHtml dengan pemanggilan fungsi helper
   const mainTenderTable = generateTenderTableHtml(mainTenders);
   const otherSpseTable = generateTenderTableHtml(
     similarTendersOtherSPSE,
@@ -150,7 +149,6 @@ export const dailyTenderTrialEmailTemplate = (
         .stack { 
               display: block !important; 
               width: 100% !important; 
-              /* Perubahan di sini */
               text-align: center !important; 
               padding:20px 0 !important; 
           }

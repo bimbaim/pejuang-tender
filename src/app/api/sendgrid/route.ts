@@ -70,6 +70,7 @@ export async function POST(req: Request) {
 
       case "dailyTenderTrial":
         // ✅ Periksa semua data yang diperlukan
+        // CATATAN: Pengecekan status Dihapus karena itu adalah properti per-Tender, bukan properti data global.
         if (
           !data ||
           typeof data.name !== "string" ||
@@ -80,6 +81,7 @@ export async function POST(req: Request) {
           !Array.isArray(data.similarTendersOtherSPSE) ||
           !Array.isArray(data.similarTendersSameSPSE) ||
           typeof data.trialEndDate !== "string"
+          // ❌ MENGHAPUS: typeof data.status !== "string"
         ) {
           return NextResponse.json(
             {
@@ -174,11 +176,16 @@ export async function POST(req: Request) {
           !data ||
           typeof data.name !== "string" ||
           typeof data.email !== "string" ||
-          typeof data.trialEndDate !== "string"
+          typeof data.trialEndDate !== "string" ||
+          // ✅ PENAMBAHAN: Validasi data baru
+          typeof data.category !== "string" ||
+          typeof data.spse !== "string" ||
+          typeof data.keyword !== "string"
         ) {
           return NextResponse.json(
             {
-              message: "Missing or invalid data for internalNotification template",
+              message:
+                "Missing or invalid data for internalNotification template. Required: name, email, trialEndDate, category, spse, keyword.",
             },
             { status: 400 }
           );
@@ -186,20 +193,29 @@ export async function POST(req: Request) {
         emailBody = internalNotificationTemplate(
           data.name,
           data.email,
-          data.trialEndDate
+          data.trialEndDate,
+          // ✅ PENAMBAHAN: Argumen baru
+          data.category, 
+          data.spse, 
+          data.keyword 
         );
         break;
 
-      case "internalSubscriptionNotification":
+     case "internalSubscriptionNotification":
         if (
           !data ||
           typeof data.name !== "string" ||
           typeof data.email !== "string" ||
-          typeof data.packageName !== "string"
+          typeof data.packageName !== "string" ||
+          // ✅ PENAMBAHAN: Validasi data filter baru
+          typeof data.category !== "string" ||
+          typeof data.spse !== "string" ||
+          typeof data.keyword !== "string"
         ) {
           return NextResponse.json(
             {
-              message: "Missing or invalid data for internalSubscriptionNotification template",
+              message:
+                "Missing or invalid data for internalSubscriptionNotification template. Required: name, email, packageName, category, spse, keyword.",
             },
             { status: 400 }
           );
@@ -207,7 +223,11 @@ export async function POST(req: Request) {
         emailBody = internalSubscriptionNotificationTemplate(
           data.name,
           data.email,
-          data.packageName
+          data.packageName,
+          // ✅ PENAMBAHAN: Argumen baru
+          data.category,
+          data.spse,
+          data.keyword
         );
         break;
 

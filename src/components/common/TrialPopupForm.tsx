@@ -324,6 +324,13 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
           throw new Error("Gagal mendapatkan ID langganan baru.");
       }
 
+      // Format data untuk dikirim ke template email
+      const formattedCategory = formData.category.toUpperCase();
+      // Mengubah array SPSE menjadi string (dipisahkan koma dan di-uppercase)
+      const formattedSpse = formData.targetSpse.join(', ').toUpperCase(); 
+      // Mengubah array Keyword menjadi string (dipisahkan koma dan di-uppercase)
+      const formattedKeyword = formData.keywords.filter(k => k.trim() !== '').join(', ').toUpperCase() || 'TIDAK ADA';
+
 
       try {
         // --- Langkah 1: Kirim Email Selamat Datang (ke pengguna) ---
@@ -352,21 +359,23 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
         // --- Langkah 2: Kirim Email Notifikasi Tambahan (ke info@pejuangtender.id) ---
         // Email ini terpisah dan memiliki tujuan yang berbeda (notifikasi internal)
-        const notificationResponse = await fetch("/api/sendgrid", {
+         const notificationResponse = await fetch("/api/sendgrid", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
             to: ["info@pejuangtender.id", "info@whello.id", "finance@whello.id"], 
-            // Subjek yang jelas bahwa ini adalah notifikasi internal
             subject: `NOTIFIKASI: Pendaftaran Trial Baru oleh ${formData.name}`,
-            // Asumsi Anda memiliki template terpisah untuk notifikasi internal
             templateName: "internalNotification", 
             data: {
               name: formData.name,
-              email: formData.email, // Data penting yang mungkin dibutuhkan tim internal
+              email: formData.email, 
               trialEndDate: endDateFormatted,
+              // ✅ PENAMBAHAN: Kirim data pilihan pengguna
+              category: formattedCategory,
+              spse: formattedSpse,
+              keyword: formattedKeyword,
             },
           }),
         });

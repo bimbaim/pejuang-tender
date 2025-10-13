@@ -14,20 +14,18 @@ console.log("Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
 console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // --- Antarmuka (Interfaces) ---
-// ✅ Diperbarui: Interface ini sekarang hanya berisi data yang dibutuhkan untuk template berbayar.
 interface SubscriptionWithDetails {
   user_id: string;
   keyword: string[] | null;
   category: string[] | null;
   spse: string[] | null;
-  payment_status: 'paid'; // ✅ PENAMBAHAN: Pastikan status pembayaran adalah 'paid'
+  payment_status: 'paid'; 
   users: {
     name: string;
     email: string;
   };
 }
 
-// ✅ PENAMBAHAN: Interface untuk PostgREST Error dan Query Result
 interface SupabaseError {
   code: string;
   details: string;
@@ -35,13 +33,14 @@ interface SupabaseError {
   message: string;
 }
 
-// ✅ PENAMBAHAN: Interface Tender dengan tipe number
+// ✅ PERUBAHAN: Menambahkan status ke interface Tender
 interface Tender {
     id: string;
     title: string;
     agency: string;
     budget: number;
     source_url: string;
+    status: string; // ✅ PENAMBAHAN
 }
 
 // Tipe gabungan untuk hasil query Supabase
@@ -77,15 +76,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ✅ TAMBAHKAN DEBUGGING DI SINI
     console.warn(`Total Paid Subscriptions fetched: ${subscriptions.length}`);
     subscriptions.forEach(sub => {
-        // Lakukan assertion di client untuk memastikan filter Supabase berhasil
         if (sub.payment_status !== 'paid') { 
             console.warn(`!!!! Peringatan: Subscription ${sub.user_id} dengan status ${sub.payment_status} bocor ke dalam loop PAID!`);
         }
     });
-    // ✅ AKHIR DEBUGGING
 
     for (const subscription of subscriptions as unknown as SubscriptionWithDetails[]) {
       const { user_id, keyword, category, spse, users } = subscription;
@@ -96,7 +92,6 @@ export async function POST(req: NextRequest) {
       }
       
       // --- Filter Conditions Helper ---
-      // ✅ Perbaikan: Menggabungkan semua kondisi filter
       const categoryConditions = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
       const spseConditions = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
       const keywordConditions = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
@@ -114,7 +109,7 @@ export async function POST(req: NextRequest) {
       // ----------------------------------------------------------------------
       let mainTenderQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
+        .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
 
       if (category && category.length > 0) {
         mainTenderQuery = mainTenderQuery.or(
@@ -140,11 +135,10 @@ export async function POST(req: NextRequest) {
 
       // -----------------------------------------------------------------------------------
       // --- Query 2: Similar Tenders Other SPSE (Category AND Keyword AND Status) ---
-      // Logic: Menghilangkan filter SPSE
       // -----------------------------------------------------------------------------------
       let similarTendersOtherSPSEQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
+        .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
 
       // Wajib: Status (sebagai AND pertama)
       similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(statusConditions.join(","));
@@ -167,11 +161,10 @@ export async function POST(req: NextRequest) {
 
         // ------------------------------------------------------------------------------------------
         // --- Query 3: Similar Tenders Same SPSE (Category AND SPSE AND Status) ---
-        // Logic: Menghilangkan filter Keyword
         // ------------------------------------------------------------------------------------------
         let similarTendersSameSPSEQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url`);
+          .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
 
         // Wajib: Status (sebagai AND pertama)
         similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(statusConditions.join(","));

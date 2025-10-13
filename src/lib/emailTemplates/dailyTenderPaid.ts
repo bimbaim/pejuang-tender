@@ -1,11 +1,13 @@
 // src/lib/emailTemplates/dailyTenderPaid.ts
 
-// ✅ Diperbarui: Interface Tender tetap sama
-interface Tender {
+// ✅ Diperbarui: Interface Tender sekarang mencakup status
+export interface Tender {
   title: string;
   agency: string;
   budget: string;
   source_url: string;
+  // ✅ PENAMBAHAN: Kolom status
+  status: string;
 }
 
 const BASE_URL =
@@ -13,7 +15,6 @@ const BASE_URL =
 
 /**
  * Helper function to generate HTML for a single tender table for PAID users.
- * Menambahkan kolom HPS.
  */
 const generateTenderTableHtml = (
   tenders: Tender[],
@@ -25,32 +26,39 @@ const generateTenderTableHtml = (
       const encodedUrl = encodeURIComponent(tender.source_url);
 
       // 2. Buat URL pengalihan (redirect URL)
-      // Menggunakan BASE_URL/redirect?url=...
       const redirectUrl = `${BASE_URL}/redirect?url=${encodedUrl}`;
+
+      // 💡 Gaya status dikembalikan ke dasar (tanpa warna) sesuai permintaan sebelumnya
+      const statusStyle = 'color:#333;font-weight:normal;';
 
       return `
     <tr>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:30px;">${
         index + 1
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:40%;">${ // 💡 Diperkecil menjadi 40% (dari yang semula otomatis)
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:40%;">${
         tender.title
       }</td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;">${
         tender.agency
       }</td>
-      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:120px;">Rp. ${ // 💡 Diperlebar menjadi 120px
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;color:#333;text-align:left;width:120px;">Rp. ${
         tender.budget
       }</td>
+      <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;width:80px;${statusStyle}">
+        ${tender.status}
+      </td>
       <td style="padding:8px 10px;border-bottom:1px solid #e0e0e0;font-size:13px;text-align:left;">
         <a href="${
-          // Menggunakan redirectUrl yang baru
           redirectUrl
         }" style="color:#0093dd;text-decoration:underline;">Link SPSE</a>
       </td>
     </tr>`;
     })
     .join("");
+    
+    // Total kolom: No, Nama, Instansi, HPS, Status, Link SPSE = 6 kolom
+    const colspanCount = 6;
 
   return `
     ${
@@ -70,15 +78,18 @@ const generateTenderTableHtml = (
           <thead>
             <tr style="background:#f5f5f5;">
               <th style="padding:10px;font-size:13px;text-align:left;width:30px;">No</th>
-              <th style="padding:10px;font-size:13px;text-align:left;width:40%;">Nama</th>  <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
-              <th style="padding:10px;font-size:13px;text-align:left;width:120px;">HPS</th>  <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:40%;">Nama</th>  
+              <th style="padding:10px;font-size:13px;text-align:left;">Instansi</th>
+              <th style="padding:10px;font-size:13px;text-align:left;width:120px;">HPS</th>  
+              <th style="padding:10px;font-size:13px;text-align:left;width:80px;">Status</th> 
+              <th style="padding:10px;font-size:13px;text-align:left;">Link SPSE</th>
             </tr>
           </thead>
           <tbody>
             ${
               tenders.length > 0
                 ? tenderListHtml
-                : `<tr><td colspan="5" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
+                : `<tr><td colspan="${colspanCount}" style="padding:15px;text-align:center;color:#666;">Tidak ada tender baru yang ditemukan hari ini.</td></tr>`
             }
           </tbody>
         </table>
@@ -100,7 +111,6 @@ const generateTenderTableHtml = (
  */
 export const dailyTenderPaidEmailTemplate = (
   name: string,
-  // ✅ PENAMBAHAN PARAMETER BARU UNTUK PAID USER
   category: string,
   spse: string,
   keyword: string,
@@ -126,10 +136,6 @@ export const dailyTenderPaidEmailTemplate = (
     "Tender Lain di SPSE Pilihan Anda"
   );
 
-  // Hapus kode map awal (tenderListHtml) dari fungsi ini
-  // karena sudah dipindahkan ke generateTenderTableHtml dan akan diganti
-  // dengan variabel mainTenderTable, dll.
-
   return `
   <!DOCTYPE html>
   <html lang="id">
@@ -153,7 +159,6 @@ export const dailyTenderPaidEmailTemplate = (
           .stack { 
               display: block !important; 
               width: 100% !important; 
-              /* Perubahan di sini */
               text-align: center !important; 
               padding:20px 0 !important; 
           }

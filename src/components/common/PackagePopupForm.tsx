@@ -369,20 +369,32 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       const basePrice = selectedPackage.price;
       const totalPrice = basePrice * 1.11;
 
+      // ✅ PENAMBAHAN: Format data filter untuk dikirim ke API /api/create-invoice
+    const formattedCategory = formData.category.join(', ').toUpperCase();
+    const formattedSpse = formData.targetSpse.join(', ').toUpperCase();
+    const formattedKeyword = formData.keywords.filter(k => k.trim() !== '').join(', ').toUpperCase() || 'TIDAK ADA';
+
       const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: Math.round(totalPrice),
-          currency: "IDR",
-          customer: {
-            email: formData.email,
-            name: formData.name,
-            whatsapp: formData.whatsapp,
-          },
-          subscriptionId: subscriptionData.id,
+            amount: Math.round(totalPrice),
+            currency: "IDR",
+            customer: {
+                email: formData.email,
+                name: formData.name,
+                whatsapp: formData.whatsapp,
+            },
+            subscriptionId: subscriptionData.id,
+            // ✅ PENAMBAHAN: Kirim data filter ke handler server
+            subscriptionDetails: {
+                category: formattedCategory,
+                spse: formattedSpse,
+                keyword: formattedKeyword,
+            }
         }),
-      });
+    });
+
 
       interface InvoiceResponse {
         invoiceUrl?: string;

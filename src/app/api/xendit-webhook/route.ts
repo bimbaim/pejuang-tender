@@ -71,14 +71,14 @@ export async function POST(req: NextRequest) {
       }
 
       // Add transaction_id to the update payload
-      const { data: subscriptionData, error: updateError } = await supabase
+       const { data: subscriptionData, error: updateError } = await supabase
           .from("subscriptions")
           .update({ 
               payment_status: "paid",
               transaction_id: webhookEvent.id
           })
           .eq("id", subscriptionId)
-          .select(`*, users(name, email), packages(alternative_name)`)
+          .select(`*, users(name, email), packages(alternative_name)`) 
           .single();
 
       if (updateError) {
@@ -91,6 +91,12 @@ export async function POST(req: NextRequest) {
       if (subscriptionData && subscriptionData.users && subscriptionData.packages) {
         const { name, email } = subscriptionData.users;
         const packageName = subscriptionData.packages.alternative_name;
+
+        // ✅ BARU: Format data array menjadi string
+        const formattedCategory = Array.isArray(subscriptionData.category) ? subscriptionData.category.join(', ') : '';
+        const formattedSpse = Array.isArray(subscriptionData.spse) ? subscriptionData.spse.join(', ') : '';
+        const formattedKeyword = Array.isArray(subscriptionData.keyword) && subscriptionData.keyword.length > 0 ? subscriptionData.keyword.join(', ') : 'TIDAK ADA';
+        
         
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
@@ -129,6 +135,10 @@ export async function POST(req: NextRequest) {
                         name,
                         email, // Sertakan email pelanggan
                         packageName,
+                        // ✅ PENAMBAHAN: Kirim data filter
+                        category: formattedCategory,
+                        spse: formattedSpse,
+                        keyword: formattedKeyword,
                     },
                 }),
             });

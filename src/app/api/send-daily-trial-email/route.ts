@@ -39,6 +39,7 @@ interface Tender {
     agency: string;
     budget: number;
     source_url: string;
+    status: string; // Sudah ada
 }
 
 type SupabaseQueryResult = {
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
       // ----------------------------------------------------------------------
       let mainTenderQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
+        .select(`id, title, agency, status, budget, source_url`); // ✅ Sudah benar ada status
 
       if (category && category.length > 0) {
         mainTenderQuery = mainTenderQuery.or(
@@ -122,11 +123,10 @@ export async function POST(req: NextRequest) {
 
       // -----------------------------------------------------------------------------------
       // --- Query 2: Similar Tenders Other SPSE (Category AND Keyword AND Status) ---
-      // Logic: Menghilangkan filter SPSE
       // -----------------------------------------------------------------------------------
       let similarTendersOtherSPSEQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url`);
+        .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
 
       // Wajib: Status (sebagai AND pertama)
       similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(statusConditions.join(","));
@@ -149,11 +149,10 @@ export async function POST(req: NextRequest) {
 
         // ------------------------------------------------------------------------------------------
         // --- Query 3: Similar Tenders Same SPSE (Category AND SPSE AND Status) ---
-        // Logic: Menghilangkan filter Keyword
         // ------------------------------------------------------------------------------------------
         let similarTendersSameSPSEQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url`);
+          .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
 
         // Wajib: Status (sebagai AND pertama)
         similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(statusConditions.join(","));

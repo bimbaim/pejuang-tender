@@ -6,7 +6,11 @@ const BASE_URL =
 export const internalSubscriptionNotificationTemplate = (
   name: string,
   email: string,
-  packageName: string
+  packageName: string,
+  // ✅ PENAMBAHAN: Parameter baru
+  category: string,
+  spse: string,
+  keyword: string
 ): string => {
   return `
   <!DOCTYPE html>
@@ -95,6 +99,20 @@ export const internalSubscriptionNotificationTemplate = (
                     <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Paket Langganan</th>
                     <td style="padding:10px 15px;background:#ffffff;color:#28a745;font-weight:bold;text-align:left;">${packageName}</td>
                   </tr>
+                  
+                  <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Kategori Pilihan</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;text-align:left;">${category}</td>
+                  </tr>
+                  <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Target SPSE</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;text-align:left;">${spse}</td>
+                  </tr>
+                  <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Kata Kunci</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;text-align:left;">${keyword}</td>
+                  </tr>
+
                   <tr>
                     <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Status</th>
                     <td style="padding:10px 15px;background:#ffffff;color:#28a745;font-weight:bold;text-align:left;">AKTIF</td>

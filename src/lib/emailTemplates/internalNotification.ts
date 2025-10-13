@@ -6,7 +6,11 @@ const BASE_URL =
 export const internalNotificationTemplate = (
   name: string,
   email: string,
-  trialEndDate: string
+  trialEndDate: string,
+  // ✅ PENAMBAHAN: Parameter baru
+  category: string,
+  spse: string,
+  keyword: string
 ): string => {
   return `
   <!DOCTYPE html>
@@ -92,6 +96,18 @@ export const internalNotificationTemplate = (
                     <td style="padding:10px 15px;background:#ffffff;color:#333;text-align:left;"><a href="mailto:${email}" style="color:#0093dd;text-decoration:none;">${email}</a></td>
                   </tr>
                   <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Kategori Pilihan</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;font-weight:bold;text-align:left;">${category}</td>
+                  </tr>
+                  <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Target SPSE</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;font-weight:bold;text-align:left;">${spse}</td>
+                  </tr>
+                  <tr>
+                    <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Kata Kunci</th>
+                    <td style="padding:10px 15px;background:#ffffff;color:#333;font-weight:bold;text-align:left;">${keyword}</td>
+                  </tr>
+                  <tr>
                     <th style="padding:10px 15px;background:#f0f0f0;font-weight:bold;color:#333;text-align:left;">Akhir Masa Trial</th>
                     <td style="padding:10px 15px;background:#ffffff;color:#d9534f;font-weight:bold;text-align:left;">${trialEndDate}</td>
                   </tr>
@@ -111,7 +127,6 @@ export const internalNotificationTemplate = (
                 </div>
               </td>
             </tr>
-
             
           </table>
 
