@@ -126,8 +126,20 @@ export async function POST(req: NextRequest) {
       // -----------------------------------------------------------------------------------
       let similarTendersOtherSPSEQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
+        .select(`id, title, agency, budget, source_url, status`);
 
+      // ✅ PERBAIKAN: Menggunakan .not() dengan format 3 argumen: .not(column, operator, value)
+      if (spse && spse.length > 0) {
+        spse.forEach((site) => {
+            // Kita harus menentukan operator secara eksplisit di sini, yaitu 'ilike'
+            similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.not(
+                "source_url", 
+                "ilike", // Operator yang akan dinegasi
+                `%${site.trim()}%`
+            );
+        });
+      }
+      
       // Wajib: Status (sebagai AND pertama)
       similarTendersOtherSPSEQuery = similarTendersOtherSPSEQuery.or(statusConditions.join(","));
 
