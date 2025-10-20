@@ -107,7 +107,6 @@ export const dailyTenderTrialEmailTemplate = (
   similarTendersOtherSPSE: Tender[],
   similarTendersSameSPSE: Tender[],
   trialEndDate: string
-  // ❌ PERBAIKAN: Parameter 'status: string' yang tidak perlu telah dihapus
 ): string => {
   // Format tanggal hari ini (misalnya: 25 September 2025)
   const today = new Date().toLocaleDateString("id-ID", {
@@ -117,14 +116,51 @@ export const dailyTenderTrialEmailTemplate = (
   });
 
   const mainTenderTable = generateTenderTableHtml(mainTenders);
-  const otherSpseTable = generateTenderTableHtml(
-    similarTendersOtherSPSE,
-    "Tender Serupa di SPSE Lain"
-  );
-  const sameSpseTable = generateTenderTableHtml(
-    similarTendersSameSPSE,
-    "Tender Lain di SPSE Pilihan Anda"
-  );
+
+  // === LOGIKA KONDISIONAL BARU UNTUK TABEL TAMBAHAN ===
+  let additionalTendersHtml = '';
+
+  if (mainTenders.length === 0) {
+    // KASUS 1: mainTenders KOSONG. Tampilkan tabel serupa.
+    const otherSpseTable = generateTenderTableHtml(
+      similarTendersOtherSPSE,
+      "Tender Serupa di SPSE Lain"
+    );
+    const sameSpseTable = generateTenderTableHtml(
+      similarTendersSameSPSE,
+      "Tender Lain di SPSE Pilihan Anda"
+    );
+
+    // Pesan jika kriteria utama tidak menemukan hasil.
+    additionalTendersHtml = `
+            <tr>
+                <td style="padding:0 20px 20px;">
+                    <p style="margin:0;font-size:14px;color:#555;">
+                        Kami tidak menemukan tender yang sesuai dengan kriteria utama Anda hari ini.
+                        Namun, kami menemukan beberapa tender serupa yang mungkin cocok buat Anda. 
+                        Mau ubah keyword atau target SPSE? Hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>.
+                    </p>
+                </td>
+            </tr>
+
+            ${otherSpseTable}
+
+            ${sameSpseTable}
+        `;
+
+  } else {
+    // KASUS 2: mainTenders ADA. HANYA tampilkan pesan kontak.
+    additionalTendersHtml = `
+            <tr>
+                <td style="padding:0 20px 20px;">
+                    <p style="margin:0;font-size:14px;color:#555;">
+                        Mau ubah keyword atau target SPSE? Hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>. 
+                    </p>
+                </td>
+            </tr>
+      `;
+  }
+  // =======================================================
 
   return `
   <!DOCTYPE html>
@@ -197,17 +233,7 @@ export const dailyTenderTrialEmailTemplate = (
 
             ${mainTenderTable}
             
-            <tr>
-                <td style="padding:0 20px 20px;">
-                    <p style="margin:0;font-size:14px;color:#555;">
-                        Mau ubah keyword atau target SPSE? Hubungi&nbsp;<a href="mailto:info@pejuangtender.id" style="color:#0093dd;text-decoration:underline;font-weight:bold;">info@pejuangtender.id</a>. Sementara itu, cek beberapa tender serupa yang mungkin cocok buat Anda.
-                    </p>
-                </td>
-            </tr>
-
-            ${otherSpseTable}
-
-            ${sameSpseTable}
+            ${additionalTendersHtml}
 
             <tr>
               <td style="padding:0 20px 20px;">

@@ -52,10 +52,19 @@ export async function POST(req: NextRequest) {
     const today = new Date();
     const sentEmails: string[] = [];
 
+    // --- Format tanggal hari ini ke ISO string YYYY-MM-DD
+    // Ini penting agar perbandingan tanggal di database akurat.
+    const todayISO = today.toISOString().split('T')[0]; 
+    
+    // =========================================================================
+    // ✅ PERUBAHAN UTAMA: Menambahkan filter .gte('end_date', todayISO)
+    // =========================================================================
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
       .select(`user_id, keyword, category, spse, end_date, users(name, email)`)
-      .eq("payment_status", "free-trial");
+      .eq("payment_status", "free-trial")
+      .gte("end_date", todayISO); 
+    // =========================================================================
 
     if (subsError) {
       console.error("Error fetching Trial subscriptions:", subsError.message);
@@ -67,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     if (!subscriptions || subscriptions.length === 0) {
       return NextResponse.json({
-        message: "No free trial subscriptions found.",
+        message: "No active free trial subscriptions found for today.",
       });
     }
 
@@ -80,6 +89,7 @@ export async function POST(req: NextRequest) {
       }
       
       // --- Filter Conditions Helper ---
+      // Dibuat di luar loop untuk menghindari duplikasi
       const categoryConditions = category?.map((cat) => `category.ilike.%${cat.trim()}%`) || [];
       const spseConditions = spse?.map((site) => `source_url.ilike.%${site.trim()}%`) || [];
       const keywordConditions = keyword?.map((key) => `title.ilike.%${key.trim()}%`) || [];
@@ -97,7 +107,7 @@ export async function POST(req: NextRequest) {
       // ----------------------------------------------------------------------
       let mainTenderQuery = supabase
         .from("lpse_tenders")
-        .select(`id, title, agency, status, budget, source_url`); // ✅ Sudah benar ada status
+        .select(`id, title, agency, status, budget, source_url`); 
 
       if (category && category.length > 0) {
         mainTenderQuery = mainTenderQuery.or(
@@ -117,7 +127,7 @@ export async function POST(req: NextRequest) {
       mainTenderQuery = mainTenderQuery.or(statusConditions.join(","));
       mainTenderQuery = mainTenderQuery
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(20);
 
       const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
 
@@ -164,7 +174,7 @@ export async function POST(req: NextRequest) {
         // ------------------------------------------------------------------------------------------
         let similarTendersSameSPSEQuery = supabase
           .from("lpse_tenders")
-          .select(`id, title, agency, budget, source_url, status`); // ✅ PERBAIKAN: Menambahkan status
+          .select(`id, title, agency, budget, source_url, status`); 
 
         // Wajib: Status (sebagai AND pertama)
         similarTendersSameSPSEQuery = similarTendersSameSPSEQuery.or(statusConditions.join(","));

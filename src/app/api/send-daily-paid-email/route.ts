@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
       mainTenderQuery = mainTenderQuery.or(statusConditions.join(","));
       mainTenderQuery = mainTenderQuery
         .order("created_at", { ascending: false })
-        .limit(5);
+        .limit(20);
 
       const { data: mainTenders, error: mainTendersError } = await mainTenderQuery as SupabaseQueryResult;
 
