@@ -7,6 +7,9 @@ import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./PackagePopupForm.css";
 
+// 🚀 TAMBAHKAN INI
+import { TagsInput } from '@mantine/core'; // <-- Tambahkan impor Mantine TagsInput
+
 // Definisikan tipe untuk fitur paket
 interface PackageFeatures {
   kategori?: number;
@@ -14,6 +17,16 @@ interface PackageFeatures {
   keywords?: number;
   email_notifikasi?: boolean;
   wa_notifikasi?: boolean;
+}
+
+interface AutoFillData {
+    name: string;
+    email: string;
+    whatsapp: string;
+    category: string[];
+    spse: string[];
+    keywords: string[];
+    subscriptionId: string; // Tetap sertakan
 }
 
 // Definisikan tipe untuk data paket
@@ -29,6 +42,8 @@ interface PackagePopupFormProps {
   isOpen: boolean;
   onClose: () => void;
   selectedPackage: SelectedPackage | null;
+  // 🚀 PERUBAHAN: Ganti subscriptionId dengan initialData
+  initialData?: Partial<AutoFillData>; 
 }
 
 interface ExtendedError extends Error {
@@ -40,6 +55,7 @@ interface LpseLocation {
   value: string;
   name: string;
 }
+
 
 // Fungsi untuk mengirim event 'add_to_cart'
 function trackAddToCart(selectedPackage: SelectedPackage) {
@@ -118,6 +134,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
   isOpen,
   onClose,
   selectedPackage,
+  initialData,
 }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -165,12 +182,37 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     };
 
     if (isOpen) {
+      console.log(initialData);
       fetchLpseOptions();
       if (selectedPackage) {
         // ✅ Add the trackAddToCart event here
         trackAddToCart(selectedPackage);
         // ✅ The view_cart event can be triggered here as well
         trackViewCart(selectedPackage);
+      }
+
+      // 🚀 LOGIKA AUTO-FILL
+      if (initialData && Object.keys(initialData).length > 0) {
+          // Hanya isi jika data tersedia
+          setFormData(prev => ({
+              ...prev,
+              name: initialData.name || prev.name,
+              email: initialData.email || prev.email,
+              whatsapp: initialData.whatsapp || prev.whatsapp,
+              category: initialData.category || prev.category,
+              targetSpse: initialData.spse || prev.targetSpse,
+              keywords: initialData.keywords || prev.keywords,
+          }));
+          
+          // Tandai field yang terisi sebagai 'tersentuh' agar validasi segera terlihat (Opsional)
+          setTouchedState({
+              name: !!initialData.name,
+              email: !!initialData.email,
+              whatsapp: !!initialData.whatsapp,
+              category: !!initialData.category,
+              targetSpse: !!initialData.spse,
+              keywords: !!initialData.keywords,
+          });
       }
     } else {
       setFormData({
@@ -200,7 +242,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
       setIsLoading(false);
       setShowProgressBar(false);
     }
-  }, [isOpen, selectedPackage]);
+  }, [isOpen, selectedPackage, initialData])
 
   if (!isOpen || !selectedPackage) return null;
 
@@ -246,25 +288,31 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     handleBlur("targetSpse");
   };
 
-  const handleKeywordChange = (index: number, value: string) => {
-    const newKeywords = [...formData.keywords];
-    newKeywords[index] = value;
-    setFormData((prev) => ({ ...prev, keywords: newKeywords }));
-  };
+  // const handleKeywordChange = (index: number, value: string) => {
+  //   const newKeywords = [...formData.keywords];
+  //   newKeywords[index] = value;
+  //   setFormData((prev) => ({ ...prev, keywords: newKeywords }));
+  // };
 
-  const handleRemoveKeyword = (indexToRemove: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      keywords: prev.keywords.filter((_, i) => i !== indexToRemove),
-    }));
-    handleBlur("keywords");
-  };
+  // const handleRemoveKeyword = (indexToRemove: number) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     keywords: prev.keywords.filter((_, i) => i !== indexToRemove),
+  //   }));
+  //   handleBlur("keywords");
+  // };
 
-  const handleAddKeyword = () => {
-    if (formData.keywords.length < keywordLimit) {
-      setFormData((prev) => ({ ...prev, keywords: [...prev.keywords, ""] }));
-      handleBlur("keywords");
-    }
+  // const handleAddKeyword = () => {
+  //   if (formData.keywords.length < keywordLimit) {
+  //     setFormData((prev) => ({ ...prev, keywords: [...prev.keywords, ""] }));
+  //     handleBlur("keywords");
+  //   }
+  // };
+
+  const handleKeywordUpdate = (newKeywords: string[]) => {
+    // Mantine TagsInput sudah membatasi jumlah tag, tapi kita tetap update state
+    setFormData(prev => ({ ...prev, keywords: newKeywords }));
+    // handleBlur('keywords'); // Panggil blur setelah update state untuk validasi real-time
   };
 
   const handleCategoryChange = (category: string) => {
@@ -311,8 +359,22 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
     setIsLoading(true);
     setShowProgressBar(true);
 
+    // 🚀 Tentukan subscriptionId di sini berdasarkan initialData
+    const subscriptionIdFromInitial = initialData?.subscriptionId;
+
     try {
       const package_id = selectedPackage.id;
+      // Deklarasi di scope yang lebih tinggi
+      let subscription_id_to_use: string;
+      let user_id: string;
+
+      const start_date = new Date();
+      const end_date = new Date();
+      end_date.setMonth(
+        start_date.getMonth() + (selectedPackage.duration_months || 0)
+      );
+
+      // 1. Ambil User ID (Diperlukan untuk kedua alur jika user belum login)
       const { data: existingUsers, error: userError } = await supabase
         .from("users")
         .select("id")
@@ -320,7 +382,6 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
 
       if (userError) throw userError;
 
-      let user_id: string;
       if (existingUsers && existingUsers.length > 0) {
         user_id = existingUsers[0].id;
       } else {
@@ -340,60 +401,85 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         user_id = newUser.id;
       }
 
-      const start_date = new Date();
-      const end_date = new Date();
-      end_date.setMonth(
-        start_date.getMonth() + (selectedPackage.duration_months || 0)
-      );
+      // --- 2. PENENTUAN ALUR (BARU vs PERPANJANGAN) ---
 
-      const { data: subscriptionData, error: subscriptionError } =
-        await supabase
-          .from("subscriptions")
-          .insert([
-            {
-              user_id,
-              package_id,
-              payment_status: "pending",
-              start_date: start_date.toISOString().split("T")[0],
-              end_date: end_date.toISOString().split("T")[0],
-              keyword: formData.keywords,
-              category: formData.category,
-              spse: formData.targetSpse,
-            },
-          ])
-          .select("id")
-          .single();
+      if (subscriptionIdFromInitial) {
+        // --- KASUS 1: PERPANJANGAN (RENEWAL) ---
+        subscription_id_to_use = subscriptionIdFromInitial;
 
-      if (subscriptionError) throw subscriptionError;
+        // 🚀 UPDATE FILTER: Update data filter untuk subscription yang sudah ada
+        const { error: updateSubError } = await supabase
+            .from("subscriptions")
+            .update({ 
+                keyword: formData.keywords,
+                category: formData.category,
+                spse: formData.targetSpse,
+                payment_status: 'pending', 
+            })
+            .eq("id", subscriptionIdFromInitial);
+
+        if (updateSubError) throw updateSubError;
+
+        // Catatan: user_id sudah ditentukan di atas.
+
+      } else {
+        // --- KASUS 2: LANGGANAN BARU (NEW SUBSCRIPTION) ---
+
+        // 🚀 INSERT SUBSCRIPTION BARU
+        const { data: subscriptionData, error: subscriptionError } =
+          await supabase
+            .from("subscriptions")
+            .insert([
+              {
+                user_id,
+                package_id,
+                payment_status: "pending",
+                start_date: start_date.toISOString().split("T")[0],
+                end_date: end_date.toISOString().split("T")[0],
+                keyword: formData.keywords,
+                category: formData.category,
+                spse: formData.targetSpse,
+              },
+            ])
+            .select("id")
+            .single();
+
+        if (subscriptionError) throw subscriptionError;
+
+        // Tetapkan ID yang baru dibuat
+        subscription_id_to_use = subscriptionData.id;
+      }
+
+      // --- 3. PROSES PEMBAYARAN (Invoice Xendit) ---
 
       const basePrice = selectedPackage.price;
       const totalPrice = basePrice * 1.11;
 
-      // ✅ PENAMBAHAN: Format data filter untuk dikirim ke API /api/create-invoice
-    const formattedCategory = formData.category.join(', ').toUpperCase();
-    const formattedSpse = formData.targetSpse.join(', ').toUpperCase();
-    const formattedKeyword = formData.keywords.filter(k => k.trim() !== '').join(', ').toUpperCase() || 'TIDAK ADA';
+      // Format data filter
+      const formattedCategory = formData.category.join(', ').toUpperCase();
+      const formattedSpse = formData.targetSpse.join(', ').toUpperCase();
+      const formattedKeyword = formData.keywords.filter(k => k.trim() !== '').join(', ').toUpperCase() || 'TIDAK ADA';
 
       const response = await fetch("/api/create-invoice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            amount: Math.round(totalPrice),
-            currency: "IDR",
-            customer: {
-                email: formData.email,
-                name: formData.name,
-                whatsapp: formData.whatsapp,
-            },
-            subscriptionId: subscriptionData.id,
-            // ✅ PENAMBAHAN: Kirim data filter ke handler server
-            subscriptionDetails: {
-                category: formattedCategory,
-                spse: formattedSpse,
-                keyword: formattedKeyword,
-            }
+          amount: Math.round(totalPrice),
+          currency: "IDR",
+          customer: {
+            email: formData.email,
+            name: formData.name,
+            whatsapp: formData.whatsapp,
+          },
+          // 🚀 Menggunakan ID yang sudah ditetapkan
+          subscriptionId: subscription_id_to_use,
+          subscriptionDetails: {
+            category: formattedCategory,
+            spse: formattedSpse,
+            keyword: formattedKeyword,
+          }
         }),
-    });
+      });
 
 
       interface InvoiceResponse {
@@ -406,10 +492,12 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
         throw new Error(responseData.error || "Gagal membuat invoice Xendit");
       }
 
+      // 4. Update Payment URL
       const { error: updateError } = await supabase
         .from("subscriptions")
         .update({ payment_url: responseData.invoiceUrl })
-        .eq("id", subscriptionData.id);
+        // 🚀 Menggunakan ID yang sudah ditetapkan
+        .eq("id", subscription_id_to_use);
 
       if (updateError) throw updateError;
 
@@ -587,9 +675,7 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
             </div>
           </div>
 
-          <div
-            className={`package-input-group ${getValidationClass("keywords")}`}
-          >
+          {/* <div className={`package-input-group ${getValidationClass("keywords")}`}>
             <div className="package-field-input">
               <label>Target Kata Kunci (maks {keywordLimit})</label>
               <div
@@ -627,7 +713,41 @@ const PackagePopupForm: React.FC<PackagePopupFormProps> = ({
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
+
+          {/* 🚀 Pengganti Kata Kunci dengan Mantine TagsInput */}
+          {/* <div className={`input-group ${getValidationClass('keywords')}`}> */}
+          {/* Mantine TagsInput memiliki label bawaan, tapi karena Anda
+                            menggunakan styling lama, kita tetap gunakan div wrapper. */}
+          <TagsInput
+            label={`Masukkan Kata Kunci Tender (maks. ${keywordLimit})`}
+
+            // 🚀 PERBAIKAN STYLING DESCRIPTION: Menggunakan <strong>
+            description={
+              <>
+                Gunakan kata dari judul tender yang ingin Anda dapatkan update-nya.
+                <br />
+                Contoh: <strong>jalan, konstruksi, server, aplikasi, sekolah</strong>
+              </>
+            }
+
+            placeholder="Ketik kata kunci lalu tekan Enter..."
+
+            value={formData.keywords}
+            onChange={handleKeywordUpdate}
+            onBlur={() => handleBlur('keywords')}
+
+            maxTags={keywordLimit}
+            error={
+              touchedState.keywords && validationState.keywords === false
+                ? `Minimal 1 kata kunci wajib diisi.`
+                : null
+            }
+
+            name="keywords"
+            size="md"
+            radius="md"
+          />
 
           <input
             type="hidden"

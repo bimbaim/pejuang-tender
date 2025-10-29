@@ -15,6 +15,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 // --- Antarmuka (Interfaces) ---
 interface SubscriptionWithDetails {
+     id: string;
     user_id: string;
     start_date: string;
     end_date: string;
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
         // ✅ Query: Cari langganan yang berakhir tepat 3 hari dari sekarang
         const { data: subscriptions, error: subsError } = await supabase
             .from("subscriptions")
-            .select(`user_id, start_date, end_date, users(name, email)`)
+            .select(`id, user_id, start_date, end_date, users(name, email)`)
             .eq("payment_status", "free-trial")
             .eq("end_date", reminderDateISOString);
 
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest) {
                 data: {
                   name: users.name,
                   trialEndDate: formattedTrialEndDate,
+                  subscription_id: subscription.id
                 }
               }),
             });

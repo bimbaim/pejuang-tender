@@ -1,4 +1,3 @@
-// File: src/components/common/CustomMultiSelect.tsx
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -27,9 +26,30 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   limit,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  // State diinisialisasi dengan defaultValue
   const [selected, setSelected] = useState<string[]>(defaultValue);
   const [searchTerm, setSearchTerm] = useState("");
   const componentRef = useRef<HTMLDivElement>(null);
+
+  // 🚀 PERBAIKAN: Efek untuk menyinkronkan state 'selected' dengan prop 'defaultValue'.
+  // Kita HANYA mereferensikan 'defaultValue' di dependencies untuk mencegah loop.
+  // Untuk perbandingan konten, kita menggunakan fungsi setter dengan nilai sebelumnya.
+  useEffect(() => {
+    // Gunakan fungsi setter untuk mendapatkan nilai 'selected' saat ini
+    setSelected(currentSelected => {
+      // Untuk menghindari re-render yang tidak perlu, bandingkan dulu
+      // Prop yang masuk (defaultValue) dengan state saat ini.
+      // Jika keduanya sama (setelah disortir untuk perbandingan konten),
+      // kembalikan state saat ini.
+      if (JSON.stringify([...currentSelected].sort()) === JSON.stringify([...defaultValue].sort())) {
+        return currentSelected;
+      }
+      
+      // Jika berbeda (data baru dari async load), update state dengan defaultValue
+      return defaultValue;
+    });
+
+  }, [defaultValue]); // Efek ini hanya bergantung pada prop 'defaultValue'
 
   // Close dropdown if click outside
   useEffect(() => {

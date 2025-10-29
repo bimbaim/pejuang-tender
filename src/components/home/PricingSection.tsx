@@ -1,12 +1,9 @@
-// src/components/home/PricingSection.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
 import CheckIcon from "../common/CheckIcon";
 import styles from "./PricingSection.module.css";
-import { supabase } from "@/lib/supabase";
-
-// import {} from '@/types/globals';
+// import { supabase } from "@/lib/supabase"; // 🚫 TIDAK DIGUNAKAN LAGI
 
 // Definisikan tipe untuk fitur paket
 interface Features {
@@ -32,6 +29,10 @@ interface Plan {
 
 interface PricingSectionProps {
   onOpenPackagePopup: (plan: Plan) => void;
+  // 🚀 PERUBAHAN: Menerima data dan status loading sebagai props
+  plansData: Plan[]; 
+  loading: boolean;
+  loadingSubscription?: boolean;
 }
 
 // Fungsi untuk mengirim event ke DataLayer
@@ -45,7 +46,6 @@ const pushViewItemListEvent = (plans: Plan[], duration: number) => {
       item_variant: `${plan.duration_months} Bulan`
     }));
 
-    // The type now correctly includes item_list_id and item_list_name
     window.dataLayer.push({
       event: "view_item_list",
       ecommerce: {
@@ -59,43 +59,33 @@ const pushViewItemListEvent = (plans: Plan[], duration: number) => {
 
 const PricingSection: React.FC<PricingSectionProps> = ({
   onOpenPackagePopup,
+  plansData, // Dari props
+  loading,   // Dari props
 }) => {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  const [loading, setLoading] = useState(true);
+  // 🚫 HAPUS SEMUA STATE & FETCHING LAMA
+
   const [activeTab, setActiveTab] = useState<number>(3); // default 3 bulan
 
+  // Efek untuk mengirim event DataLayer - menggunakan plansData dari props
   useEffect(() => {
-    const fetchPlans = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("packages")
-        .select("*")
-        .order("price", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching plans:", error);
-      } else {
-        setPlans(data as Plan[]);
-      }
-      setLoading(false);
-    };
-
-    fetchPlans();
-  }, []);
-
-  useEffect(() => {
-    if (plans.length > 0) {
-      const filtered = plans.filter((p) => p.duration_months === activeTab);
+    if (plansData.length > 0) {
+      const filtered = plansData.filter((p) => p.duration_months === activeTab);
       pushViewItemListEvent(filtered, activeTab);
     }
-  }, [plans, activeTab]);
+  }, [plansData, activeTab]);
 
-  if (loading) {
+  // 🚀 PERBAIKAN: Hanya satu blok loading check
+  if (loading) { 
     return <p className={styles.loading}>Loading packages...</p>;
   }
 
-  const filteredPlans = plans.filter((p) => p.duration_months === activeTab);
-
+  // 🚀 PERBAIKAN: Deklarasi filteredPlans yang benar
+  const filteredPlans = plansData.filter((p: Plan) => p.duration_months === activeTab);
+  
+  // 🚀 PERBAIKAN: Mengurutkan plansData berdasarkan harga secara ASCENDING (terkecil ke terbesar).
+  // Menggunakan spread operator [...] untuk membuat salinan array agar tidak memodifikasi state props secara langsung.
+  const finalPlans = [...filteredPlans].sort((a, b) => a.price - b.price); 
+  
   const formatPrice = (amount: number) => {
     if (amount >= 1000) {
       const amountInK = amount / 1000;
@@ -114,12 +104,14 @@ const PricingSection: React.FC<PricingSectionProps> = ({
     return list;
   };
 
-  const hardcodedNames = [
+  // Hardcoded names dan highlight harus disesuaikan dengan urutan tampilan: [Prajurit, Komandan, Jendral]
+  const finalHardcodedNames = [
     "Prajurit Tender",
     "Komandan Tender",
     "Jendral Tender",
   ];
-  const hardcodedHighlight = [false, true, false];
+  const finalHardcodedHighlight = [false, true, false];
+
 
   return (
     <section id="paket" className={styles.pricingSection}>
@@ -153,11 +145,14 @@ const PricingSection: React.FC<PricingSectionProps> = ({
             </button>
           </div>
           <div className={styles.pricingCards}>
-            {filteredPlans.map((plan, index) => {
+            {/*
+              ACTION: Menggunakan finalPlans yang sudah diurutkan berdasarkan harga (ascending)
+            */}
+            {finalPlans.map((plan, index) => {
               const customPlan: Plan = {
                 ...plan,
-                name: hardcodedNames[index] ?? plan.name,
-                isHighlighted: hardcodedHighlight[index] ?? false,
+                name: finalHardcodedNames[index] ?? plan.name,
+                isHighlighted: finalHardcodedHighlight[index] ?? false,
               };
 
               return (

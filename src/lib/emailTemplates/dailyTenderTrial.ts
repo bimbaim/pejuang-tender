@@ -106,7 +106,8 @@ export const dailyTenderTrialEmailTemplate = (
   mainTenders: Tender[],
   similarTendersOtherSPSE: Tender[],
   similarTendersSameSPSE: Tender[],
-  trialEndDate: string
+  trialEndDate: string,
+  subscription_id: string
 ): string => {
   // Format tanggal hari ini (misalnya: 25 September 2025)
   const today = new Date().toLocaleDateString("id-ID", {
@@ -258,7 +259,7 @@ export const dailyTenderTrialEmailTemplate = (
 
             <tr>
               <td align="center" style="padding:10px 20px 30px;">
-                    <a href="${BASE_URL}/#paket" class="btn" 
+                    <a href="${BASE_URL}/?subscription_id=${subscription_id}" class="btn"
                       style="display:inline-block;padding:12px 25px;background:#0093dd;color:#fff;
                               text-decoration:none;border-radius:8px;font-weight:bold;
                               width:auto;max-width:100%;text-align:center;">

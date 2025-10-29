@@ -1,3 +1,4 @@
+// File: src/components/common/TrialPopupForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -5,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import CustomMultiSelect from "@/components/common/CustomMultiSelect";
 import "./TrialPopupForm.css";
+
+// 🚀 TAMBAHKAN INI
+import { TagsInput } from '@mantine/core'; // <-- Tambahkan impor Mantine TagsInput
 
 // ✅ [BARU] Import definisi tipe dari file global.d.ts Anda
 // Secara teknis, ini tidak perlu karena 'declare global' membuatnya tersedia,
@@ -183,28 +187,34 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     handleBlur('category');
   };
 
-  const handleKeywordChange = (index: number, value: string) => {
-    const newKeywords = [...formData.keywords];
-    newKeywords[index] = value;
-    setFormData(prev => ({ ...prev, keywords: newKeywords }));
-  };
-  
-  const handleRemoveKeyword = (indexToRemove: number) => {
-    const newKeywords = formData.keywords.filter((_, index) => index !== indexToRemove);
-    setFormData(prev => ({ ...prev, keywords: newKeywords }));
-    handleBlur('keywords');
-  };
-  
-  const handleAddKeyword = () => {
-    if (formData.keywords.length < keywordLimit) {
-      setFormData(prev => ({ ...prev, keywords: [...prev.keywords, ""] }));
-      handleBlur('keywords');
-    }
-  };
-  
+  // const handleKeywordChange = (index: number, value: string) => {
+  //   const newKeywords = [...formData.keywords];
+  //   newKeywords[index] = value;
+  //   setFormData(prev => ({ ...prev, keywords: newKeywords }));
+  // };
+
+  // const handleRemoveKeyword = (indexToRemove: number) => {
+  //   const newKeywords = formData.keywords.filter((_, index) => index !== indexToRemove);
+  //   setFormData(prev => ({ ...prev, keywords: newKeywords }));
+  //   handleBlur('keywords');
+  // };
+
+  // const handleAddKeyword = () => {
+  //   if (formData.keywords.length < keywordLimit) {
+  //     setFormData(prev => ({ ...prev, keywords: [...prev.keywords, ""] }));
+  //     handleBlur('keywords');
+  //   }
+  // };
+
   const handleLpseChange = (selectedValues: string[]) => {
     setFormData(prev => ({ ...prev, targetSpse: selectedValues }));
     handleBlur('targetSpse');
+  };
+
+  const handleKeywordUpdate = (newKeywords: string[]) => {
+    // Mantine TagsInput sudah membatasi jumlah tag, tapi kita tetap update state
+    setFormData(prev => ({ ...prev, keywords: newKeywords }));
+    // handleBlur('keywords'); // Panggil blur setelah update state untuk validasi real-time
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -219,7 +229,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       targetSpse: true,
       keywords: true,
     });
-    
+
     // Jalankan validasi terakhir
     const formValidationResult = validateForm(formData);
     setValidationState(formValidationResult);
@@ -256,23 +266,23 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       if (userError) throw userError;
 
       if (existingUsers && existingUsers.length > 0) {
-            // If a user with this email exists, check for an existing trial subscription.
-            const existingUserId = existingUsers[0].id;
-            const { data: existingSubscription, error: subError } = await supabase
-              .from("subscriptions")
-              .select("id")
-              .eq("user_id", existingUserId)
-              .eq("payment_status", "free-trial");
+        // If a user with this email exists, check for an existing trial subscription.
+        const existingUserId = existingUsers[0].id;
+        const { data: existingSubscription, error: subError } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", existingUserId)
+          .eq("payment_status", "free-trial");
 
-            if (subError) throw subError;
+        if (subError) throw subError;
 
-            if (existingSubscription && existingSubscription.length > 0) { // Cek apakah ada langganan trial
-              setNotification("Email ini sudah terdaftar untuk trial gratis. Silakan pilih paket berbayar atau hubungi customer service.");
-              // onClose(); // Close the form
-              return; // Stop the function from proceeding
-            }
-            user_id = existingUserId; // Use existing user_id if they don't have a trial yet
-          } else {
+        if (existingSubscription && existingSubscription.length > 0) { // Cek apakah ada langganan trial
+          setNotification("Email ini sudah terdaftar untuk trial gratis. Silakan pilih paket berbayar atau hubungi customer service.");
+          // onClose(); // Close the form
+          return; // Stop the function from proceeding
+        }
+        user_id = existingUserId; // Use existing user_id if they don't have a trial yet
+      } else {
         const { data: newUser, error: insertUserError } = await supabase
           .from("users")
           .insert([
@@ -296,7 +306,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         month: "long",
         year: "numeric",
       });
-      
+
       // ✅ [MODIFIKASI] Ambil ID dari langganan yang baru dibuat
       const { data: newSubscription, error: subscriptionError } = await supabase
         .from("subscriptions")
@@ -316,18 +326,18 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         .single(); // Asumsikan hanya satu yang dimasukkan
 
       if (subscriptionError) throw subscriptionError;
-      
+
       // ✅ [BARU] Dapatkan ID langganan
       const subscriptionId = newSubscription?.id;
-      
+
       if (!subscriptionId) {
-          throw new Error("Gagal mendapatkan ID langganan baru.");
+        throw new Error("Gagal mendapatkan ID langganan baru.");
       }
 
       // Format data untuk dikirim ke template email
       const formattedCategory = formData.category.toUpperCase();
       // Mengubah array SPSE menjadi string (dipisahkan koma dan di-uppercase)
-      const formattedSpse = formData.targetSpse.join(', ').toUpperCase(); 
+      const formattedSpse = formData.targetSpse.join(', ').toUpperCase();
       // Mengubah array Keyword menjadi string (dipisahkan koma dan di-uppercase)
       const formattedKeyword = formData.keywords.filter(k => k.trim() !== '').join(', ').toUpperCase() || 'TIDAK ADA';
 
@@ -359,18 +369,18 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
 
         // --- Langkah 2: Kirim Email Notifikasi Tambahan (ke info@pejuangtender.id) ---
         // Email ini terpisah dan memiliki tujuan yang berbeda (notifikasi internal)
-         const notificationResponse = await fetch("/api/sendgrid", {
+        const notificationResponse = await fetch("/api/sendgrid", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            to: ["info@pejuangtender.id", "info@whello.id", "finance@whello.id"], 
+            to: ["info@pejuangtender.id", "info@whello.id", "finance@whello.id"],
             subject: `NOTIFIKASI: Pendaftaran Trial Baru oleh ${formData.name}`,
-            templateName: "internalNotification", 
+            templateName: "internalNotification",
             data: {
               name: formData.name,
-              email: formData.email, 
+              email: formData.email,
               trialEndDate: endDateFormatted,
               // ✅ PENAMBAHAN: Kirim data pilihan pengguna
               category: formattedCategory,
@@ -379,7 +389,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             },
           }),
         });
-        
+
         // Periksa status pengiriman email notifikasi
         if (!notificationResponse.ok) {
           const errorData = await notificationResponse.json();
@@ -388,12 +398,12 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
         }
 
         console.log("Email notifikasi berhasil dikirim ke info@pejuangtender.id!");
-        
-    } catch (apiError: unknown) {
+
+      } catch (apiError: unknown) {
         const err = apiError as ExtendedError;
         // Log error dari salah satu dari dua panggilan API
         console.error("Gagal mengirim salah satu atau kedua email via API:", err.message);
-    }
+      }
 
       onClose();
       // ✅ [MODIFIKASI] Redirect dengan subscription_id sebagai query parameter
@@ -403,7 +413,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
       console.error("Error creating trial account:", err.message);
       alert(
         "❌ Terjadi kesalahan saat mendaftar akun trial, silakan coba lagi: " +
-          err.message
+        err.message
       );
     }
   };
@@ -412,12 +422,12 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
     value: lpse.value,
     label: lpse.name,
   }));
-  
+
   const getValidationClass = (field: keyof typeof validationState) => {
     // Validasi hanya jika field sudah disentuh DAN status validasinya tidak null
     const state = validationState[field];
     const isTouched = touchedState[field];
-    
+
     if (isTouched && state !== null) {
       return state === true ? 'valid' : 'invalid';
     }
@@ -427,7 +437,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
   return (
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup-content" onClick={(e) => e.stopPropagation()}>
-         {notification && (
+        {notification && (
           <div className="notification">
             <p>{notification}</p>
           </div>
@@ -554,7 +564,7 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Kata Kunci */}
-            <div className={`input-group ${getValidationClass('keywords')}`}>
+            {/* <div className={`input-group ${getValidationClass('keywords')}`}>
               <label>Target Kata Kunci (maks {keywordLimit})</label>
               <div className="keywords-input-area" onBlur={() => handleBlur('keywords')}>
                 {formData.keywords.map((keyword, index) => (
@@ -590,7 +600,43 @@ const PopupForm: React.FC<PopupFormProps> = ({ isOpen, onClose }) => {
                   Maksimal {keywordLimit} kata kunci
                 </p>
               )}
-            </div>
+            </div> */}
+
+            {/* 🚀 Pengganti Kata Kunci dengan Mantine TagsInput */}
+            {/* <div className={`input-group ${getValidationClass('keywords')}`}> */}
+            {/* Mantine TagsInput memiliki label bawaan, tapi karena Anda
+                  menggunakan styling lama, kita tetap gunakan div wrapper. */}
+            <TagsInput
+              label={`Masukkan Kata Kunci Tender (maks. ${keywordLimit})`}
+
+              // 🚀 PERBAIKAN STYLING DESCRIPTION: Menggunakan <strong>
+              description={
+                <>
+                  Gunakan kata dari judul tender yang ingin Anda dapatkan update-nya.
+                  <br />
+                  Contoh: <strong>jalan, konstruksi, server, aplikasi, sekolah</strong>
+                </>
+              }
+
+              placeholder="Ketik kata kunci lalu tekan Enter..."
+
+              value={formData.keywords}
+              onChange={handleKeywordUpdate}
+              onBlur={() => handleBlur('keywords')}
+
+              maxTags={keywordLimit}
+              error={
+                touchedState.keywords && validationState.keywords === false
+                  ? `Minimal 1 kata kunci wajib diisi.`
+                  : null
+              }
+
+              name="keywords"
+              size="md"
+              radius="md"
+            />
+            {/* </div> */}
+            {/* ⚠️ Catatan: Anda mungkin perlu menghapus CSS terkait .keywords-input-area di TrialPopupForm.css */}
 
             {/* Submit */}
             <button type="submit" className="submit-button">

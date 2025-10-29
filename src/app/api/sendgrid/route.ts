@@ -101,7 +101,8 @@ export async function POST(req: Request) {
           data.mainTenders,
           data.similarTendersOtherSPSE,
           data.similarTendersSameSPSE,
-          data.trialEndDate
+          data.trialEndDate,
+          data.subscription_id 
         );
         break;
 
@@ -149,7 +150,7 @@ export async function POST(req: Request) {
             { status: 400 }
           );
         }
-        emailBody = reminderTrialEmailTemplate(data.name, data.trialEndDate);
+        emailBody = reminderTrialEmailTemplate(data.name, data.trialEndDate, data.subscription_id);
         break;
 
       case "reminderPaid":

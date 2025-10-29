@@ -1,9 +1,13 @@
-// app/layout.tsx
+// src/app/layout.tsx
 
 import type { Metadata } from 'next';
 import { Saira } from 'next/font/google';
 import { Quicksand } from 'next/font/google';
 import './globals.css';
+
+// 🚀 Tambahan Mantine
+import '@mantine/core/styles.css'; // WAJIB: Import CSS Mantine
+import { MantineProviderWrapper } from './providers/MantineProviderWrapper'; // Import Provider
 
 // Import kedua komponen
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
@@ -27,7 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${saira.className} ${quicksand.className}`}>
-        {children}
+        {/* 🚀 Bungkus children dengan MantineProviderWrapper */}
+        <MantineProviderWrapper>
+          {children}
+        </MantineProviderWrapper>
       </body>
       
       {/* Tambahkan Google Tag Manager */}

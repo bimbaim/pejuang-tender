@@ -15,6 +15,7 @@ console.log("Using Service Role Key:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 // --- Antarmuka (Interfaces) ---
 interface SubscriptionWithDetails {
+  id: string;
   user_id: string;
   keyword: string[] | null;
   category: string[] | null;
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
     // =========================================================================
     const { data: subscriptions, error: subsError } = await supabase
       .from("subscriptions")
-      .select(`user_id, keyword, category, spse, end_date, users(name, email)`)
+      .select(`id, user_id, keyword, category, spse, end_date, users(name, email)`)
       .eq("payment_status", "free-trial")
       .gte("end_date", todayISO); 
     // =========================================================================
@@ -231,7 +232,8 @@ export async function POST(req: NextRequest) {
             mainTenders: mainTenders || [],
             similarTendersOtherSPSE: similarTendersOtherSPSE || [],
             similarTendersSameSPSE: similarTendersSameSPSE || [],
-            trialEndDate: subscription.end_date, 
+            trialEndDate: subscription.end_date,
+            subscription_id: subscription.id
           },
         }),
       });
