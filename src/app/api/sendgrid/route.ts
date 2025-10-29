@@ -168,7 +168,8 @@ export async function POST(req: Request) {
         emailBody = reminderPaidEmailTemplate(
           data.name,
           data.packageName,
-          data.subscriptionEndDate
+          data.subscriptionEndDate,
+          data.subscription_id
         );
         break;
 

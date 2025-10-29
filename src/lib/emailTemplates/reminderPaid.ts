@@ -11,7 +11,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://pejuang-tender.verc
  * @param subscriptionEndDate The end date of the user's subscription.
  * @returns The complete HTML string for the email.
  */
-export const reminderPaidEmailTemplate = (name: string, packageName: string, subscriptionEndDate: string): string => {
+export const reminderPaidEmailTemplate = (name: string, packageName: string, subscriptionEndDate: string, subscription_id: string ): string => {
   return `
   <!DOCTYPE html>
   <html lang="id">
@@ -112,7 +112,7 @@ export const reminderPaidEmailTemplate = (name: string, packageName: string, sub
 
             <tr>
               <td align="center" style="padding:10px 20px 30px;">
-                    <a href="${BASE_URL}/#paket" class="btn" 
+                     <a href="${BASE_URL}/?subscription_id=${subscription_id}" class="btn"
                       style="display:inline-block;padding:12px 25px;background:#0093dd;color:#fff;
                               text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;
                               width:auto;max-width:100%;text-align:center;">

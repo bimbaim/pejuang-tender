@@ -15,6 +15,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 // --- Antarmuka (Interfaces) ---
 interface SubscriptionWithDetails {
+    id: string;
     user_id: string;
     package_id: string; // ✅ Ditambahkan: package_id
     start_date: string;
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
         // ✅ Query: Tambahkan `package_id` pada select
         const { data: subscriptions, error: subsError } = await supabase
             .from("subscriptions")
-            .select(`user_id, package_id, start_date, end_date, users(name, email)`)
+            .select(`id, user_id, keyword, category, spse, end_date, users(name, email)`)
             .eq("payment_status", "paid")
             .eq("end_date", reminderDateISOString);
 
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
                   // ✅ Mengirimkan nama paket ke template email
                   packageName: packageName, 
                   subscriptionEndDate: formattedSubscriptionEndDate,
+                    subscription_id: subscription.id
                 }
               }),
             });
